@@ -26,9 +26,9 @@
 spring:
   # ── Railway PostgreSQL / Railway PostgreSQL ────────────────────────────────
   datasource:
-    url: ${DATABASE_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=require
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       # Connection pool tuned for Railway's free tier / Verbindungspool für Railway Free Tier optimiert
