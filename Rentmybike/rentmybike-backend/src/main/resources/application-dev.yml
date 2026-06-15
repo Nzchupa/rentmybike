@@ -1,0 +1,59 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# RentMyBike — Development Profile
+# RentMyBike — Entwicklungsprofil
+#
+# Active when: SPRING_PROFILES_ACTIVE=dev (default for local development)
+# Aktiv wenn: SPRING_PROFILES_ACTIVE=dev (Standard für lokale Entwicklung)
+#
+# To activate: add to your IDE run configuration or .env file:
+# Zum Aktivieren: zu IDE-Startkonfiguration oder .env-Datei hinzufügen:
+#   SPRING_PROFILES_ACTIVE=dev
+# ══════════════════════════════════════════════════════════════════════════════
+
+spring:
+  # ── Local PostgreSQL / Lokales PostgreSQL ──────────────────────────────────
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/rentmybike_dev}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  # ── Dev JPA — show SQL for debugging / SQL für Debugging anzeigen ──────────
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # ── Mailtrap — catches all emails in dev, nothing reaches real inboxes
+  # ── Mailtrap — fängt alle E-Mails in dev ab, nichts erreicht echte Postfächer
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    port: 2525
+    username: ${MAILTRAP_USERNAME:your-mailtrap-username}
+    password: ${MAILTRAP_PASSWORD:your-mailtrap-password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# ── Dev-specific App overrides / Entwicklungsspezifische App-Überschreibungen
+app:
+  frontend-url: http://localhost:3000
+  auto-verify-email: true   # Skip email verification in dev / E-Mail-Verifizierung in dev überspringen
+  secure-cookie: false      # HTTP localhost / HTTP localhost
+  jwt:
+    # Shorter secret is fine for dev / Kürzeres Secret ist für dev in Ordnung
+    secret: dev-secret-key-only-for-local-development-not-for-production-1234
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Dev Logging / Entwicklungs-Logging
+# ══════════════════════════════════════════════════════════════════════════════
+logging:
+  level:
+    com.rentmybike: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE

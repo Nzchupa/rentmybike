@@ -1,0 +1,69 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# RentMyBike — Production Profile (Railway)
+# RentMyBike — Produktionsprofil (Railway)
+#
+# Active when: SPRING_PROFILES_ACTIVE=prod
+# Aktiv wenn: SPRING_PROFILES_ACTIVE=prod
+#
+# ALL sensitive values come from Railway environment variables.
+# ALLE sensiblen Werte kommen aus Railway-Umgebungsvariablen.
+# NEVER hardcode secrets here! / NIEMALS Geheimnisse hier hardcoden!
+#
+# Required Railway env vars / Erforderliche Railway-Umgebungsvariablen:
+#   DATABASE_URL        — PostgreSQL connection URL (Railway provides this)
+#   DB_USERNAME         — database username / Datenbankbenutzername
+#   DB_PASSWORD         — database password / Datenbankpasswort
+#   JWT_SECRET          — min 64 chars random string / mind. 64 Zeichen zufälliger String
+#   CLOUDINARY_CLOUD_NAME
+#   CLOUDINARY_API_KEY
+#   CLOUDINARY_API_SECRET
+#   SMTP_HOST           — e.g. smtp.resend.com or smtp.mailgun.org
+#   SMTP_USERNAME
+#   SMTP_PASSWORD
+#   FRONTEND_URL        — e.g. https://rentmybike.vercel.app
+# ══════════════════════════════════════════════════════════════════════════════
+
+spring:
+  # ── Railway PostgreSQL / Railway PostgreSQL ────────────────────────────────
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      # Connection pool tuned for Railway's free tier / Verbindungspool für Railway Free Tier optimiert
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # ── Production JPA — no SQL logging / Kein SQL-Logging in der Produktion ───
+  jpa:
+    show-sql: false
+
+  # ── Production SMTP (Resend / Mailgun) / Produktions-SMTP ─────────────────
+  mail:
+    host: ${SMTP_HOST}
+    port: 587
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Production Logging — errors only / Nur Fehler in der Produktion
+# ══════════════════════════════════════════════════════════════════════════════
+app:
+  secure-cookie: true   # HTTPS only in production / Nur HTTPS in der Produktion
+
+logging:
+  level:
+    root: WARN
+    com.rentmybike: INFO
+    org.springframework.security: WARN

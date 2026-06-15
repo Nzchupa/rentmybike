@@ -1,0 +1,29 @@
+# Maven
+target/
+*.class
+*.jar
+*.war
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Logs
+*.log
+logs/
+
+# Environment / secrets — NEVER commit these
+.env
+.env.local
+.env.*.local
+application-local.yml
+application-local.properties
+
+# OS
+.DS_Store
+Thumbs.db

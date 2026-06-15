@@ -1,0 +1,281 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "confirm": "Confirm",
+    "back": "Back",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "clearFilters": "Clear filters",
+    "noResults": "No results found",
+    "perDay": "/ day",
+    "from": "From",
+    "to": "To",
+    "days": "{count, plural, one {# day} other {# days}}",
+    "total": "Total"
+  },
+  "nav": {
+    "home": "Home",
+    "bikes": "Browse Bikes",
+    "dashboard": "Dashboard",
+    "admin": "Admin",
+    "login": "Log in",
+    "register": "Sign up",
+    "logout": "Log out",
+    "myProfile": "My Profile"
+  },
+  "home": {
+    "hero": {
+      "title": "Rent a Bike, Explore Your City",
+      "subtitle": "The peer-to-peer marketplace to rent bikes from locals. Affordable, flexible, eco-friendly.",
+      "cta": "Browse Bikes",
+      "ctaOwner": "List Your Bike"
+    },
+    "features": {
+      "title": "Why RentMyBike?",
+      "peer": "Peer-to-peer",
+      "peerDesc": "Rent directly from local owners. No middleman, fair prices.",
+      "flexible": "Flexible dates",
+      "flexibleDesc": "Book for a day, a week, or longer. Cancel anytime before acceptance.",
+      "trusted": "Trusted community",
+      "trustedDesc": "Verified reviews from real renters and owners."
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Log in to your RentMyBike account",
+      "email": "Email address",
+      "password": "Password",
+      "submit": "Log in",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up"
+    },
+    "register": {
+      "title": "Create your account",
+      "subtitle": "Join RentMyBike and start riding",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email address",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "signIn": "Log in",
+      "termsNote": "By signing up you agree to our Terms of Service."
+    },
+    "verify": {
+      "title": "Verify your email",
+      "pendingTitle": "Check your inbox",
+      "pendingMessage": "We sent a verification link to {email}. Click it to activate your account.",
+      "successTitle": "Email verified!",
+      "successMessage": "Your email has been verified. You can now log in.",
+      "errorTitle": "Verification failed",
+      "errorMessage": "The link is invalid or has expired. Please register again.",
+      "goToLogin": "Go to login"
+    },
+    "errors": {
+      "invalidCredentials": "Invalid email or password",
+      "emailTaken": "This email is already registered",
+      "passwordMismatch": "Passwords do not match",
+      "weakPassword": "Password must be at least 8 characters",
+      "accountLocked": "Your account has been suspended. Contact support.",
+      "emailNotVerified": "Please verify your email before logging in."
+    }
+  },
+  "bikes": {
+    "search": {
+      "placeholder": "City or location...",
+      "category": "Category",
+      "allCategories": "All categories",
+      "minPrice": "Min price",
+      "maxPrice": "Max price",
+      "priceRange": "Price range (€/day)"
+    },
+    "categories": {
+      "CITY": "City",
+      "MOUNTAIN": "Mountain",
+      "ROAD": "Road",
+      "ELECTRIC": "Electric",
+      "HYBRID": "Hybrid",
+      "CARGO": "Cargo",
+      "KIDS": "Kids"
+    },
+    "card": {
+      "perDay": "/ day",
+      "viewDetails": "View details"
+    },
+    "detail": {
+      "bookNow": "Book now",
+      "owner": "Owner",
+      "location": "Location",
+      "description": "Description",
+      "photos": "Photos",
+      "reviews": "Reviews",
+      "noReviews": "No reviews yet",
+      "available": "Available",
+      "unavailable": "Not available",
+      "pendingApproval": "Pending approval",
+      "pricePerDay": "Price per day"
+    },
+    "approvalStatus": {
+      "PENDING": "Pending review",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected"
+    }
+  },
+  "booking": {
+    "form": {
+      "title": "Book this bike",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "message": "Message to owner (optional)",
+      "messagePlaceholder": "Tell the owner about your plans...",
+      "summary": "Booking summary",
+      "days": "{count, plural, one {# day} other {# days}}",
+      "pricePerDay": "Price per day",
+      "totalPrice": "Total price",
+      "submit": "Send booking request",
+      "loginRequired": "Please log in to book"
+    },
+    "status": {
+      "PENDING": "Pending",
+      "ACCEPTED": "Accepted",
+      "REJECTED": "Rejected",
+      "CANCELLED": "Cancelled",
+      "COMPLETED": "Completed"
+    },
+    "errors": {
+      "dateConflict": "These dates are already booked",
+      "selfBooking": "You cannot book your own bike",
+      "pastDate": "Start date must be in the future",
+      "endBeforeStart": "End date must be after start date"
+    },
+    "actions": {
+      "accept": "Accept",
+      "reject": "Reject",
+      "cancel": "Cancel booking",
+      "complete": "Mark as completed"
+    },
+    "cancelConfirm": "Are you sure you want to cancel this booking?",
+    "acceptConfirm": "Accept this booking request?",
+    "rejectConfirm": "Reject this booking request?"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "tabs": {
+      "overview": "Overview",
+      "myBikes": "My Bikes",
+      "asRenter": "As Renter",
+      "asOwner": "As Owner",
+      "profile": "Profile"
+    },
+    "bikes": {
+      "title": "My Bikes",
+      "addBike": "Add a bike",
+      "noBikes": "You haven't listed any bikes yet.",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this bike? This cannot be undone.",
+      "photos": "Photos",
+      "addPhoto": "Add photo",
+      "maxPhotos": "Maximum 5 photos per bike"
+    },
+    "bikeForm": {
+      "createTitle": "List a new bike",
+      "editTitle": "Edit bike",
+      "title": "Title",
+      "description": "Description",
+      "category": "Category",
+      "pricePerDay": "Price per day (€)",
+      "city": "City",
+      "address": "Address (optional)",
+      "available": "Available for rent",
+      "submit": "Save bike",
+      "titlePlaceholder": "e.g. Red Trek city bike",
+      "descriptionPlaceholder": "Describe your bike — condition, accessories, suitable for...",
+      "hints": {
+        "pending": "Your bike will be reviewed by our team before going live (usually within 24h).",
+        "resetToApproval": "Editing content will send the bike back for review."
+      }
+    },
+    "profile": {
+      "title": "My Profile",
+      "avatar": "Profile photo",
+      "changeAvatar": "Change photo",
+      "fullName": "Full name",
+      "email": "Email",
+      "phone": "Phone number",
+      "saveChanges": "Save changes",
+      "changePassword": "Change password",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmNewPassword": "Confirm new password"
+    }
+  },
+  "reviews": {
+    "title": "Reviews",
+    "writeReview": "Write a review",
+    "rating": "Rating",
+    "comment": "Your review",
+    "commentPlaceholder": "Share your experience...",
+    "submitReview": "Submit review",
+    "renterToOwner": "Review for owner",
+    "ownerToRenter": "Review for renter",
+    "averageRating": "{rating} out of 5",
+    "reviewCount": "{count, plural, one {# review} other {# reviews}}"
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "stats": {
+      "title": "Platform Statistics",
+      "totalUsers": "Total Users",
+      "bannedUsers": "Banned Users",
+      "totalBikes": "Total Bikes",
+      "pendingBikes": "Pending Review",
+      "approvedBikes": "Approved Bikes",
+      "totalBookings": "Total Bookings",
+      "completedBookings": "Completed",
+      "totalRevenue": "Gross Revenue"
+    },
+    "users": {
+      "title": "User Management",
+      "searchPlaceholder": "Search by name or email...",
+      "ban": "Ban",
+      "unban": "Unban",
+      "delete": "Delete",
+      "banConfirm": "Ban this user? They will be locked out immediately.",
+      "deleteConfirm": "Delete this user account? This cannot be undone.",
+      "role": "Role",
+      "status": "Status",
+      "active": "Active",
+      "banned": "Banned"
+    },
+    "bikes": {
+      "title": "Bike Moderation",
+      "approve": "Approve",
+      "reject": "Reject",
+      "rejectReason": "Rejection reason",
+      "rejectReasonPlaceholder": "Explain why this bike is rejected (min. 10 characters)...",
+      "filter": {
+        "all": "All",
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      }
+    }
+  },
+  "errors": {
+    "404": "Page not found",
+    "403": "Access denied",
+    "500": "Server error",
+    "networkError": "Network error — is the backend running?",
+    "goHome": "Go home"
+  }
+}

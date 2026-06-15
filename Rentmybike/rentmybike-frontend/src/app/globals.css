@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+@layer base {
+  :root {
+    --background: 255 255 255;
+    --foreground: 15 23 42;
+  }
+
+  .dark {
+    --background: 15 23 42;
+    --foreground: 241 245 249;
+  }
+
+  body {
+    @apply bg-white text-slate-900 antialiased;
+    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  * {
+    @apply border-slate-200;
+  }
+}
+
+@layer components {
+  /* Reusable card shell */
+  .card {
+    @apply rounded-2xl bg-white border border-slate-200 shadow-sm;
+  }
+
+  /* Section heading */
+  .section-title {
+    @apply text-2xl font-bold text-slate-900;
+  }
+
+  /* Form label */
+  .label {
+    @apply block text-sm font-medium text-slate-700 mb-1;
+  }
+
+  /* Form field error */
+  .field-error {
+    @apply text-xs text-red-600 mt-1;
+  }
+}

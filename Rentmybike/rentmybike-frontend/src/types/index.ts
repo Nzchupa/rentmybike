@@ -1,0 +1,254 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Shared / Allgemein
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Backend generic wrapper — matches ApiResponse<T> */
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string | null;
+  data: T;
+  timestamp: string;
+}
+
+/** Paginated result — matches PageResponse<T> */
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// User / Benutzer
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type UserRole = "USER" | "ADMIN";
+
+export interface UserProfileResponse {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  phone: string | null;
+  avatarUrl: string | null;
+  role: UserRole;
+  emailVerified: boolean;
+  createdAt: string;
+}
+
+export interface PublicUserResponse {
+  id: string;
+  fullName: string;
+  avatarUrl: string | null;
+  createdAt: string;
+  averageRating: number;
+  reviewCount: number;
+}
+
+export interface UpdateProfileRequest {
+  firstName: string;
+  lastName: string;
+  phone?: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Auth / Authentifizierung
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
+/** Shape returned by POST /api/auth/login and POST /api/auth/refresh */
+export interface AuthResponse {
+  userId: string;
+  fullName: string;
+  email: string;
+  role: UserRole;
+  avatarUrl: string | null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Bike / Fahrrad
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type BikeCategory =
+  | "CITY"
+  | "MOUNTAIN"
+  | "ROAD"
+  | "ELECTRIC"
+  | "HYBRID"
+  | "CARGO"
+  | "KIDS";
+
+export type ApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
+
+export interface BikePhotoResponse {
+  id: string;
+  url: string;
+  displayOrder: number;
+  primary: boolean;
+}
+
+export interface BikeResponse {
+  id: string;
+  ownerId: string;
+  ownerName: string;
+  ownerAvatarUrl: string | null;
+  title: string;
+  description: string;
+  category: BikeCategory;
+  pricePerDay: number;
+  city: string;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  available: boolean;
+  approvalStatus: ApprovalStatus;
+  rejectionReason: string | null;
+  primaryPhotoUrl: string | null;
+  photos: BikePhotoResponse[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateBikeRequest {
+  title: string;
+  description: string;
+  category: BikeCategory;
+  pricePerDay: number;
+  city: string;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+}
+
+export interface UpdateBikeRequest extends CreateBikeRequest {
+  available: boolean;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Booking / Buchung
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type BookingStatus =
+  | "PENDING"
+  | "ACCEPTED"
+  | "REJECTED"
+  | "CANCELLED"
+  | "COMPLETED";
+
+export interface BookingResponse {
+  id: string;
+  bikeId: string;
+  bikeTitle: string;
+  bikeCity: string;
+  bikePrimaryPhotoUrl: string | null;
+  renterId: string;
+  renterName: string;
+  renterAvatarUrl: string | null;
+  ownerId: string;
+  ownerName: string;
+  ownerAvatarUrl: string | null;
+  startDate: string;   // ISO date: "2025-06-01"
+  endDate: string;
+  rentalDays: number;
+  totalPrice: number;
+  status: BookingStatus;
+  message: string | null;
+  cancellable: boolean;
+  reviewable: boolean;
+  createdAt: string;
+}
+
+export interface CreateBookingRequest {
+  bikeId: string;
+  startDate: string;   // ISO date
+  endDate: string;
+  message?: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Review / Bewertung
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type ReviewType = "RENTER_TO_OWNER" | "OWNER_TO_RENTER";
+
+export interface ReviewResponse {
+  id: string;
+  bookingId: string;
+  type: ReviewType;
+  reviewerId: string;
+  reviewerName: string;
+  reviewerAvatarUrl: string | null;
+  revieweeId: string;
+  revieweeName: string;
+  rating: number;
+  comment: string | null;
+  createdAt: string;
+}
+
+export interface CreateReviewRequest {
+  bookingId: string;
+  type: ReviewType;
+  rating: number;
+  comment?: string;
+}
+
+export interface UserRatingResponse {
+  averageRating: number;
+  reviewCount: number;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Admin / Administration
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface AdminUserResponse {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string | null;
+  avatarUrl: string | null;
+  role: UserRole;
+  emailVerified: boolean;
+  banned: boolean;
+  bannedAt: string | null;
+  createdAt: string;
+  deletedAt: string | null;
+}
+
+export interface AdminStatsResponse {
+  totalUsers: number;
+  bannedUsers: number;
+  totalAdmins: number;
+  totalBikes: number;
+  pendingBikes: number;
+  approvedBikes: number;
+  rejectedBikes: number;
+  totalBookings: number;
+  pendingBookings: number;
+  acceptedBookings: number;
+  completedBookings: number;
+  cancelledBookings: number;
+  rejectedBookings: number;
+  totalRevenue: number;
+}

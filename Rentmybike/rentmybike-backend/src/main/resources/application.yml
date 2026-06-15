@@ -1,0 +1,86 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# RentMyBike — Base Application Configuration
+# RentMyBike — Basis-Anwendungskonfiguration
+#
+# This file contains settings shared across ALL profiles (dev + prod).
+# Diese Datei enthält Einstellungen, die für ALLE Profile gelten (dev + prod).
+# Profile-specific overrides are in application-dev.yml and application-prod.yml.
+# Profilspezifische Überschreibungen sind in application-dev.yml und application-prod.yml.
+# ══════════════════════════════════════════════════════════════════════════════
+
+spring:
+  application:
+    name: rentmybike-backend
+
+  # ── JPA / Hibernate ────────────────────────────────────────────────────────
+  jpa:
+    open-in-view: false        # Disable OSIV — prevents lazy-load leaks / OSIV deaktivieren
+    show-sql: false            # Overridden to true in dev / In dev auf true überschrieben
+    hibernate:
+      ddl-auto: validate       # Flyway manages schema — Hibernate only validates / Flyway verwaltet Schema
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # ── Flyway — database migrations / Datenbankmigrationen ───────────────────
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+
+  # ── File upload / Datei-Upload ─────────────────────────────────────────────
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB       # Max size per file / Max. Größe pro Datei
+      max-request-size: 50MB    # Max size for entire request (5 photos) / Max. Größe der gesamten Anfrage
+
+  # ── JSON serialization / JSON-Serialisierung ───────────────────────────────
+  jackson:
+    default-property-inclusion: non_null   # Skip null fields in response / Null-Felder überspringen
+    serialization:
+      write-dates-as-timestamps: false     # Use ISO-8601 strings / ISO-8601-Strings verwenden
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Custom App Properties (bound to AppProperties.java)
+# Benutzerdefinierte App-Eigenschaften (gebunden an AppProperties.java)
+# ══════════════════════════════════════════════════════════════════════════════
+app:
+  # JWT tokens / JWT-Token
+  jwt:
+    secret: ${JWT_SECRET:change-this-in-production-must-be-at-least-64-characters-long!!}
+    access-token-expiration: 900000        # 15 minutes / 15 Minuten
+    refresh-token-expiration: 604800000    # 7 days / 7 Tage
+
+  # Frontend URL for CORS + email links / Frontend-URL für CORS + E-Mail-Links
+  frontend-url: ${FRONTEND_URL:http://localhost:3000}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Cloudinary / Cloudinary
+# ══════════════════════════════════════════════════════════════════════════════
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:your-cloud-name}
+  api-key: ${CLOUDINARY_API_KEY:your-api-key}
+  api-secret: ${CLOUDINARY_API_SECRET:your-api-secret}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Actuator — health check for Railway / Gesundheitsprüfung für Railway
+# ══════════════════════════════════════════════════════════════════════════════
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: never      # Don't expose DB details publicly / DB-Details nicht öffentlich zeigen
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Server
+# ══════════════════════════════════════════════════════════════════════════════
+server:
+  port: ${PORT:8080}
+  error:
+    include-message: always    # Show error messages in responses / Fehlermeldungen in Antworten zeigen
+    include-binding-errors: always
