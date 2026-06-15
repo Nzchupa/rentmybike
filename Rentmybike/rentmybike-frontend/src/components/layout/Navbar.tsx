@@ -20,6 +20,8 @@ export function Navbar() {
   const locale = useLocale();
   const pathname = usePathname();
   const { user, isAuthenticated, isAdmin } = useAuthStore();
+  const authenticated = isAuthenticated();
+  const admin = isAdmin();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { logout } = useAuth();
 
@@ -30,8 +32,8 @@ export function Navbar() {
   const navLinks = [
     { label: t("home"),  href: "/" },
     { label: t("bikes"), href: "/bikes" },
-    ...(isAuthenticated ? [{ label: t("dashboard"), href: "/dashboard" }] : []),
-    ...(isAdmin ? [{ label: t("admin"), href: "/admin" }] : []),
+    ...(authenticated ? [{ label: t("dashboard"), href: "/dashboard" }] : []),
+    ...(admin ? [{ label: t("admin"), href: "/admin" }] : []),
   ];
 
   return (
@@ -73,7 +75,7 @@ export function Navbar() {
               {locale === "en" ? "DE" : "EN"}
             </Link>
 
-            {isAuthenticated && user ? (
+            {authenticated && user ? (
               <div className="flex items-center gap-3">
                 <Link href={localePath("/dashboard/profile")}>
                   <Avatar name={user.fullName} avatarUrl={user.avatarUrl} size="sm" />
@@ -118,7 +120,7 @@ export function Navbar() {
             </Link>
           ))}
           <div className="pt-2 flex flex-col gap-2">
-            {isAuthenticated ? (
+            {authenticated ? (
               <Button variant="outline" size="sm" onClick={logout} className="w-full">
                 {t("logout")}
               </Button>
