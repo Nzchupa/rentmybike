@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["jdk21_headless", "maven"]
+
+[phases.build]
+cmds = ["mvn clean package -DskipTests -B"]
+
+[start]
+cmd = "java -jar target/rentmybike-backend-0.0.1-SNAPSHOT.jar"
