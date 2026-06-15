@@ -178,20 +178,20 @@ export default function ProfilePage() {
           <Input
             label={t("currentPassword")}
             type="password"
-            error={pwdErrors.currentPassword?.message}
+            error={pwdErrors.currentPassword?.message as string}
             {...regPwd("currentPassword")}
           />
           <Input
             label={t("newPassword")}
             type="password"
             placeholder="Min. 8 characters"
-            error={pwdErrors.newPassword?.message}
+            error={pwdErrors.newPassword?.message as string}
             {...regPwd("newPassword")}
           />
           <Input
             label={t("confirmNewPassword")}
             type="password"
-            error={pwdErrors.confirmNewPassword?.message}
+            error={pwdErrors.confirmNewPassword?.message as string}
             {...regPwd("confirmNewPassword")}
           />
           <Button type="submit" loading={savingPwd} variant="secondary">
