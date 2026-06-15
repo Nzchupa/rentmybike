@@ -59,6 +59,11 @@ spring:
 # ══════════════════════════════════════════════════════════════════════════════
 # Production Logging — errors only / Nur Fehler in der Produktion
 # ══════════════════════════════════════════════════════════════════════════════
+management:
+  health:
+    mail:
+      enabled: false   # SMTP not needed for health check / SMTP nicht für Healthcheck benötigt
+
 app:
   secure-cookie: true   # HTTPS only in production / Nur HTTPS in der Produktion
 
