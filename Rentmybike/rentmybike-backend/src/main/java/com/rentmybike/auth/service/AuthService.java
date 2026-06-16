@@ -302,8 +302,19 @@ public class AuthService {
         //
         // secureCookie=false for localhost (HTTP), true for production (HTTPS).
         // secureCookie=false für localhost (HTTP), true für Produktion (HTTPS).
+        //
+        // Frontend (rentmybike.xyz) and backend (railway.app) are different
+        // registrable domains, so this is a cross-site request from the
+        // browser's point of view. Cross-site cookies are ONLY sent by the
+        // browser when SameSite=None (combined with Secure) — both Strict
+        // and Lax are stripped from XHR/fetch requests across origins.
+        // Frontend (rentmybike.xyz) und Backend (railway.app) sind unterschiedliche
+        // Domains, daher ist dies aus Sicht des Browsers ein Cross-Site-Request.
+        // Cross-Site-Cookies werden vom Browser nur bei SameSite=None (zusammen
+        // mit Secure) gesendet — sowohl Strict als auch Lax werden bei
+        // XHR/fetch-Anfragen über Origins hinweg entfernt.
         boolean secure = appProperties.isSecureCookie();
-        String sameSite = secure ? "Strict" : "Lax";
+        String sameSite = secure ? "None" : "Lax";
 
         String header = String.format(
                 "%s=%s; Max-Age=%d; Path=/; HttpOnly%s; SameSite=%s",
