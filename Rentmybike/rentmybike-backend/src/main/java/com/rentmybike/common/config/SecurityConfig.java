@@ -21,6 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 /**
  * Spring Security configuration for the RentMyBike application.
@@ -45,6 +46,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserRepository userRepository;
+    private final CorsConfigurationSource corsConfigurationSource;
 
     // ──────────────────────────────────────────────────────────────────────────
     // Security filter chain / Sicherheits-Filter-Kette
@@ -57,6 +59,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            // ── Enable CORS using the rules defined in CorsConfig — without this,
+            //    Spring Security never adds Access-Control-Allow-Origin headers,
+            //    no matter what's configured in CorsConfigurationSource.
+            // ── CORS mit den in CorsConfig definierten Regeln aktivieren — ohne dies
+            //    fügt Spring Security niemals Access-Control-Allow-Origin-Header hinzu,
+            //    unabhängig davon, was in CorsConfigurationSource konfiguriert ist.
+            .cors(cors -> cors.configurationSource(corsConfigurationSource))
+
             // ── Disable CSRF — we use SameSite=Strict cookies instead
             // ── CSRF deaktivieren — wir verwenden stattdessen SameSite=Strict-Cookies
             .csrf(AbstractHttpConfigurer::disable)
