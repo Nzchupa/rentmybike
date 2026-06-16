@@ -42,6 +42,8 @@ public class CorsConfig {
         // Projekts (jeder Push erhält eine eigene *-nzchupas-projects.vercel.app URL).
         config.setAllowedOriginPatterns(List.of(
                 appProperties.getFrontendUrl(),                          // Vercel production / Vercel-Produktion
+                "https://rentmybike.xyz",                                 // Custom domain (apex) / Eigene Domain (apex)
+                "https://www.rentmybike.xyz",                             // Custom domain (www) / Eigene Domain (www)
                 "https://rentmybike-*-nzchupas-projects.vercel.app",     // Vercel previews / Vercel-Vorschauen
                 "http://localhost:3000"                                   // Local dev / Lokale Entwicklung
         ));
