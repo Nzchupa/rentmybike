@@ -86,7 +86,9 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom("noreply@rentmybike.app", "RentMyBike");
+            // Verified custom domain — can send to any recipient, not just the sandbox owner.
+            // Verifizierte eigene Domain — kann an beliebige Empfänger senden, nicht nur an den Sandbox-Besitzer.
+            helper.setFrom("noreply@rentmybike.xyz", "RentMyBike");
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlBody, true); // true = isHtml / true = ist HTML
