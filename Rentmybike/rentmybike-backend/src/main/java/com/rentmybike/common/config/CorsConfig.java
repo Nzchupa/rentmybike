@@ -34,11 +34,16 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Allow only the configured frontend URL (no wildcards when credentials=true)
-        // Nur die konfigurierte Frontend-URL erlauben (keine Wildcards wenn credentials=true)
-        config.setAllowedOrigins(List.of(
-                appProperties.getFrontendUrl(),   // Vercel production / Vercel-Produktion
-                "http://localhost:3000"            // Local dev / Lokale Entwicklung
+        // Allow the configured frontend URL plus all Vercel preview deployments for this
+        // project (each push gets a unique *-nzchupas-projects.vercel.app URL).
+        // setAllowedOriginPatterns supports wildcards and still works with credentials=true,
+        // unlike setAllowedOrigins("*").
+        // Erlaubt die konfigurierte Frontend-URL sowie alle Vercel-Preview-Deployments dieses
+        // Projekts (jeder Push erhält eine eigene *-nzchupas-projects.vercel.app URL).
+        config.setAllowedOriginPatterns(List.of(
+                appProperties.getFrontendUrl(),                          // Vercel production / Vercel-Produktion
+                "https://rentmybike-*-nzchupas-projects.vercel.app",     // Vercel previews / Vercel-Vorschauen
+                "http://localhost:3000"                                   // Local dev / Lokale Entwicklung
         ));
 
         // Allow standard HTTP methods used by the REST API
