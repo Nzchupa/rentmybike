@@ -57,6 +57,21 @@ app:
   frontend-url: ${FRONTEND_URL:http://localhost:3000}
 
 # ══════════════════════════════════════════════════════════════════════════════
+# Resend — transactional email via HTTPS API (not SMTP)
+# Resend — Transaktions-E-Mails über HTTPS-API (nicht SMTP)
+#
+# Railway blocks outbound SMTP ports (25/465/587), so emails are sent through
+# Resend's HTTP API (port 443) instead of JavaMailSender/SMTP.
+# Railway blockiert ausgehende SMTP-Ports (25/465/587), daher werden E-Mails
+# über Resends HTTP-API (Port 443) statt JavaMailSender/SMTP gesendet.
+#
+# Reuses the existing SMTP_PASSWORD env var (which is already the Resend API key)
+# so no new Railway variable is needed. Set RESEND_API_KEY explicitly to override.
+# ══════════════════════════════════════════════════════════════════════════════
+resend:
+  api-key: ${RESEND_API_KEY:${SMTP_PASSWORD:}}
+
+# ══════════════════════════════════════════════════════════════════════════════
 # Cloudinary / Cloudinary
 # ══════════════════════════════════════════════════════════════════════════════
 cloudinary:

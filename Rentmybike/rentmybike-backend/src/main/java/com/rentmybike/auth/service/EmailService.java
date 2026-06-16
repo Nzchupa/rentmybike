@@ -1,16 +1,19 @@
 package com.rentmybike.auth.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rentmybike.common.config.AppProperties;
 import com.rentmybike.user.entity.User;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.Map;
 
 /**
  * Service for sending transactional emails (verification, etc.).
@@ -19,16 +22,34 @@ import jakarta.mail.internet.MimeMessage;
  * <p>All email sending is done asynchronously to avoid blocking HTTP requests.
  * <p>Alle E-Mail-Versendungen erfolgen asynchron, um HTTP-Anfragen nicht zu blockieren.
  *
- * <p>Dev environment uses Mailtrap; prod uses configured SMTP (Resend/Mailgun).
- * <p>Entwicklungsumgebung nutzt Mailtrap; Produktion nutzt konfiguriertes SMTP (Resend/Mailgun).
+ * <p>Emails are sent via Resend's HTTPS API (https://api.resend.com/emails) rather
+ * than SMTP, because Railway blocks outbound SMTP ports (25/465/587) on this plan.
+ * The HTTP API only needs port 443, which is never blocked.
+ * <p>E-Mails werden über Resends HTTPS-API gesendet statt über SMTP, da Railway
+ * ausgehende SMTP-Ports (25/465/587) auf diesem Plan blockiert. Die HTTP-API
+ * benötigt nur Port 443, der nie blockiert wird.
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    private static final String RESEND_API_URL = "https://api.resend.com/emails";
+    private static final String FROM_ADDRESS = "RentMyBike <noreply@rentmybike.xyz>";
+
     private final AppProperties appProperties;
+    private final String resendApiKey;
+    private final HttpClient httpClient;
+    private final ObjectMapper objectMapper;
+
+    public EmailService(AppProperties appProperties,
+                         @Value("${resend.api-key:}") String resendApiKey) {
+        this.appProperties = appProperties;
+        this.resendApiKey = resendApiKey;
+        this.httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+        this.objectMapper = new ObjectMapper();
+    }
 
     // ──────────────────────────────────────────────────────────────────────────
     // Email verification / E-Mail-Verifizierung
@@ -74,34 +95,52 @@ public class EmailService {
     // ──────────────────────────────────────────────────────────────────────────
 
     /**
-     * Sends an HTML email to the given address.
-     * Sendet eine HTML-E-Mail an die angegebene Adresse.
+     * Sends an HTML email via the Resend HTTPS API.
+     * Sendet eine HTML-E-Mail über die Resend-HTTPS-API.
      *
      * @param to       recipient email / Empfänger-E-Mail
      * @param subject  email subject / E-Mail-Betreff
      * @param htmlBody HTML content / HTML-Inhalt
      */
     private void sendHtmlEmail(String to, String subject, String htmlBody) {
+        if (resendApiKey == null || resendApiKey.isBlank()) {
+            log.error("Resend API key is not configured — email to {} not sent / "
+                    + "Resend API-Schlüssel ist nicht konfiguriert — E-Mail an {} nicht gesendet", to, to);
+            return;
+        }
+
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            Map<String, Object> payload = Map.of(
+                    "from", FROM_ADDRESS,
+                    "to", new String[]{to},
+                    "subject", subject,
+                    "html", htmlBody
+            );
+            String jsonBody = objectMapper.writeValueAsString(payload);
 
-            // Verified custom domain — can send to any recipient, not just the sandbox owner.
-            // Verifizierte eigene Domain — kann an beliebige Empfänger senden, nicht nur an den Sandbox-Besitzer.
-            helper.setFrom("noreply@rentmybike.xyz", "RentMyBike");
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(htmlBody, true); // true = isHtml / true = ist HTML
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(RESEND_API_URL))
+                    .timeout(Duration.ofSeconds(15))
+                    .header("Authorization", "Bearer " + resendApiKey)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .build();
 
-            mailSender.send(message);
-            log.info("Email sent to: {} / E-Mail gesendet an: {}", to, to);
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-        } catch (MessagingException e) {
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                log.info("Email sent to: {} / E-Mail gesendet an: {}", to, to);
+            } else {
+                log.error("Resend API returned {} for email to {}: {} / "
+                        + "Resend-API gab {} für E-Mail an {} zurück: {}",
+                        response.statusCode(), to, response.body(),
+                        response.statusCode(), to, response.body());
+            }
+
+        } catch (Exception e) {
             // Log but don't rethrow — email failure should not break the user flow
             // Protokollieren aber nicht weiterwerfen — E-Mail-Fehler soll den Benutzerfluss nicht unterbrechen
             log.error("Failed to send email to: {} / E-Mail-Versand an {} fehlgeschlagen: {}", to, to, e.getMessage());
-        } catch (Exception e) {
-            log.error("Unexpected error sending email / Unerwarteter Fehler beim E-Mail-Versand: {}", e.getMessage());
         }
     }
 
