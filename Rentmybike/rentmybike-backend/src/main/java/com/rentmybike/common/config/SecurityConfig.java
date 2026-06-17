@@ -89,6 +89,12 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/bikes").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/bikes/{id}").permitAll()
 
+                // Public booked-date ranges — lets the booking calendar disable
+                // taken dates before the user is even logged in / Öffentliche
+                // belegte Datumsbereiche — ermöglicht es dem Buchungskalender,
+                // vergebene Termine zu deaktivieren, bevor der Benutzer angemeldet ist
+                .requestMatchers(HttpMethod.GET, "/api/v1/bookings/bike/*/booked-dates").permitAll()
+
                 // Public reviews — bike and user profiles / Öffentliche Bewertungen — Fahrrad- und Benutzerprofile
                 .requestMatchers(HttpMethod.GET, "/api/v1/reviews/bike/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/reviews/user/**").permitAll()

@@ -5,6 +5,7 @@ import com.rentmybike.auth.dto.LoginRequest;
 import com.rentmybike.auth.dto.RegisterRequest;
 import com.rentmybike.auth.service.AuthService;
 import com.rentmybike.common.response.ApiResponse;
+import com.rentmybike.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -13,6 +14,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -86,14 +88,22 @@ public class AuthController {
     // ──────────────────────────────────────────────────────────────────────────
 
     /**
-     * Log out the current user by clearing auth cookies.
-     * Aktuellen Benutzer abmelden, indem Auth-Cookies gelöscht werden.
+     * Log out the current user: clears auth cookies and revokes their
+     * outstanding tokens server-side (see AuthService.logout).
+     * Aktuellen Benutzer abmelden: löscht Auth-Cookies und widerruft
+     * serverseitig dessen ausstehende Token (siehe AuthService.logout).
      *
-     * @param response used to clear cookies / zum Löschen von Cookies
+     * @param currentUser the authenticated user, if the access token was still
+     *                     valid, or null if it had already expired / der
+     *                     authentifizierte Benutzer, falls der Zugriffstoken noch
+     *                     gültig war, sonst null
+     * @param response    used to clear cookies / zum Löschen von Cookies
      */
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<Void>> logout(HttpServletResponse response) {
-        authService.logout(response);
+    public ResponseEntity<ApiResponse<Void>> logout(
+            @AuthenticationPrincipal User currentUser,
+            HttpServletResponse response) {
+        authService.logout(currentUser == null ? null : currentUser.getId(), response);
         return ResponseEntity.ok(ApiResponse.success(null, "Logged out successfully / Erfolgreich abgemeldet"));
     }
 

@@ -1,4 +1,5 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import { useAuthStore } from "@/store/auth.store";
 
 /**
  * Pre-configured Axios instance pointing at the Spring Boot backend.
@@ -18,13 +19,71 @@ export const api = axios.create({
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Response interceptor — unwrap data.data and normalize errors
-// Response-Interceptor — data.data auspacken und Fehler normalisieren
+// 401 → refresh → retry
+// 401 → Aktualisieren → Wiederholen
+//
+// The access token is short-lived (15 min). Previously a 401 from an expired
+// access token just bubbled up as an error — authApi.refreshToken existed but
+// was never called, so every user got silently logged out every 15 minutes.
+// This interceptor transparently calls /auth/refresh once and retries the
+// original request; only if the refresh itself fails do we clear local auth
+// state and send the user to /login.
+//
+// Der Zugriffstoken ist kurzlebig (15 Min). Vorher wurde ein 401 durch einen
+// abgelaufenen Zugriffstoken einfach als Fehler durchgereicht — authApi.
+// refreshToken existierte, wurde aber nie aufgerufen, sodass jeder Benutzer
+// alle 15 Minuten stillschweigend abgemeldet wurde. Dieser Interceptor ruft
+// transparent einmal /auth/refresh auf und wiederholt die ursprüngliche
+// Anfrage; nur wenn die Aktualisierung selbst fehlschlägt, wird der lokale
+// Auth-Zustand gelöscht und der Benutzer zu /login geschickt.
 // ─────────────────────────────────────────────────────────────────────────────
+
+type RetryableConfig = AxiosRequestConfig & { _retry?: boolean };
+
+// Endpoints that must never trigger a refresh attempt themselves, otherwise
+// a failed login/refresh could recurse into another refresh call.
+const AUTH_ENDPOINTS = ["/api/v1/auth/refresh", "/api/v1/auth/login", "/api/v1/auth/register"];
+
+// Shared in-flight refresh promise so concurrent 401s from several requests
+// firing at once only trigger a single /auth/refresh call.
+let refreshPromise: Promise<void> | null = null;
+
+function redirectToLogin() {
+  useAuthStore.getState().logout();
+  if (typeof window !== "undefined") {
+    const locale = window.location.pathname.split("/")[1] || "en";
+    window.location.href = `/${locale}/login`;
+  }
+}
 
 api.interceptors.response.use(
   (response) => response,
-  (error: AxiosError<{ message?: string }>) => {
+  async (error: AxiosError<{ message?: string }>) => {
+    const originalRequest = error.config as RetryableConfig | undefined;
+    const status = error.response?.status;
+    const url = originalRequest?.url ?? "";
+    const isAuthEndpoint = AUTH_ENDPOINTS.some((p) => url.includes(p));
+
+    if (status === 401 && originalRequest && !originalRequest._retry && !isAuthEndpoint) {
+      originalRequest._retry = true;
+
+      try {
+        if (!refreshPromise) {
+          refreshPromise = api
+            .post("/api/v1/auth/refresh")
+            .then(() => undefined)
+            .finally(() => {
+              refreshPromise = null;
+            });
+        }
+        await refreshPromise;
+        return api(originalRequest);
+      } catch {
+        redirectToLogin();
+        return Promise.reject(new Error("Session expired — please log in again / Sitzung abgelaufen — bitte erneut anmelden"));
+      }
+    }
+
     const message =
       error.response?.data?.message ??
       error.message ??
@@ -191,6 +250,14 @@ export const bookingsApi = {
 
   adminComplete: (id: string) =>
     api.post<ApiResponse<BookingResponse>>(`/api/v1/admin/bookings/${id}/complete`),
+
+  // Public — occupied date ranges for a bike, used by the booking calendar
+  // to disable already-taken dates / Öffentlich — belegte Datumsbereiche für
+  // ein Fahrrad, vom Buchungskalender zum Deaktivieren vergebener Termine genutzt.
+  getBookedDates: (bikeId: string) =>
+    api.get<ApiResponse<{ startDate: string; endDate: string }[]>>(
+      `/api/v1/bookings/bike/${bikeId}/booked-dates`
+    ),
 };
 
 // ── Reviews ───────────────────────────────────────────────────────────────────

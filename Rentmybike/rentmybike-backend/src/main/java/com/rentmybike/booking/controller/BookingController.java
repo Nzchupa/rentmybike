@@ -1,5 +1,6 @@
 package com.rentmybike.booking.controller;
 
+import com.rentmybike.booking.dto.BookedDateRangeResponse;
 import com.rentmybike.booking.dto.BookingResponse;
 import com.rentmybike.booking.dto.CreateBookingRequest;
 import com.rentmybike.booking.entity.BookingStatus;
@@ -18,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -112,6 +114,23 @@ public class BookingController {
         BookingResponse cancelled = bookingService.cancelBookingAsRenter(id, currentUser.getId());
         return ResponseEntity.ok(ApiResponse.success(cancelled,
                 "Booking cancelled / Buchung storniert"));
+    }
+
+    /**
+     * Occupied date ranges for a bike — public, used by the booking calendar
+     * to disable already-taken dates and validate overlap before submitting.
+     * Belegte Datumsbereiche für ein Fahrrad — öffentlich, wird vom Buchungs-
+     * kalender verwendet, um bereits vergebene Termine zu deaktivieren und
+     * Überschneidungen vor dem Senden zu validieren.
+     *
+     * <p>GET /api/v1/bookings/bike/{bikeId}/booked-dates
+     */
+    @GetMapping("/api/v1/bookings/bike/{bikeId}/booked-dates")
+    public ResponseEntity<ApiResponse<List<BookedDateRangeResponse>>> getBookedDates(
+            @PathVariable UUID bikeId) {
+
+        List<BookedDateRangeResponse> ranges = bookingService.getBookedDateRanges(bikeId);
+        return ResponseEntity.ok(ApiResponse.success(ranges));
     }
 
     // ══════════════════════════════════════════════════════════════════════════

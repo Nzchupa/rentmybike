@@ -3,9 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DayPicker } from "react-day-picker";
-import { format, isBefore, startOfToday } from "date-fns";
+import { format, isBefore, parseISO, startOfToday } from "date-fns";
 import { de, enUS } from "date-fns/locale";
 import toast from "react-hot-toast";
 import "react-day-picker/dist/style.css";
@@ -28,6 +28,7 @@ interface BookingFormProps {
  */
 export function BookingForm({ bike }: BookingFormProps) {
   const t = useTranslations("booking.form");
+  const te = useTranslations("booking.errors");
   const locale = useLocale();
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
@@ -35,6 +36,20 @@ export function BookingForm({ bike }: BookingFormProps) {
   const [range, setRange] = useState<{ from?: Date; to?: Date }>({});
   const [message, setMessage] = useState("");
   const [showCalendar, setShowCalendar] = useState(false);
+
+  // Occupied date ranges for this bike — used to disable already-booked dates
+  // in the calendar and to validate overlap before submitting, instead of
+  // only finding out via a generic error toast after the POST fails.
+  // Belegte Datumsbereiche für dieses Fahrrad — werden verwendet, um bereits
+  // gebuchte Termine im Kalender zu deaktivieren und Überschneidungen vor dem
+  // Senden zu validieren, statt dies erst nach einem fehlgeschlagenen POST
+  // über eine generische Fehlermeldung zu erfahren.
+  const { data: bookedRanges = [] } = useQuery({
+    queryKey: ["booked-dates", bike.id],
+    queryFn: () => bookingsApi.getBookedDates(bike.id),
+    select: (r) => r.data.data ?? [],
+    staleTime: 60 * 1000,
+  });
 
   const { mutate: createBooking, isPending } = useMutation({
     mutationFn: bookingsApi.create,
@@ -70,10 +85,37 @@ export function BookingForm({ bike }: BookingFormProps) {
       ? calcTotalPrice(bike.pricePerDay, toIsoDate(startDate), toIsoDate(endDate))
       : 0;
 
-  const canSubmit = !!startDate && !!endDate && !isBefore(endDate, startDate);
+  // Date ranges already booked (PENDING/ACCEPTED), parsed for the calendar's
+  // `disabled` prop and for the overlap check below.
+  const bookedIntervals = bookedRanges.map((r) => ({
+    from: parseISO(r.startDate),
+    to: parseISO(r.endDate),
+  }));
+
+  function rangeOverlapsBooked(s: Date, e: Date): boolean {
+    const sIso = toIsoDate(s);
+    const eIso = toIsoDate(e);
+    return bookedRanges.some((r) => sIso <= r.endDate && eIso >= r.startDate);
+  }
+
+  const pastDateError = !!startDate && isBefore(startDate, today);
+  const endBeforeStartError = !!startDate && !!endDate && isBefore(endDate, startDate);
+  const dateConflictError =
+    !!startDate && !!endDate && !endBeforeStartError && rangeOverlapsBooked(startDate, endDate);
+
+  const dateError = pastDateError
+    ? te("pastDate")
+    : endBeforeStartError
+      ? te("endBeforeStart")
+      : dateConflictError
+        ? te("dateConflict")
+        : null;
+
+  const canSubmit =
+    !!startDate && !!endDate && !pastDateError && !endBeforeStartError && !dateConflictError;
 
   function handleSubmit() {
-    if (!startDate || !endDate) return;
+    if (!startDate || !endDate || !canSubmit) return;
     createBooking({
       bikeId: bike.id,
       startDate: toIsoDate(startDate),
@@ -121,7 +163,7 @@ export function BookingForm({ bike }: BookingFormProps) {
               mode="range"
               selected={{ from: range.from, to: range.to }}
               onSelect={(r) => setRange({ from: r?.from, to: r?.to })}
-              disabled={{ before: today }}
+              disabled={[{ before: today }, ...bookedIntervals]}
               locale={locale === "de" ? de : enUS}
               className="!font-sans"
             />
@@ -134,6 +176,10 @@ export function BookingForm({ bike }: BookingFormProps) {
               Done / Fertig
             </Button>
           </div>
+        )}
+
+        {dateError && (
+          <p className="mt-2 text-sm text-red-600">{dateError}</p>
         )}
       </div>
 

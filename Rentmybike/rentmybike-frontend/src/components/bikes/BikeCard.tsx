@@ -1,9 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
 import { MapPin } from "lucide-react";
 import { StarRating } from "@/components/ui/StarRating";
 import { formatPrice } from "@/lib/utils";
+import { reviewsApi } from "@/lib/api";
 import type { BikeResponse } from "@/types";
 
 interface BikeCardProps {
@@ -17,6 +19,21 @@ interface BikeCardProps {
 export function BikeCard({ bike }: BikeCardProps) {
   const locale = useLocale();
   const t = useTranslations("bikes.card");
+
+  // Previously StarRating below was hardcoded to 0 for every card, even
+  // though GET /api/v1/reviews/bike/{id}/rating already existed and was
+  // used elsewhere — every bike looked unrated regardless of real reviews.
+  //
+  // Vorher war die StarRating unten für jede Karte fest auf 0 gesetzt,
+  // obwohl GET /api/v1/reviews/bike/{id}/rating bereits existierte und an
+  // anderer Stelle verwendet wurde — jedes Fahrrad wirkte unbewertet,
+  // unabhängig von echten Bewertungen.
+  const { data: rating } = useQuery({
+    queryKey: ["bike-rating", bike.id],
+    queryFn: () => reviewsApi.getBikeRating(bike.id),
+    select: (r) => r.data.data,
+    staleTime: 5 * 60 * 1000,
+  });
 
   return (
     <Link href={`/${locale}/bikes/${bike.id}`} className="group block">
@@ -65,7 +82,7 @@ export function BikeCard({ bike }: BikeCardProps) {
               <span className="text-sm text-slate-500"> {t("perDay")}</span>
             </div>
 
-            <StarRating rating={0} size="sm" />
+            <StarRating rating={rating?.averageRating ?? 0} size="sm" />
           </div>
         </div>
       </div>

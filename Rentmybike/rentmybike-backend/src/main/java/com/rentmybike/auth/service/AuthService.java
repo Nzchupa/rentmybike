@@ -158,15 +158,37 @@ public class AuthService {
     // ──────────────────────────────────────────────────────────────────────────
 
     /**
-     * Clears auth cookies, effectively logging the user out.
-     * Löscht Auth-Cookies und meldet den Benutzer damit ab.
+     * Clears auth cookies and revokes every outstanding access/refresh token
+     * server-side, effectively logging the user out everywhere.
+     * Löscht Auth-Cookies und widerruft serverseitig alle ausstehenden
+     * Access-/Refresh-Token, wodurch der Benutzer überall abgemeldet wird.
      *
+     * <p>Clearing cookies alone is not enough: a copy of the refresh token
+     * (e.g. exfiltrated via XSS, or simply replayed by a malicious client
+     * that ignored the Set-Cookie deletion) would otherwise stay valid for
+     * its full 7-day lifetime. Bumping tokenVersion makes every previously
+     * issued token — access or refresh — fail validation immediately.
+     * <p>Das alleinige Löschen der Cookies reicht nicht aus: Eine Kopie des
+     * Refresh-Tokens (z. B. über XSS exfiltriert oder von einem böswilligen
+     * Client erneut verwendet, der die Set-Cookie-Löschung ignoriert) würde
+     * sonst für ihre volle 7-Tage-Lebensdauer gültig bleiben. Das Erhöhen von
+     * tokenVersion lässt jeden zuvor ausgestellten Token sofort ungültig werden.
+     *
+     * @param userId   the currently authenticated user, or null if already anonymous /
+     *                 der aktuell authentifizierte Benutzer, oder null wenn bereits anonym
      * @param response HTTP response to clear cookies on / HTTP-Antwort zum Löschen der Cookies
      */
-    public void logout(HttpServletResponse response) {
+    public void logout(UUID userId, HttpServletResponse response) {
+        if (userId != null) {
+            userRepository.findById(userId).ifPresent(user -> {
+                user.setTokenVersion(user.getTokenVersion() + 1);
+                userRepository.save(user);
+            });
+        }
+
         // Clear both tokens by setting expired cookies / Beide Token durch abgelaufene Cookies löschen
         clearTokenCookies(response);
-        log.debug("User logged out — cookies cleared / Benutzer abgemeldet — Cookies gelöscht");
+        log.debug("User logged out — cookies cleared and tokens revoked / Benutzer abgemeldet — Cookies gelöscht und Token widerrufen");
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -195,8 +217,18 @@ public class AuthService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found / Benutzer nicht gefunden"));
 
-        if (!user.isEnabled()) {
+        if (!user.isEnabled() || !user.isAccountNonLocked()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Account is inactive / Konto ist inaktiv");
+        }
+
+        // Reject refresh tokens issued before the user's last logout (or any
+        // other event that bumps tokenVersion) — see logout() above.
+        // Refresh-Token ablehnen, die vor dem letzten Logout des Benutzers
+        // ausgestellt wurden (oder einem anderen Ereignis, das tokenVersion
+        // erhöht) — siehe logout() oben.
+        if (jwtService.extractTokenVersion(refreshToken) != user.getTokenVersion()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "Refresh token has been revoked / Aktualisierungstoken wurde widerrufen");
         }
 
         // Only rotate the access token — keep the refresh token / Nur Zugriffstoken rotieren — Refresh-Token behalten

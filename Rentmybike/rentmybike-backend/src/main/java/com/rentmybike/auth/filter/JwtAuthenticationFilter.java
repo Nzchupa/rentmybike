@@ -2,6 +2,7 @@ package com.rentmybike.auth.filter;
 
 import com.rentmybike.auth.service.AuthService;
 import com.rentmybike.auth.service.JwtService;
+import com.rentmybike.user.entity.User;
 import com.rentmybike.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -86,11 +86,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             UUID userId = jwtService.extractUserId(accessToken);
 
             // Load full user entity from database / Vollständige Benutzer-Entity aus Datenbank laden
-            UserDetails userDetails = userRepository.findById(userId).orElse(null);
+            User userDetails = userRepository.findById(userId).orElse(null);
 
-            if (userDetails == null || !userDetails.isEnabled()) {
-                // User deleted or banned since token was issued
-                // Benutzer gelöscht oder gesperrt seit Token-Ausstellung
+            // isEnabled() only covers emailVerified + not-deleted; bans live in
+            // isAccountNonLocked(). A banned user still has isEnabled() == true, so
+            // without this explicit check a still-valid JWT issued before the ban
+            // would keep authenticating successfully.
+            //
+            // isEnabled() deckt nur emailVerified + nicht gelöscht ab; Sperrungen
+            // liegen in isAccountNonLocked(). Ein gesperrter Benutzer hat weiterhin
+            // isEnabled() == true, daher würde ohne diese Prüfung ein vor der
+            // Sperrung ausgestelltes, noch gültiges JWT weiterhin authentifizieren.
+            //
+            // tokenVersion mismatch means the user logged out (or was otherwise
+            // revoked) after this access token was issued — see AuthService.logout().
+            // tokenVersion-Abweichung bedeutet, dass der Benutzer sich abgemeldet hat
+            // (oder anderweitig widerrufen wurde), nachdem dieser Zugriffstoken
+            // ausgestellt wurde — siehe AuthService.logout().
+            if (userDetails == null || !userDetails.isEnabled() || !userDetails.isAccountNonLocked()
+                    || jwtService.extractTokenVersion(accessToken) != userDetails.getTokenVersion()) {
+                // User deleted, unverified, banned, or token revoked since issuance
+                // Benutzer gelöscht, nicht verifiziert, gesperrt oder Token widerrufen seit Ausstellung
                 filterChain.doFilter(request, response);
                 return;
             }

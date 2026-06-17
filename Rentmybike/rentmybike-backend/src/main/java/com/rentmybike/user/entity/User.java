@@ -128,6 +128,20 @@ public class User extends BaseEntity implements UserDetails {
     @Column
     private LocalDateTime bannedAt;
 
+    /**
+     * Incremented on logout (and should be on password change) to invalidate
+     * every access/refresh token issued before that point — tokens embed the
+     * version they were issued with, and a mismatch is treated as revoked.
+     *
+     * Wird beim Logout (und sollte bei Passwortänderung) erhöht, um jeden
+     * zuvor ausgestellten Access-/Refresh-Token zu invalidieren — Token
+     * enthalten die Version, mit der sie ausgestellt wurden; bei Abweichung
+     * gelten sie als widerrufen.
+     */
+    @Column(nullable = false)
+    @Builder.Default
+    private int tokenVersion = 0;
+
     // ──────────────────────────────────────────────────────────────────────────
     // Convenience methods / Hilfsmethoden
     // ──────────────────────────────────────────────────────────────────────────

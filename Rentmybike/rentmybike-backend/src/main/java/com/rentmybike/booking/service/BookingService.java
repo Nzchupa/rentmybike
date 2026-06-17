@@ -152,6 +152,31 @@ public class BookingService {
     }
 
     /**
+     * Occupied date ranges for a bike (PENDING/ACCEPTED bookings only) — public,
+     * used by the frontend booking calendar to disable already-taken dates and
+     * to validate overlap client-side before submitting a request.
+     * Belegte Datumsbereiche für ein Fahrrad (nur PENDING/ACCEPTED-Buchungen) —
+     * öffentlich, wird vom Frontend-Buchungskalender verwendet, um bereits
+     * vergebene Termine zu deaktivieren und Überschneidungen Client-seitig vor
+     * dem Senden einer Anfrage zu validieren.
+     *
+     * <p>No identity or message data is returned — see
+     * BookingRepository.findActiveBookingsByBikeId.
+     */
+    @Transactional(readOnly = true)
+    public java.util.List<com.rentmybike.booking.dto.BookedDateRangeResponse> getBookedDateRanges(UUID bikeId) {
+        if (!bikeRepository.existsById(bikeId)) {
+            throw new ResourceNotFoundException("Bike", bikeId);
+        }
+        return bookingRepository.findActiveBookingsByBikeId(bikeId).stream()
+                .map(b -> com.rentmybike.booking.dto.BookedDateRangeResponse.builder()
+                        .startDate(b.getStartDate())
+                        .endDate(b.getEndDate())
+                        .build())
+                .toList();
+    }
+
+    /**
      * Renter's booking history (all their rentals).
      * Buchungshistorie des Mieters (alle seine Mieten).
      */
@@ -186,6 +211,32 @@ public class BookingService {
 
         if (booking.getStatus() != BookingStatus.PENDING) {
             throw new BusinessException("Only PENDING bookings can be accepted / Nur PENDING-Buchungen können akzeptiert werden");
+        }
+
+        // Lock the bike row for the rest of this transaction, same as createBooking.
+        // A renter can submit several overlapping PENDING requests for the same bike
+        // (createBooking only blocks overlap against PENDING/ACCEPTED at request time,
+        // and two different renters can both land in PENDING for the same dates). Without
+        // re-checking here, an owner accepting two such requests in quick succession could
+        // end up with two ACCEPTED bookings for the same dates — this lock plus the
+        // conflict check below closes that gap.
+        //
+        // Sperrt die Fahrrad-Zeile für den Rest dieser Transaktion, wie bei createBooking.
+        // Ein Mieter kann mehrere sich überschneidende PENDING-Anfragen für dasselbe Fahrrad
+        // einreichen (createBooking blockiert Überschneidungen nur zum Anfragezeitpunkt gegen
+        // PENDING/ACCEPTED, und zwei verschiedene Mieter können beide für dieselben Termine
+        // PENDING landen). Ohne erneute Prüfung hier könnte ein Eigentümer, der zwei solche
+        // Anfragen kurz nacheinander akzeptiert, am Ende zwei ACCEPTED-Buchungen für dieselben
+        // Termine haben — diese Sperre plus die Konfliktprüfung unten schließt diese Lücke.
+        bikeRepository.findByIdForUpdate(booking.getBike().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Bike", booking.getBike().getId()));
+
+        boolean hasConflict = bookingRepository.existsDateConflictExcluding(
+                booking.getBike().getId(), booking.getStartDate(), booking.getEndDate(), booking.getId());
+        if (hasConflict) {
+            throw new BusinessException(
+                    "Another booking for overlapping dates was already accepted / " +
+                    "Eine andere Buchung für überlappende Termine wurde bereits akzeptiert");
         }
 
         booking.setStatus(BookingStatus.ACCEPTED);

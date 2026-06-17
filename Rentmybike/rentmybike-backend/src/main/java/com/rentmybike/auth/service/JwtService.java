@@ -36,6 +36,7 @@ public class JwtService {
 
     private static final String CLAIM_ROLE = "role";
     private static final String CLAIM_TYPE = "type";
+    private static final String CLAIM_TOKEN_VERSION = "tv";
     private static final String TYPE_ACCESS = "access";
     private static final String TYPE_REFRESH = "refresh";
 
@@ -94,6 +95,18 @@ public class JwtService {
     }
 
     /**
+     * Extracts the token-version claim used for server-side revocation.
+     * Extrahiert den Token-Versions-Anspruch zur serverseitigen Widerrufsprüfung.
+     *
+     * @param token JWT string / JWT-String
+     * @return token version the user had when this token was issued / Token-Version bei Ausstellung
+     */
+    public int extractTokenVersion(String token) {
+        Integer version = extractClaims(token).get(CLAIM_TOKEN_VERSION, Integer.class);
+        return version == null ? 0 : version;
+    }
+
+    /**
      * Validates that the token is well-formed, not expired, and matches the expected type.
      * Validiert, dass der Token wohlgeformt, nicht abgelaufen ist und dem erwarteten Typ entspricht.
      *
@@ -145,6 +158,7 @@ public class JwtService {
                 .subject(user.getId().toString())
                 .claim(CLAIM_ROLE, user.getRole().name())
                 .claim(CLAIM_TYPE, type)
+                .claim(CLAIM_TOKEN_VERSION, user.getTokenVersion())
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(getSigningKey())

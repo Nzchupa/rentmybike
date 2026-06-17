@@ -200,6 +200,32 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             """)
     List<Booking> findByBikeIdOrderByStartDateDesc(@Param("bikeId") UUID bikeId);
 
+    /**
+     * Active (PENDING/ACCEPTED) bookings for a bike, used to expose occupied
+     * date ranges on the public bike detail page so renters can see — and the
+     * client-side calendar can disable — dates that are already taken.
+     * Aktive (PENDING/ACCEPTED) Buchungen für ein Fahrrad, um belegte
+     * Datumsbereiche auf der öffentlichen Fahrrad-Detailseite offenzulegen,
+     * damit Mieter sehen — und der Client-seitige Kalender deaktivieren —
+     * kann, welche Termine bereits vergeben sind.
+     *
+     * <p>Unlike {@link #findByBikeIdOrderByStartDateDesc}, this intentionally
+     * does not fetch the renter — it's used behind a public endpoint and must
+     * not leak who booked which dates.
+     * <p>Im Gegensatz zu {@link #findByBikeIdOrderByStartDateDesc} wird hier
+     * bewusst nicht der Mieter geladen — wird hinter einem öffentlichen
+     * Endpunkt verwendet und darf nicht offenlegen, wer welche Termine
+     * gebucht hat.
+     */
+    @Query("""
+            SELECT b FROM Booking b
+            WHERE b.bike.id = :bikeId
+              AND b.status IN (com.rentmybike.booking.entity.BookingStatus.PENDING, com.rentmybike.booking.entity.BookingStatus.ACCEPTED)
+              AND b.deletedAt IS NULL
+            ORDER BY b.startDate ASC
+            """)
+    List<Booking> findActiveBookingsByBikeId(@Param("bikeId") UUID bikeId);
+
     // ──────────────────────────────────────────────────────────────────────────
     // Admin stats counts / Admin-Statistikzählungen
     // ──────────────────────────────────────────────────────────────────────────
