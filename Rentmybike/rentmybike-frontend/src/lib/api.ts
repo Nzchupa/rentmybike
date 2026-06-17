@@ -116,7 +116,7 @@ function redirectToLogin() {
   useAuthStore.getState().logout();
   if (typeof window !== "undefined") {
     const locale = window.location.pathname.split("/")[1] || "en";
-    window.location.href = `/${locale}/login`;
+    window.location.href = `/${locale}/auth/login`;
   }
 }
 
