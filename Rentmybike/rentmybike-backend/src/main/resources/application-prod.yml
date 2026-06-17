@@ -21,6 +21,8 @@
 #   SMTP_USERNAME
 #   SMTP_PASSWORD
 #   FRONTEND_URL        — e.g. https://rentmybike.vercel.app
+#   COOKIE_DOMAIN        — shared parent domain for the CSRF cookie, e.g. .rentmybike.xyz
+#                          (frontend and backend are different subdomains of this)
 # ══════════════════════════════════════════════════════════════════════════════
 
 spring:
@@ -71,6 +73,16 @@ management:
 
 app:
   secure-cookie: true   # HTTPS only in production / Nur HTTPS in der Produktion
+  # Shared parent domain so the frontend (rentmybike.xyz) can read the
+  # XSRF-TOKEN cookie set by the backend (api.rentmybike.xyz) — without this
+  # the cookie is host-only and invisible to the SPA, causing 403s on every
+  # CSRF-protected request (e.g. logout). Defaults to ".rentmybike.xyz"; can
+  # be overridden via the COOKIE_DOMAIN Railway env var if the domain changes.
+  # Gemeinsame übergeordnete Domain, damit das Frontend das vom Backend
+  # gesetzte XSRF-TOKEN-Cookie lesen kann — sonst ist das Cookie Host-only
+  # und für die SPA unsichtbar, was zu 403-Fehlern bei jeder CSRF-geschützten
+  # Anfrage führt (z. B. Logout).
+  cookie-domain: ${COOKIE_DOMAIN:.rentmybike.xyz}
   jwt:
     # No fallback here on purpose: if JWT_SECRET is not set in Railway, startup
     # MUST fail loudly instead of silently using the insecure default from

@@ -37,6 +37,26 @@ public class AppProperties {
     private boolean secureCookie = false;
 
     /**
+     * Domain attribute for the readable XSRF-TOKEN cookie (double-submit CSRF).
+     * Empty = host-only cookie (fine for localhost, where frontend and backend
+     * share the same host). In production, frontend (rentmybike.xyz) and backend
+     * (api.rentmybike.xyz) are different hosts under the same registrable domain
+     * — a host-only cookie set by the backend is invisible to frontend JS, so
+     * axios can never read it to echo it back as X-XSRF-TOKEN, and every
+     * state-changing request (e.g. logout) is rejected with 403. Setting this to
+     * ".rentmybike.xyz" makes the cookie shared across subdomains so the SPA can
+     * actually read it.
+     * Domain-Attribut für das lesbare XSRF-TOKEN-Cookie (Double-Submit-CSRF).
+     * Leer = Host-only-Cookie (passt für localhost). In der Produktion sind
+     * Frontend (rentmybike.xyz) und Backend (api.rentmybike.xyz) unterschiedliche
+     * Hosts — ein Host-only-Cookie des Backends ist für Frontend-JS unsichtbar,
+     * daher kann axios es nicht lesen und jede zustandsändernde Anfrage (z. B.
+     * Logout) wird mit 403 abgelehnt. ".rentmybike.xyz" macht das Cookie über
+     * Subdomains hinweg gemeinsam nutzbar.
+     */
+    private String cookieDomain = "";
+
+    /**
      * If true, newly registered users are automatically email-verified.
      * Use only in development — never in production!
      * Wenn true, werden neu registrierte Benutzer automatisch verifiziert.

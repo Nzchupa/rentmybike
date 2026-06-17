@@ -57,6 +57,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserRepository userRepository;
     private final CorsConfigurationSource corsConfigurationSource;
+    private final AppProperties appProperties;
 
     // ──────────────────────────────────────────────────────────────────────────
     // Security filter chain / Sicherheits-Filter-Kette
@@ -112,7 +113,7 @@ public class SecurityConfig {
             //    könnte, und /refresh wird transparent vom Axios-Interceptor
             //    aufgerufen.
             .csrf(csrf -> csrf
-                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                    .csrfTokenRepository(csrfTokenRepository())
                     .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                     .ignoringRequestMatchers(
                             "/api/v1/auth/login",
@@ -172,6 +173,31 @@ public class SecurityConfig {
             .authenticationProvider(authenticationProvider());
 
         return http.build();
+    }
+
+    /**
+     * CSRF token repository — issues the readable XSRF-TOKEN cookie used for
+     * double-submit CSRF protection. When app.cookie-domain is set (production),
+     * the cookie's Domain attribute is widened to that shared parent domain so
+     * frontend JS on a different subdomain (e.g. rentmybike.xyz reading a cookie
+     * set by api.rentmybike.xyz) can actually read it — otherwise the cookie is
+     * host-only, invisible to the SPA, and every state-changing request (e.g.
+     * logout) is rejected with 403 because axios can never send X-XSRF-TOKEN.
+     * CSRF-Token-Repository — stellt das lesbare XSRF-TOKEN-Cookie für den
+     * Double-Submit-CSRF-Schutz aus. Wenn app.cookie-domain gesetzt ist
+     * (Produktion), wird das Domain-Attribut des Cookies auf diese gemeinsame
+     * übergeordnete Domain erweitert, damit Frontend-JS auf einer anderen
+     * Subdomain es lesen kann — sonst ist das Cookie Host-only und für die SPA
+     * unsichtbar, wodurch jede zustandsändernde Anfrage (z. B. Logout) mit 403
+     * abgelehnt wird, weil axios X-XSRF-TOKEN nie senden kann.
+     */
+    private CookieCsrfTokenRepository csrfTokenRepository() {
+        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        String cookieDomain = appProperties.getCookieDomain();
+        if (cookieDomain != null && !cookieDomain.isBlank()) {
+            repository.setCookieCustomizer(cookie -> cookie.domain(cookieDomain));
+        }
+        return repository;
     }
 
     // ──────────────────────────────────────────────────────────────────────────

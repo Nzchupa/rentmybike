@@ -38,10 +38,18 @@ public interface BikeRepository extends JpaRepository<Bike, UUID> {
      * <p>Gibt nur APPROVED + verfügbare + nicht gelöschte Fahrräder zurück.
      * Alle Filterparameter sind optional (null = Filter ignorieren).
      */
+    // Note: no LEFT JOIN FETCH b.photos here — combining a collection fetch
+    // join with Pageable causes Hibernate to paginate in memory (and, with
+    // Spring Data's auto-derived COUNT query, can throw at runtime). Photos
+    // are lazily loaded per-bike instead — fine at these page sizes.
+    // Hinweis: kein LEFT JOIN FETCH b.photos hier — die Kombination eines
+    // Collection-Fetch-Joins mit Pageable führt dazu, dass Hibernate im
+    // Speicher paginiert (und mit der automatisch abgeleiteten COUNT-Abfrage
+    // von Spring Data zur Laufzeit eine Exception auslösen kann). Fotos
+    // werden stattdessen pro Fahrrad lazy geladen — bei diesen Seitengrößen unbedenklich.
     @Query("""
             SELECT b FROM Bike b
             JOIN FETCH b.owner o
-            LEFT JOIN FETCH b.photos p
             WHERE b.deletedAt IS NULL
               AND b.approvalStatus = 'APPROVED'
               AND b.available = true
@@ -67,9 +75,9 @@ public interface BikeRepository extends JpaRepository<Bike, UUID> {
      * All bikes owned by a user (for "My Bikes" page), including pending/rejected.
      * Alle Fahrräder eines Benutzers (für "Meine Fahrräder"-Seite), inkl. pending/rejected.
      */
+    // No collection fetch join — see comment on searchPublic() above for why.
     @Query("""
             SELECT b FROM Bike b
-            LEFT JOIN FETCH b.photos p
             WHERE b.owner.id = :ownerId
               AND b.deletedAt IS NULL
             ORDER BY b.createdAt DESC
@@ -101,10 +109,10 @@ public interface BikeRepository extends JpaRepository<Bike, UUID> {
      * All bikes filtered by approval status (for admin moderation queue).
      * Alle Fahrräder gefiltert nach Genehmigungsstatus (für die Admin-Moderationswarteschlange).
      */
+    // No collection fetch join — see comment on searchPublic() above for why.
     @Query("""
             SELECT b FROM Bike b
             JOIN FETCH b.owner o
-            LEFT JOIN FETCH b.photos p
             WHERE b.deletedAt IS NULL
               AND (:status IS NULL OR b.approvalStatus = :status)
             ORDER BY b.createdAt ASC
