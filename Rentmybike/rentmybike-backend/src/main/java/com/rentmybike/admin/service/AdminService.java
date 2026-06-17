@@ -3,7 +3,9 @@ package com.rentmybike.admin.service;
 import com.rentmybike.admin.dto.AdminStatsResponse;
 import com.rentmybike.admin.dto.AdminUserResponse;
 import com.rentmybike.bike.entity.ApprovalStatus;
+import com.rentmybike.bike.entity.Bike;
 import com.rentmybike.bike.repository.BikeRepository;
+import com.rentmybike.booking.entity.Booking;
 import com.rentmybike.booking.entity.BookingStatus;
 import com.rentmybike.booking.repository.BookingRepository;
 import com.rentmybike.common.exception.BusinessException;
@@ -113,8 +115,18 @@ public class AdminService {
     }
 
     /**
-     * Soft-deletes a user account.
-     * Soft-löscht ein Benutzerkonto.
+     * Soft-deletes a user account, cascading to their bikes and bookings so
+     * nothing active is left pointing at a deleted account.
+     * Soft-löscht ein Benutzerkonto und kaskadiert auf dessen Fahrräder und
+     * Buchungen, damit nichts Aktives auf ein gelöschtes Konto verweist.
+     *
+     * <p>Without this, a deleted user's bike listings stayed APPROVED/visible
+     * in public search, and their PENDING/ACCEPTED bookings (as renter or as
+     * bike owner) stayed active with no one able to act on them.
+     * <p>Ohne dies blieben die Fahrrad-Inserate eines gelöschten Benutzers
+     * APPROVED/sichtbar in der öffentlichen Suche, und seine PENDING/ACCEPTED-
+     * Buchungen (als Mieter oder als Fahrrad-Eigentümer) blieben aktiv, ohne
+     * dass jemand darauf reagieren konnte.
      *
      * <p>Admin cannot delete themselves.
      * <p>Admin kann sich nicht selbst löschen.
@@ -129,8 +141,29 @@ public class AdminService {
             throw new BusinessException("Cannot delete another admin / Kann keinen anderen Admin löschen");
         }
 
+        // Cancel every booking where this user is the renter or the bike owner —
+        // both sides lose the ability to act on the booking once either party
+        // is gone, so leaving it PENDING/ACCEPTED would strand the other side.
+        // Jede Buchung stornieren, bei der dieser Benutzer Mieter oder
+        // Fahrrad-Eigentümer ist — beide Seiten verlieren die Möglichkeit, auf
+        // die Buchung zu reagieren, sobald eine Partei weg ist.
+        for (Booking booking : bookingRepository.findActiveBookingsByUserId(userId)) {
+            booking.setStatus(BookingStatus.CANCELLED);
+        }
+
+        // Soft-delete all of the user's bike listings and take them off the
+        // market — an orphaned listing should not still be rentable.
+        // Alle Fahrrad-Inserate des Benutzers soft löschen und vom Markt nehmen —
+        // ein verwaistes Inserat sollte nicht weiter mietbar sein.
+        for (Bike bike : bikeRepository.findActiveBikesByOwnerId(userId)) {
+            bike.setAvailable(false);
+            bike.softDelete();
+        }
+
         target.softDelete();
-        log.info("Admin {} soft-deleted user {} / Admin {} hat Benutzer {} soft-gelöscht", adminId, userId, adminId, userId);
+        log.info("Admin {} soft-deleted user {} (cascaded to bikes + bookings) / "
+                + "Admin {} hat Benutzer {} soft-gelöscht (kaskadiert auf Fahrräder + Buchungen)",
+                adminId, userId, adminId, userId);
     }
 
     // ──────────────────────────────────────────────────────────────────────────

@@ -43,20 +43,32 @@ public class AuthController {
      * Register a new user account.
      * Neues Benutzerkonto registrieren.
      *
-     * <p>201 Created on success — verification email is sent asynchronously.
-     * <p>201 Created bei Erfolg — Verifizierungs-E-Mail wird asynchron gesendet.
+     * <p>201 Created on success. The response message reflects whether the
+     * verification email actually went out — if Resend failed, the account
+     * still exists, but the user is told to use "resend verification" instead
+     * of being falsely told to check their inbox.
+     * <p>201 Created bei Erfolg. Die Antwortnachricht spiegelt wider, ob die
+     * Verifizierungs-E-Mail tatsächlich versendet wurde — falls Resend
+     * fehlschlug, existiert das Konto trotzdem, aber der Benutzer wird
+     * angewiesen, "Verifizierung erneut senden" zu nutzen, statt fälschlich
+     * zur Prüfung des Posteingangs aufgefordert zu werden.
      *
      * @param request registration data (validated) / Registrierungsdaten (validiert)
      * @return 201 with success message / 201 mit Erfolgsmeldung
      */
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Void>> register(@Valid @RequestBody RegisterRequest request) {
-        authService.register(request);
+        boolean emailSent = authService.register(request);
+        String message = emailSent
+                ? "Registration successful! Check your email to verify your account. / " +
+                  "Registrierung erfolgreich! Überprüfe deine E-Mail zur Kontobestätigung."
+                : "Registration successful, but we couldn't send the verification email right now. " +
+                  "Use \"resend verification\" to try again. / " +
+                  "Registrierung erfolgreich, aber die Verifizierungs-E-Mail konnte momentan nicht gesendet werden. " +
+                  "Nutze \"Verifizierung erneut senden\", um es erneut zu versuchen.";
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(null,
-                        "Registration successful! Check your email to verify your account. / " +
-                        "Registrierung erfolgreich! Überprüfe deine E-Mail zur Kontobestätigung."));
+                .body(ApiResponse.success(null, message));
     }
 
     // ──────────────────────────────────────────────────────────────────────────

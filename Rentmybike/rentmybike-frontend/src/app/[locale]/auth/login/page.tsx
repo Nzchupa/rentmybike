@@ -12,12 +12,22 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import type { LoginRequest } from "@/types";
 
-const loginSchema = z.object({
-  email: z.string().email("Invalid email / Ungültige E-Mail"),
-  password: z.string().min(1, "Password required / Passwort erforderlich"),
-});
+// Validation messages are resolved at submit-time via the translation
+// function passed into makeLoginSchema(), so the error text follows the
+// active locale instead of always showing both languages at once.
+//
+// Validierungsmeldungen werden zur Absendezeit über die in
+// makeLoginSchema() übergebene Übersetzungsfunktion aufgelöst, sodass der
+// Fehlertext der aktiven Sprache folgt, anstatt immer beide Sprachen
+// gleichzeitig zu zeigen.
+function makeLoginSchema(t: (key: string) => string) {
+  return z.object({
+    email: z.string().email(t("auth.errors.invalidEmail")),
+    password: z.string().min(1, t("auth.errors.passwordRequired")),
+  });
+}
 
-type LoginForm = z.infer<typeof loginSchema>;
+type LoginForm = z.infer<ReturnType<typeof makeLoginSchema>>;
 
 /**
  * Login page.
@@ -25,6 +35,7 @@ type LoginForm = z.infer<typeof loginSchema>;
  */
 export default function LoginPage() {
   const t = useTranslations("auth.login");
+  const tRoot = useTranslations();
   const locale = useLocale();
   const { login } = useAuth();
 
@@ -32,13 +43,13 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginForm>({ resolver: zodResolver(loginSchema) });
+  } = useForm<LoginForm>({ resolver: zodResolver(makeLoginSchema(tRoot)) });
 
   async function onSubmit(data: LoginForm) {
     try {
       await login(data as LoginRequest);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Login failed";
+      const msg = err instanceof Error ? err.message : tRoot("auth.errors.loginFailed");
       toast.error(msg);
     }
   }

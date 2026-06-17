@@ -5,7 +5,6 @@ import com.rentmybike.common.config.AppProperties;
 import com.rentmybike.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -19,8 +18,12 @@ import java.util.Map;
  * Service for sending transactional emails (verification, etc.).
  * Service zum Senden von Transaktions-E-Mails (Verifizierung, etc.).
  *
- * <p>All email sending is done asynchronously to avoid blocking HTTP requests.
- * <p>Alle E-Mail-Versendungen erfolgen asynchron, um HTTP-Anfragen nicht zu blockieren.
+ * <p>Sending is synchronous and returns a success/failure boolean — callers
+ * use it to tell the user honestly whether the verification email actually
+ * went out, instead of always claiming success.
+ * <p>Der Versand erfolgt synchron und liefert ein Erfolg/Fehlschlag-Boolean
+ * zurück — Aufrufer nutzen es, um dem Benutzer ehrlich mitzuteilen, ob die
+ * Verifizierungs-E-Mail tatsächlich verschickt wurde, statt immer Erfolg zu behaupten.
  *
  * <p>Emails are sent via Resend's HTTPS API (https://api.resend.com/emails) rather
  * than SMTP, because Railway blocks outbound SMTP ports (25/465/587) on this plan.
@@ -62,11 +65,21 @@ public class EmailService {
      * <p>The link is valid for 24 hours after sending.
      * <p>Der Link ist 24 Stunden nach dem Versand gültig.
      *
+     * <p>Intentionally synchronous (not {@code @Async}): callers (AuthService)
+     * need the success/failure result to decide what to tell the user — if this
+     * silently failed in the background, registration would always claim "check
+     * your email" even when no email was ever sent.
+     * <p>Bewusst synchron (kein {@code @Async}): Aufrufer (AuthService) benötigen
+     * das Erfolgs-/Fehlschlag-Ergebnis, um zu entscheiden, was dem Benutzer
+     * mitgeteilt wird — würde dies im Hintergrund stillschweigend fehlschlagen,
+     * würde die Registrierung immer "E-Mail prüfen" behaupten, auch wenn nie eine
+     * E-Mail gesendet wurde.
+     *
      * @param user  the user to verify / der zu verifizierende Benutzer
      * @param token the verification token / der Verifizierungstoken
+     * @return true if the email was accepted by Resend / true, wenn die E-Mail von Resend angenommen wurde
      */
-    @Async
-    public void sendVerificationEmail(User user, String token) {
+    public boolean sendVerificationEmail(User user, String token) {
         // Construct the verification URL / Verifizierungs-URL zusammenstellen
         String verificationUrl = appProperties.getFrontendUrl()
                 + "/auth/verify-email?token=" + token;
@@ -74,7 +87,7 @@ public class EmailService {
         String subject = "Verify your RentMyBike account / RentMyBike-Konto bestätigen";
         String htmlBody = buildVerificationEmailHtml(user.getFirstName(), verificationUrl);
 
-        sendHtmlEmail(user.getEmail(), subject, htmlBody);
+        return sendHtmlEmail(user.getEmail(), subject, htmlBody);
     }
 
     /**
@@ -83,11 +96,11 @@ public class EmailService {
      *
      * @param user  the user requesting resend / der Benutzer, der erneuten Versand anfordert
      * @param token the new verification token / der neue Verifizierungstoken
+     * @return true if the email was accepted by Resend / true, wenn die E-Mail von Resend angenommen wurde
      */
-    @Async
-    public void resendVerificationEmail(User user, String token) {
+    public boolean resendVerificationEmail(User user, String token) {
         // Reuse the same template, just with a fresh token / Gleiche Vorlage verwenden, nur mit neuem Token
-        sendVerificationEmail(user, token);
+        return sendVerificationEmail(user, token);
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -102,11 +115,11 @@ public class EmailService {
      * @param subject  email subject / E-Mail-Betreff
      * @param htmlBody HTML content / HTML-Inhalt
      */
-    private void sendHtmlEmail(String to, String subject, String htmlBody) {
+    private boolean sendHtmlEmail(String to, String subject, String htmlBody) {
         if (resendApiKey == null || resendApiKey.isBlank()) {
             log.error("Resend API key is not configured — email to {} not sent / "
                     + "Resend API-Schlüssel ist nicht konfiguriert — E-Mail an {} nicht gesendet", to, to);
-            return;
+            return false;
         }
 
         try {
@@ -130,17 +143,23 @@ public class EmailService {
 
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
                 log.info("Email sent to: {} / E-Mail gesendet an: {}", to, to);
+                return true;
             } else {
                 log.error("Resend API returned {} for email to {}: {} / "
                         + "Resend-API gab {} für E-Mail an {} zurück: {}",
                         response.statusCode(), to, response.body(),
                         response.statusCode(), to, response.body());
+                return false;
             }
 
         } catch (Exception e) {
-            // Log but don't rethrow — email failure should not break the user flow
-            // Protokollieren aber nicht weiterwerfen — E-Mail-Fehler soll den Benutzerfluss nicht unterbrechen
+            // Log but don't rethrow — email failure should not break the user flow;
+            // the caller decides how to inform the user based on the boolean result.
+            // Protokollieren aber nicht weiterwerfen — E-Mail-Fehler soll den Benutzerfluss
+            // nicht unterbrechen; der Aufrufer entscheidet anhand des booleschen Ergebnisses,
+            // wie der Benutzer informiert wird.
             log.error("Failed to send email to: {} / E-Mail-Versand an {} fehlgeschlagen: {}", to, to, e.getMessage());
+            return false;
         }
     }
 

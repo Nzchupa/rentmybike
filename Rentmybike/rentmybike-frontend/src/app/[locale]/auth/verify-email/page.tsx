@@ -56,7 +56,7 @@ function VerifyEmailContent() {
     return (
       <div className="text-center">
         <div className="w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-slate-600">Verifying... / Wird verifiziert...</p>
+        <p className="text-slate-600">{t("verifying")}</p>
       </div>
     );
   }
@@ -84,7 +84,7 @@ function VerifyEmailContent() {
       <h1 className="text-2xl font-bold text-slate-900 mb-2">{t("errorTitle")}</h1>
       <p className="text-slate-600 mb-6">{t("errorMessage")}</p>
       <Button variant="secondary" asChild>
-        <Link href={`/${locale}/auth/register`}>Register again / Erneut registrieren</Link>
+        <Link href={`/${locale}/auth/register`}>{t("registerAgain")}</Link>
       </Button>
     </div>
   );

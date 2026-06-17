@@ -7,6 +7,7 @@ import com.rentmybike.bike.entity.BikeCategory;
 import com.rentmybike.bike.entity.BikePhoto;
 import com.rentmybike.bike.repository.BikePhotoRepository;
 import com.rentmybike.bike.repository.BikeRepository;
+import com.rentmybike.booking.repository.BookingRepository;
 import com.rentmybike.common.exception.AccessDeniedException;
 import com.rentmybike.common.exception.BusinessException;
 import com.rentmybike.common.exception.ResourceNotFoundException;
@@ -51,6 +52,7 @@ public class BikeService {
     private final BikePhotoRepository bikePhotoRepository;
     private final UserRepository userRepository;
     private final CloudinaryService cloudinaryService;
+    private final BookingRepository bookingRepository;
 
     // ──────────────────────────────────────────────────────────────────────────
     // CREATE / ERSTELLEN
@@ -236,6 +238,16 @@ public class BikeService {
      * Soft-deletes a bike (sets deleted_at timestamp).
      * Löscht ein Fahrrad soft (setzt deleted_at-Zeitstempel).
      *
+     * <p>Refuses to delete while the bike has any PENDING/ACCEPTED booking —
+     * otherwise a renter could be left with a confirmed rental for a bike that
+     * silently disappeared. The owner must wait for those bookings to resolve
+     * (complete/cancel/reject) before deleting the listing.
+     * <p>Verweigert die Löschung, solange das Fahrrad eine PENDING/ACCEPTED-Buchung
+     * hat — sonst könnte ein Mieter mit einer bestätigten Mietbuchung für ein
+     * Fahrrad zurückbleiben, das stillschweigend verschwunden ist. Der Eigentümer
+     * muss warten, bis diese Buchungen abgeschlossen sind (completed/cancelled/
+     * rejected), bevor das Inserat gelöscht werden kann.
+     *
      * <p>Photos are NOT removed from Cloudinary immediately — a background cleanup
      * job would handle that in production. For now, only the DB row is soft-deleted.
      * <p>Fotos werden nicht sofort von Cloudinary entfernt — ein Hintergrundbereinigungsjob
@@ -246,6 +258,14 @@ public class BikeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Bike", bikeId));
 
         requireOwner(bike, ownerId);
+
+        if (bookingRepository.existsActiveBookingsForBike(bikeId)) {
+            throw new BusinessException(
+                    "Cannot delete a bike with pending or accepted bookings — resolve them first / "
+                    + "Ein Fahrrad mit ausstehenden oder akzeptierten Buchungen kann nicht gelöscht werden — "
+                    + "bitte diese zuerst abschließen");
+        }
+
         bike.softDelete(); // from BaseEntity
         bikeRepository.save(bike);
 

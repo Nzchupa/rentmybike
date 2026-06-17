@@ -45,7 +45,7 @@ export default function DashboardPage() {
         {user && <Avatar name={user.fullName} avatarUrl={user.avatarUrl} size="lg" />}
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            Hey, {user?.firstName}! 👋
+            {t("greeting", { name: user?.firstName ?? "" })}
           </h1>
           <p className="text-slate-500 text-sm">{user?.email}</p>
         </div>
@@ -90,7 +90,7 @@ export default function DashboardPage() {
               <p className="text-2xl font-bold text-slate-900">
                 {pendingCount}
               </p>
-              <p className="text-sm text-slate-500">Pending requests</p>
+              <p className="text-sm text-slate-500">{t("pendingRequests")}</p>
             </div>
           </div>
         </Link>
@@ -98,7 +98,7 @@ export default function DashboardPage() {
 
       {/* Quick actions */}
       <div>
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">Quick actions</h2>
+        <h2 className="text-lg font-semibold text-slate-900 mb-4">{t("quickActions")}</h2>
         <div className="flex flex-wrap gap-3">
           <Button asChild>
             <Link href={`/${locale}/dashboard/bikes/new`}>
@@ -107,7 +107,7 @@ export default function DashboardPage() {
             </Link>
           </Button>
           <Button variant="secondary" asChild>
-            <Link href={`/${locale}/bikes`}>Browse bikes</Link>
+            <Link href={`/${locale}/bikes`}>{t("browseBikes")}</Link>
           </Button>
         </div>
       </div>

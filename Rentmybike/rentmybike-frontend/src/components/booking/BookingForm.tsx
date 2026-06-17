@@ -29,6 +29,7 @@ interface BookingFormProps {
 export function BookingForm({ bike }: BookingFormProps) {
   const t = useTranslations("booking.form");
   const te = useTranslations("booking.errors");
+  const tNav = useTranslations("nav");
   const locale = useLocale();
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
@@ -54,7 +55,7 @@ export function BookingForm({ bike }: BookingFormProps) {
   const { mutate: createBooking, isPending } = useMutation({
     mutationFn: bookingsApi.create,
     onSuccess: () => {
-      toast.success("Booking request sent! / Buchungsanfrage gesendet!");
+      toast.success(t("requestSent"));
       setRange({});
       setMessage("");
       setShowCalendar(false);
@@ -70,7 +71,7 @@ export function BookingForm({ bike }: BookingFormProps) {
       <div className="card p-6 text-center space-y-4">
         <p className="text-slate-600">{t("loginRequired")}</p>
         <Button asChild className="w-full">
-          <Link href={`/${locale}/auth/login`}>Log in / Anmelden</Link>
+          <Link href={`/${locale}/auth/login`}>{tNav("login")}</Link>
         </Button>
       </div>
     );
@@ -144,14 +145,14 @@ export function BookingForm({ bike }: BookingFormProps) {
           <div>
             <div className="text-xs text-slate-500 mb-0.5">{t("startDate")}</div>
             <div className={startDate ? "text-slate-900 font-medium" : "text-slate-400"}>
-              {startDate ? format(startDate, "dd MMM yyyy") : "Select date / Datum wählen"}
+              {startDate ? format(startDate, "dd MMM yyyy") : t("selectDate")}
             </div>
           </div>
           <div className="w-px h-8 bg-slate-200 mx-3" />
           <div>
             <div className="text-xs text-slate-500 mb-0.5">{t("endDate")}</div>
             <div className={endDate ? "text-slate-900 font-medium" : "text-slate-400"}>
-              {endDate ? format(endDate, "dd MMM yyyy") : "Select date / Datum wählen"}
+              {endDate ? format(endDate, "dd MMM yyyy") : t("selectDate")}
             </div>
           </div>
         </button>
@@ -173,7 +174,7 @@ export function BookingForm({ bike }: BookingFormProps) {
               className="w-full mt-2"
               onClick={() => setShowCalendar(false)}
             >
-              Done / Fertig
+              {t("done")}
             </Button>
           </div>
         )}
@@ -204,7 +205,7 @@ export function BookingForm({ bike }: BookingFormProps) {
             <span>{formatPrice(bike.pricePerDay, locale)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-600">× {rentalDays} days</span>
+            <span className="text-slate-600">× {t("days", { count: rentalDays })}</span>
             <span />
           </div>
           <div className="border-t border-slate-200 pt-2 flex justify-between font-semibold">

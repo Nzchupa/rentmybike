@@ -96,7 +96,7 @@ export default function BikePhotosPage({ params }: BikePhotosPageProps) {
   if (isLoading) {
     return <div className="animate-pulse h-96 rounded-2xl bg-slate-100" />;
   }
-  if (!bike) return <p>Bike not found. / Fahrrad nicht gefunden.</p>;
+  if (!bike) return <p>{t("bikeNotFound")}</p>;
 
   return (
     <div className="max-w-2xl space-y-6">

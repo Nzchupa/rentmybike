@@ -13,7 +13,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,6 +20,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 /**
@@ -30,7 +32,15 @@ import org.springframework.web.cors.CorsConfigurationSource;
  * <p>Security model / Sicherheitsmodell:
  * <ul>
  *   <li>Stateless JWT via httpOnly cookies / Zustandslos mit JWT via httpOnly-Cookies</li>
- *   <li>No CSRF (cookies are SameSite=Strict) / Kein CSRF (Cookies sind SameSite=Strict)</li>
+ *   <li>Cookie-based double-submit CSRF protection for state-changing requests
+ *       (the JWT cookies are SameSite=None in production, since the frontend
+ *       and backend are on different origins — SameSite alone does NOT block
+ *       cross-site requests in that mode, so CSRF must be handled explicitly)
+ *       / Cookie-basierter Double-Submit-CSRF-Schutz für zustandsändernde
+ *       Anfragen (die JWT-Cookies sind in der Produktion SameSite=None, da
+ *       Frontend und Backend auf unterschiedlichen Origins liegen — SameSite
+ *       allein blockiert in diesem Modus KEINE Cross-Site-Anfragen, daher
+ *       muss CSRF explizit behandelt werden)</li>
  *   <li>No session (STATELESS) / Keine Session (STATELESS)</li>
  *   <li>Public: auth endpoints, GET bikes/home / Öffentlich: Auth-Endpunkte, GET Bikes/Home</li>
  *   <li>Protected: all other endpoints / Geschützt: alle anderen Endpunkte</li>
@@ -67,9 +77,53 @@ public class SecurityConfig {
             //    unabhängig davon, was in CorsConfigurationSource konfiguriert ist.
             .cors(cors -> cors.configurationSource(corsConfigurationSource))
 
-            // ── Disable CSRF — we use SameSite=Strict cookies instead
-            // ── CSRF deaktivieren — wir verwenden stattdessen SameSite=Strict-Cookies
-            .csrf(AbstractHttpConfigurer::disable)
+            // ── Cookie-based double-submit CSRF protection. The JWT auth
+            //    cookies are SameSite=None in production (cross-origin
+            //    frontend/backend), so they ARE sent on cross-site requests —
+            //    the comment that used to justify disabling CSRF here
+            //    ("cookies are SameSite=Strict") did not match the actual
+            //    cookie code in AuthService, which sets None/Lax depending on
+            //    environment. CookieCsrfTokenRepository issues a readable
+            //    XSRF-TOKEN cookie; the SPA echoes it back as the
+            //    X-XSRF-TOKEN header (axios does this automatically via
+            //    withXSRFToken), and CsrfFilter rejects state-changing
+            //    requests where the two don't match — a header an attacker's
+            //    cross-site form/script cannot read or set.
+            //    Pure-credential auth endpoints are exempted: they don't yet
+            //    have an authenticated session to forge, and /refresh is
+            //    invoked transparently by the axios interceptor.
+            //
+            // ── Cookie-basierter Double-Submit-CSRF-Schutz. Die JWT-Auth-
+            //    Cookies sind in der Produktion SameSite=None (Frontend und
+            //    Backend auf unterschiedlichen Origins), werden also bei
+            //    Cross-Site-Anfragen MITGESENDET — der Kommentar, der das
+            //    Deaktivieren von CSRF früher begründete ("Cookies sind
+            //    SameSite=Strict"), stimmte nicht mit dem tatsächlichen
+            //    Cookie-Code in AuthService überein, der je nach Umgebung
+            //    None/Lax setzt. CookieCsrfTokenRepository stellt ein
+            //    lesbares XSRF-TOKEN-Cookie aus; die SPA sendet es als
+            //    X-XSRF-TOKEN-Header zurück (axios macht das automatisch via
+            //    withXSRFToken), und CsrfFilter lehnt zustandsändernde
+            //    Anfragen ab, bei denen beide nicht übereinstimmen — ein
+            //    Header, den ein Cross-Site-Formular/Skript eines Angreifers
+            //    nicht lesen oder setzen kann.
+            //    Reine Credential-Auth-Endpunkte sind ausgenommen: Sie haben
+            //    noch keine authentifizierte Sitzung, die gefälscht werden
+            //    könnte, und /refresh wird transparent vom Axios-Interceptor
+            //    aufgerufen.
+            .csrf(csrf -> csrf
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                    .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                    .ignoringRequestMatchers(
+                            "/api/v1/auth/login",
+                            "/api/v1/auth/register",
+                            "/api/v1/auth/refresh",
+                            "/api/v1/auth/verify-email",
+                            "/api/v1/auth/resend-verification",
+                            "/actuator/**"
+                    )
+            )
+            .addFilterAfter(new CsrfCookieFilter(), CsrfFilter.class)
 
             // ── Stateless session — no HttpSession will be created
             // ── Zustandslose Session — kein HttpSession wird erstellt

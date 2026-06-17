@@ -11,20 +11,30 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
-const registerSchema = z
-  .object({
-    firstName: z.string().min(2, "Min 2 characters / Min. 2 Zeichen"),
-    lastName:  z.string().min(2, "Min 2 characters / Min. 2 Zeichen"),
-    email:     z.string().email("Invalid email / Ungültige E-Mail"),
-    password:  z.string().min(8, "Min 8 characters / Min. 8 Zeichen"),
-    confirmPassword: z.string(),
-  })
-  .refine((d) => d.password === d.confirmPassword, {
-    message: "Passwords do not match / Passwörter stimmen nicht überein",
-    path: ["confirmPassword"],
-  });
+// Validation messages are resolved at submit-time via the translation
+// function passed into makeRegisterSchema(), so the error text follows the
+// active locale instead of always showing both languages at once.
+//
+// Validierungsmeldungen werden zur Absendezeit über die in
+// makeRegisterSchema() übergebene Übersetzungsfunktion aufgelöst, sodass der
+// Fehlertext der aktiven Sprache folgt, anstatt immer beide Sprachen
+// gleichzeitig zu zeigen.
+function makeRegisterSchema(t: (key: string) => string) {
+  return z
+    .object({
+      firstName: z.string().min(2, t("auth.errors.nameMin")),
+      lastName:  z.string().min(2, t("auth.errors.nameMin")),
+      email:     z.string().email(t("auth.errors.invalidEmail")),
+      password:  z.string().min(8, t("auth.errors.weakPassword")),
+      confirmPassword: z.string(),
+    })
+    .refine((d) => d.password === d.confirmPassword, {
+      message: t("auth.errors.passwordMismatch"),
+      path: ["confirmPassword"],
+    });
+}
 
-type RegisterForm = z.infer<typeof registerSchema>;
+type RegisterForm = z.infer<ReturnType<typeof makeRegisterSchema>>;
 
 /**
  * Registration page.
@@ -32,6 +42,7 @@ type RegisterForm = z.infer<typeof registerSchema>;
  */
 export default function RegisterPage() {
   const t = useTranslations("auth.register");
+  const tRoot = useTranslations();
   const locale = useLocale();
   const { register: registerUser } = useAuth();
 
@@ -39,7 +50,7 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterForm>({ resolver: zodResolver(registerSchema) });
+  } = useForm<RegisterForm>({ resolver: zodResolver(makeRegisterSchema(tRoot)) });
 
   async function onSubmit(data: RegisterForm) {
     try {
@@ -50,7 +61,7 @@ export default function RegisterPage() {
         password:  data.password,
       });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Registration failed";
+      const msg = err instanceof Error ? err.message : tRoot("auth.errors.registrationFailed");
       toast.error(msg);
     }
   }

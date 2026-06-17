@@ -23,7 +23,7 @@ export default function Error({
       <h1 className="text-2xl font-bold text-slate-900 mb-2">{t("500")}</h1>
       <p className="text-slate-500 mb-8">{error.message}</p>
       <Button onClick={reset} variant="secondary">
-        Try again / Erneut versuchen
+        {t("tryAgain")}
       </Button>
     </div>
   );

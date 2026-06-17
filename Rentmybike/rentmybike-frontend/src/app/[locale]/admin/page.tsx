@@ -64,14 +64,14 @@ export default function AdminStatsPage() {
         label={t("totalRevenue")}
         value={formatPrice(stats.totalRevenue)}
         icon={<TrendingUp size={18} className="text-brand-600" />}
-        sub={`${stats.completedBookings} completed bookings`}
+        sub={t("completedBookingsSub", { count: stats.completedBookings })}
         highlight
       />
 
       {/* User stats */}
       <section>
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">
-          Users / Benutzer
+          {t("sectionUsers")}
         </h2>
         <div className="grid sm:grid-cols-3 gap-4">
           <StatCard
@@ -83,10 +83,10 @@ export default function AdminStatsPage() {
             label={t("bannedUsers")}
             value={stats.bannedUsers}
             icon={<Users size={18} className="text-red-500" />}
-            sub="Locked accounts"
+            sub={t("lockedAccounts")}
           />
           <StatCard
-            label="Admins"
+            label={t("admins")}
             value={stats.totalAdmins}
             icon={<Users size={18} className="text-purple-500" />}
           />
@@ -96,7 +96,7 @@ export default function AdminStatsPage() {
       {/* Bike stats */}
       <section>
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">
-          Bikes / Fahrräder
+          {t("sectionBikes")}
         </h2>
         <div className="grid sm:grid-cols-3 gap-4">
           <StatCard
@@ -108,13 +108,13 @@ export default function AdminStatsPage() {
             label={t("pendingBikes")}
             value={stats.pendingBikes}
             icon={<Clock size={18} className="text-amber-500" />}
-            sub="Awaiting moderation"
+            sub={t("awaitingModeration")}
           />
           <StatCard
             label={t("approvedBikes")}
             value={stats.approvedBikes}
             icon={<CheckCircle size={18} className="text-green-500" />}
-            sub="Live on platform"
+            sub={t("liveOnPlatform")}
           />
         </div>
       </section>
@@ -122,7 +122,7 @@ export default function AdminStatsPage() {
       {/* Booking stats */}
       <section>
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">
-          Bookings / Buchungen
+          {t("sectionBookings")}
         </h2>
         <div className="grid sm:grid-cols-3 gap-4">
           <StatCard
@@ -131,7 +131,7 @@ export default function AdminStatsPage() {
             icon={<Calendar size={18} className="text-slate-600" />}
           />
           <StatCard
-            label="Pending / Ausstehend"
+            label={t("pendingBookings")}
             value={stats.pendingBookings}
             icon={<Clock size={18} className="text-amber-500" />}
           />

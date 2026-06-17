@@ -15,22 +15,34 @@ import { Input } from "@/components/ui/Input";
 import { Avatar } from "@/components/ui/Avatar";
 import type { UpdateProfileRequest, ChangePasswordRequest } from "@/types";
 
-const profileSchema = z.object({
-  firstName: z.string().min(2, "Min 2 chars"),
-  lastName:  z.string().min(2, "Min 2 chars"),
-  phone:     z.string().max(30).optional(),
-});
-
-const passwordSchema = z
-  .object({
-    currentPassword:    z.string().min(1, "Required"),
-    newPassword:        z.string().min(8, "Min 8 chars"),
-    confirmNewPassword: z.string(),
-  })
-  .refine((d) => d.newPassword === d.confirmNewPassword, {
-    message: "Passwords do not match",
-    path: ["confirmNewPassword"],
+// Validation messages are resolved at submit-time via the translation
+// function passed into makeProfileSchema()/makePasswordSchema(), so the
+// error text follows the active locale instead of always showing English.
+//
+// Validierungsmeldungen werden zur Absendezeit über die in
+// makeProfileSchema()/makePasswordSchema() übergebene Übersetzungsfunktion
+// aufgelöst, sodass der Fehlertext der aktiven Sprache folgt, anstatt
+// immer Englisch zu zeigen.
+function makeProfileSchema(t: (key: string) => string) {
+  return z.object({
+    firstName: z.string().min(2, t("dashboard.profile.validation.minTwoChars")),
+    lastName:  z.string().min(2, t("dashboard.profile.validation.minTwoChars")),
+    phone:     z.string().max(30).optional(),
   });
+}
+
+function makePasswordSchema(t: (key: string) => string) {
+  return z
+    .object({
+      currentPassword:    z.string().min(1, t("dashboard.profile.validation.required")),
+      newPassword:        z.string().min(8, t("auth.errors.weakPassword")),
+      confirmNewPassword: z.string(),
+    })
+    .refine((d) => d.newPassword === d.confirmNewPassword, {
+      message: t("auth.errors.passwordMismatch"),
+      path: ["confirmNewPassword"],
+    });
+}
 
 /**
  * Profile edit page.
@@ -38,6 +50,7 @@ const passwordSchema = z
  */
 export default function ProfilePage() {
   const t = useTranslations("dashboard.profile");
+  const tRoot = useTranslations();
   const { user, setUser } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -47,7 +60,7 @@ export default function ProfilePage() {
     handleSubmit: handleProfile,
     formState: { errors: profileErrors, isSubmitting: savingProfile },
   } = useForm({
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(makeProfileSchema(tRoot)),
     defaultValues: {
       firstName: user?.firstName ?? "",
       lastName:  user?.lastName ?? "",
@@ -61,13 +74,13 @@ export default function ProfilePage() {
     handleSubmit: handlePwd,
     reset: resetPwd,
     formState: { errors: pwdErrors, isSubmitting: savingPwd },
-  } = useForm({ resolver: zodResolver(passwordSchema) });
+  } = useForm({ resolver: zodResolver(makePasswordSchema(tRoot)) });
 
   const { mutateAsync: updateProfile } = useMutation({
     mutationFn: (data: UpdateProfileRequest) => usersApi.updateProfile(data),
     onSuccess: (res) => {
       setUser(res.data.data);
-      toast.success("Profile saved / Profil gespeichert");
+      toast.success(t("profileSaved"));
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -75,7 +88,7 @@ export default function ProfilePage() {
   const { mutateAsync: changePassword } = useMutation({
     mutationFn: (data: ChangePasswordRequest) => usersApi.changePassword(data),
     onSuccess: () => {
-      toast.success("Password changed / Passwort geändert");
+      toast.success(t("passwordChanged"));
       resetPwd();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -85,7 +98,7 @@ export default function ProfilePage() {
     mutationFn: (file: File) => usersApi.uploadAvatar(file),
     onSuccess: (res) => {
       setUser(res.data.data);
-      toast.success("Avatar updated / Avatar aktualisiert");
+      toast.success(t("avatarUpdated"));
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -143,12 +156,12 @@ export default function ProfilePage() {
         >
           <div className="grid grid-cols-2 gap-3">
             <Input
-              label="First name / Vorname"
+              label={t("firstName")}
               error={profileErrors.firstName?.message}
               {...regProfile("firstName")}
             />
             <Input
-              label="Last name / Nachname"
+              label={t("lastName")}
               error={profileErrors.lastName?.message}
               {...regProfile("lastName")}
             />
@@ -184,7 +197,7 @@ export default function ProfilePage() {
           <Input
             label={t("newPassword")}
             type="password"
-            placeholder="Min. 8 characters"
+            placeholder={t("newPasswordHint")}
             error={pwdErrors.newPassword?.message as string}
             {...regPwd("newPassword")}
           />

@@ -19,6 +19,7 @@ const STATUS_FILTERS: (BookingStatus | "ALL")[] = [
 export default function OwnerBookingsPage() {
   const t = useTranslations("dashboard.tabs");
   const tb = useTranslations("booking.status");
+  const tBookings = useTranslations("dashboard.bookings");
   const [statusFilter, setStatusFilter] = useState<BookingStatus | undefined>(undefined);
 
   const { data, isLoading } = useQuery({
@@ -46,7 +47,7 @@ export default function OwnerBookingsPage() {
             }
             onClick={() => setStatusFilter(s === "ALL" ? undefined : (s as BookingStatus))}
           >
-            {s === "ALL" ? "All" : tb(s)}
+            {tb(s)}
           </Button>
         ))}
       </div>
@@ -59,7 +60,7 @@ export default function OwnerBookingsPage() {
         </div>
       ) : bookings.length === 0 ? (
         <div className="card p-12 text-center text-slate-500">
-          <p>No booking requests yet. / Noch keine Buchungsanfragen.</p>
+          <p>{tBookings("noOwnerBookings")}</p>
         </div>
       ) : (
         <div className="space-y-3">

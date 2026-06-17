@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -77,6 +78,20 @@ public interface BikeRepository extends JpaRepository<Bike, UUID> {
             @Param("ownerId") UUID ownerId,
             Pageable pageable
     );
+
+    /**
+     * All non-deleted bikes owned by a user, unpaginated — used by AdminService
+     * to cascade-soft-delete a user's listings when their account is deleted.
+     * Alle nicht gelöschten Fahrräder eines Benutzers, ohne Paginierung — wird
+     * von AdminService verwendet, um die Inserate eines Benutzers bei
+     * Kontolöschung kaskadiert soft zu löschen.
+     */
+    @Query("""
+            SELECT b FROM Bike b
+            WHERE b.owner.id = :ownerId
+              AND b.deletedAt IS NULL
+            """)
+    List<Bike> findActiveBikesByOwnerId(@Param("ownerId") UUID ownerId);
 
     // ──────────────────────────────────────────────────────────────────────────
     // Admin queries / Admin-Abfragen

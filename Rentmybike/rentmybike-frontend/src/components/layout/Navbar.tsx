@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { Bike, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useAuthStore } from "@/store/auth.store";
@@ -19,6 +19,7 @@ export function Navbar() {
   const t = useTranslations("nav");
   const locale = useLocale();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { user, isAuthenticated, isAdmin } = useAuthStore();
   const authenticated = isAuthenticated();
   const admin = isAdmin();
@@ -28,6 +29,30 @@ export function Navbar() {
   const localePath = (path: string) => `/${locale}${path}`;
 
   const isActive = (path: string) => pathname.startsWith(localePath(path));
+
+  // Builds the href for the language switcher. Previously this used
+  // pathname.replace(`/${locale}`, ...) which (a) is a plain string
+  // replacement, so it could match `/en` anywhere in the path — not just the
+  // locale prefix — and corrupt URLs like /en/bikes/english-rider, and
+  // (b) usePathname() never includes the query string, so switching
+  // language silently dropped params like ?city=Berlin&page=2. We now
+  // replace only the leading locale segment and re-append the current
+  // search params.
+  //
+  // Erstellt den Href für den Sprachumschalter. Vorher wurde
+  // pathname.replace(`/${locale}`, ...) verwendet, was (a) eine reine
+  // String-Ersetzung ist und daher `/en` überall im Pfad treffen konnte —
+  // nicht nur im Locale-Präfix — und URLs wie /en/bikes/english-rider
+  // beschädigte, und (b) usePathname() enthält nie den Query-String,
+  // wodurch beim Sprachwechsel Parameter wie ?city=Berlin&page=2 stillschweigend
+  // verloren gingen. Jetzt wird nur das führende Locale-Segment ersetzt und
+  // die aktuellen Suchparameter werden wieder angehängt.
+  const otherLocale = locale === "en" ? "de" : "en";
+  const localeSwitchHref = (() => {
+    const newPath = pathname.replace(new RegExp(`^/${locale}`), `/${otherLocale}`);
+    const query = searchParams.toString();
+    return query ? `${newPath}?${query}` : newPath;
+  })();
 
   const navLinks = [
     { label: t("home"),  href: "/" },
@@ -69,7 +94,7 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {/* Language switcher */}
             <Link
-              href={pathname.replace(`/${locale}`, locale === "en" ? "/de" : "/en")}
+              href={localeSwitchHref}
               className="text-xs font-medium text-slate-500 hover:text-slate-900 border border-slate-200 rounded-lg px-2 py-1"
             >
               {locale === "en" ? "DE" : "EN"}

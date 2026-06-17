@@ -16,6 +16,25 @@ export const api = axios.create({
     "Content-Type": "application/json",
   },
   timeout: 15_000,
+  // CSRF double-submit cookie: the backend issues a readable XSRF-TOKEN
+  // cookie (CookieCsrfTokenRepository) and rejects state-changing requests
+  // unless the same value is echoed back as the X-XSRF-TOKEN header — a
+  // header a cross-site attacker's form/script cannot read or set. Axios
+  // does this automatically given these three options; `withXSRFToken: true`
+  // is required because our frontend and backend are on different origins
+  // (axios only auto-attaches the header for same-origin requests by default).
+  // CSRF Double-Submit-Cookie: Das Backend stellt ein lesbares
+  // XSRF-TOKEN-Cookie aus (CookieCsrfTokenRepository) und lehnt
+  // zustandsändernde Anfragen ab, sofern nicht derselbe Wert als
+  // X-XSRF-TOKEN-Header zurückgesendet wird — ein Header, den das
+  // Formular/Skript eines Cross-Site-Angreifers nicht lesen oder setzen
+  // kann. Axios erledigt dies automatisch mit diesen drei Optionen;
+  // `withXSRFToken: true` ist erforderlich, da Frontend und Backend auf
+  // unterschiedlichen Origins liegen (Axios hängt den Header standardmäßig
+  // nur bei Anfragen zum gleichen Origin automatisch an).
+  xsrfCookieName: "XSRF-TOKEN",
+  xsrfHeaderName: "X-XSRF-TOKEN",
+  withXSRFToken: true,
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -40,6 +59,26 @@ export const api = axios.create({
 
 type RetryableConfig = AxiosRequestConfig & { _retry?: boolean };
 
+/**
+ * Error thrown by the response interceptor. Carries the original HTTP status
+ * code so callers can distinguish e.g. a 401 (session issue) from a 500
+ * (transient server error) instead of treating every failure identically.
+ *
+ * Fehler, der vom Response-Interceptor geworfen wird. Trägt den
+ * ursprünglichen HTTP-Statuscode, damit Aufrufer z. B. einen 401
+ * (Sitzungsproblem) von einem 500 (vorübergehender Serverfehler)
+ * unterscheiden können, statt jeden Fehler gleich zu behandeln.
+ */
+export class ApiError extends Error {
+  readonly status?: number;
+
+  constructor(message: string, status?: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
 // Endpoints that must never trigger a refresh attempt themselves, otherwise
 // a failed login/refresh could recurse into another refresh call.
 const AUTH_ENDPOINTS = ["/api/v1/auth/refresh", "/api/v1/auth/login", "/api/v1/auth/register"];
@@ -47,6 +86,31 @@ const AUTH_ENDPOINTS = ["/api/v1/auth/refresh", "/api/v1/auth/login", "/api/v1/a
 // Shared in-flight refresh promise so concurrent 401s from several requests
 // firing at once only trigger a single /auth/refresh call.
 let refreshPromise: Promise<void> | null = null;
+
+// This module runs outside the React tree (axios interceptor), so the
+// next-intl useTranslations() hook isn't available here. The active locale
+// is instead read from the URL path segment (same trick redirectToLogin()
+// already uses below), and these two generic fallback messages are looked
+// up from a tiny inline dictionary so they don't always render bilingually
+// regardless of the active locale.
+//
+// Dieses Modul läuft außerhalb des React-Baums (Axios-Interceptor), daher
+// ist der next-intl useTranslations()-Hook hier nicht verfügbar. Die aktive
+// Sprache wird stattdessen aus dem URL-Pfadsegment gelesen (derselbe Trick,
+// den redirectToLogin() unten bereits verwendet), und diese beiden
+// allgemeinen Fallback-Meldungen werden aus einem kleinen, eingebetteten
+// Wörterbuch geholt, damit sie nicht unabhängig von der aktiven Sprache
+// immer zweisprachig angezeigt werden.
+const FALLBACK_MESSAGES = {
+  en: { sessionExpired: "Session expired — please log in again", unknownError: "Unknown error" },
+  de: { sessionExpired: "Sitzung abgelaufen — bitte erneut anmelden", unknownError: "Unbekannter Fehler" },
+} as const;
+
+function getCurrentLocale(): keyof typeof FALLBACK_MESSAGES {
+  if (typeof window === "undefined") return "en";
+  const seg = window.location.pathname.split("/")[1];
+  return seg === "de" ? "de" : "en";
+}
 
 function redirectToLogin() {
   useAuthStore.getState().logout();
@@ -80,15 +144,28 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch {
         redirectToLogin();
-        return Promise.reject(new Error("Session expired — please log in again / Sitzung abgelaufen — bitte erneut anmelden"));
+        return Promise.reject(
+          new ApiError(FALLBACK_MESSAGES[getCurrentLocale()].sessionExpired, 401)
+        );
       }
     }
 
+    // Previously the status code was discarded here, so every failure (a
+    // 401 session issue, a 422 validation error, a 500 transient server
+    // error) looked identical to callers — code that wanted to e.g. show a
+    // "try again" message only for 5xx, or surface field errors only for
+    // 422, had no way to do that.
+    //
+    // Vorher wurde der Statuscode hier verworfen, sodass jeder Fehler (ein
+    // 401-Sitzungsproblem, ein 422-Validierungsfehler, ein vorübergehender
+    // 500-Serverfehler) für Aufrufer identisch aussah — Code, der z. B. nur
+    // bei 5xx eine "Erneut versuchen"-Meldung oder nur bei 422 Feldfehler
+    // anzeigen wollte, hatte dazu keine Möglichkeit.
     const message =
       error.response?.data?.message ??
       error.message ??
-      "Unknown error / Unbekannter Fehler";
-    return Promise.reject(new Error(message));
+      FALLBACK_MESSAGES[getCurrentLocale()].unknownError;
+    return Promise.reject(new ApiError(message, status));
   }
 );
 

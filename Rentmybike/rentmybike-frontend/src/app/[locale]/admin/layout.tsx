@@ -9,9 +9,9 @@ import { useAuthStore } from "@/store/auth.store";
 import { cn } from "@/lib/utils";
 
 const tabs = [
-  { key: "stats",  label: "Statistics", icon: BarChart3, href: "/admin" },
-  { key: "users",  label: "Users",      icon: Users,     href: "/admin/users" },
-  { key: "bikes",  label: "Bikes",      icon: Bike,      href: "/admin/bikes" },
+  { key: "stats",  labelKey: "stats", icon: BarChart3, href: "/admin" },
+  { key: "users",  labelKey: "users", icon: Users,     href: "/admin/users" },
+  { key: "bikes",  labelKey: "bikes", icon: Bike,      href: "/admin/bikes" },
 ];
 
 /**
@@ -20,6 +20,7 @@ const tabs = [
  */
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const t = useTranslations("admin");
+  const tNav = useTranslations("admin.nav");
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
@@ -48,7 +49,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <p className="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
             {t("title")}
           </p>
-          {tabs.map(({ key, label, icon: Icon, href }) => {
+          {tabs.map(({ key, labelKey, icon: Icon, href }) => {
             const fullHref = `/${locale}${href}`;
             const active =
               href === "/admin"
@@ -66,7 +67,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 )}
               >
                 <Icon size={18} />
-                {label}
+                {tNav(labelKey)}
               </Link>
             );
           })}

@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import type { BookingStatus, ApprovalStatus } from "@/types";
 
@@ -42,7 +45,11 @@ const bookingStatusVariant: Record<BookingStatus, BadgeVariant> = {
 };
 
 export function BookingStatusBadge({ status }: { status: BookingStatus }) {
-  return <Badge variant={bookingStatusVariant[status]}>{status}</Badge>;
+  // Previously rendered the raw enum value (e.g. "PENDING") regardless of
+  // locale. Vorher wurde der rohe Enum-Wert (z. B. "PENDING") unabhängig
+  // von der Sprache angezeigt.
+  const t = useTranslations("booking.status");
+  return <Badge variant={bookingStatusVariant[status]}>{t(status)}</Badge>;
 }
 
 const approvalStatusVariant: Record<ApprovalStatus, BadgeVariant> = {
@@ -52,5 +59,9 @@ const approvalStatusVariant: Record<ApprovalStatus, BadgeVariant> = {
 };
 
 export function ApprovalStatusBadge({ status }: { status: ApprovalStatus }) {
-  return <Badge variant={approvalStatusVariant[status]}>{status}</Badge>;
+  // Previously rendered the raw enum value (e.g. "APPROVED") regardless of
+  // locale. Vorher wurde der rohe Enum-Wert (z. B. "APPROVED") unabhängig
+  // von der Sprache angezeigt.
+  const t = useTranslations("bikes.approvalStatus");
+  return <Badge variant={approvalStatusVariant[status]}>{t(status)}</Badge>;
 }

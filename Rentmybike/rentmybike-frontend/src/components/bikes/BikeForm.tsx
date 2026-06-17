@@ -13,17 +13,26 @@ const CATEGORIES: BikeCategory[] = [
   "CITY", "MOUNTAIN", "ROAD", "ELECTRIC", "HYBRID", "CARGO", "KIDS",
 ];
 
-const bikeSchema = z.object({
-  title:       z.string().min(5, "Min 5 chars / Min. 5 Zeichen").max(100),
-  description: z.string().min(20, "Min 20 chars / Min. 20 Zeichen").max(3000),
-  category:    z.enum(["CITY", "MOUNTAIN", "ROAD", "ELECTRIC", "HYBRID", "CARGO", "KIDS"]),
-  pricePerDay: z.coerce.number().min(1, "Min €1"),
-  city:        z.string().min(2, "City required / Stadt erforderlich").max(100),
-  address:     z.string().max(255).optional(),
-  available:   z.boolean(),
-});
+// Validation messages are resolved at submit-time via the translation
+// function passed into makeBikeSchema(), so the error text follows the
+// active locale instead of always showing both languages at once.
+//
+// Validierungsmeldungen werden zur Absendezeit über die in makeBikeSchema()
+// übergebene Übersetzungsfunktion aufgelöst, sodass der Fehlertext der
+// aktiven Sprache folgt, anstatt immer beide Sprachen gleichzeitig zu zeigen.
+function makeBikeSchema(t: (key: string) => string) {
+  return z.object({
+    title:       z.string().min(5, t("validation.titleMin")).max(100),
+    description: z.string().min(20, t("validation.descriptionMin")).max(3000),
+    category:    z.enum(["CITY", "MOUNTAIN", "ROAD", "ELECTRIC", "HYBRID", "CARGO", "KIDS"]),
+    pricePerDay: z.coerce.number().min(1, t("validation.priceMin")),
+    city:        z.string().min(2, t("validation.cityRequired")).max(100),
+    address:     z.string().max(255).optional(),
+    available:   z.boolean(),
+  });
+}
 
-export type BikeFormValues = z.infer<typeof bikeSchema>;
+export type BikeFormValues = z.infer<ReturnType<typeof makeBikeSchema>>;
 
 interface BikeFormProps {
   defaultValues?: Partial<BikeFormValues>;
@@ -39,6 +48,7 @@ interface BikeFormProps {
 export function BikeForm({ defaultValues, existingBike, onSubmit, isEditing }: BikeFormProps) {
   const t = useTranslations("dashboard.bikeForm");
   const tc = useTranslations("bikes.categories");
+  const bikeSchema = makeBikeSchema(t);
 
   const {
     register,
@@ -84,7 +94,7 @@ export function BikeForm({ defaultValues, existingBike, onSubmit, isEditing }: B
           }`}
           {...register("category")}
         >
-          <option value="">Select category / Kategorie wählen</option>
+          <option value="">{t("selectCategory")}</option>
           {CATEGORIES.map((cat) => (
             <option key={cat} value={cat}>{tc(cat)}</option>
           ))}

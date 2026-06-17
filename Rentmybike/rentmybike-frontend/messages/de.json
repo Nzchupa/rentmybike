@@ -17,7 +17,8 @@
     "from": "Von",
     "to": "Bis",
     "days": "{count, plural, one {# Tag} other {# Tage}}",
-    "total": "Gesamt"
+    "total": "Gesamt",
+    "loggedOut": "Abgemeldet"
   },
   "nav": {
     "home": "Startseite",
@@ -78,7 +79,9 @@
       "successMessage": "Ihre E-Mail wurde bestätigt. Sie können sich jetzt anmelden.",
       "errorTitle": "Bestätigung fehlgeschlagen",
       "errorMessage": "Der Link ist ungültig oder abgelaufen. Bitte registrieren Sie sich erneut.",
-      "goToLogin": "Zur Anmeldung"
+      "goToLogin": "Zur Anmeldung",
+      "verifying": "Wird verifiziert...",
+      "registerAgain": "Erneut registrieren"
     },
     "errors": {
       "invalidCredentials": "Ungültige E-Mail oder ungültiges Passwort",
@@ -86,7 +89,12 @@
       "passwordMismatch": "Passwörter stimmen nicht überein",
       "weakPassword": "Passwort muss mindestens 8 Zeichen haben",
       "accountLocked": "Ihr Konto wurde gesperrt. Kontaktieren Sie den Support.",
-      "emailNotVerified": "Bitte bestätigen Sie Ihre E-Mail vor der Anmeldung."
+      "emailNotVerified": "Bitte bestätigen Sie Ihre E-Mail vor der Anmeldung.",
+      "invalidEmail": "Ungültige E-Mail",
+      "nameMin": "Min. 2 Zeichen",
+      "passwordRequired": "Passwort erforderlich",
+      "registrationFailed": "Registrierung fehlgeschlagen",
+      "loginFailed": "Anmeldung fehlgeschlagen"
     }
   },
   "bikes": {
@@ -122,7 +130,11 @@
       "available": "Verfügbar",
       "unavailable": "Nicht verfügbar",
       "pendingApproval": "Ausstehende Genehmigung",
-      "pricePerDay": "Preis pro Tag"
+      "pricePerDay": "Preis pro Tag",
+      "backToSearch": "Zurück zur Suche",
+      "reviewsCount": "{count, plural, one {# Bewertung} other {# Bewertungen}}",
+      "ownerNotice": "Dies ist Ihr Fahrrad.",
+      "editInDashboard": "Im Dashboard bearbeiten"
     },
     "approvalStatus": {
       "PENDING": "Ausstehende Prüfung",
@@ -142,9 +154,13 @@
       "pricePerDay": "Preis pro Tag",
       "totalPrice": "Gesamtpreis",
       "submit": "Buchungsanfrage senden",
-      "loginRequired": "Bitte anmelden zum Buchen"
+      "loginRequired": "Bitte anmelden zum Buchen",
+      "selectDate": "Datum wählen",
+      "done": "Fertig",
+      "requestSent": "Buchungsanfrage gesendet!"
     },
     "status": {
+      "ALL": "Alle",
       "PENDING": "Ausstehend",
       "ACCEPTED": "Akzeptiert",
       "REJECTED": "Abgelehnt",
@@ -169,6 +185,10 @@
   },
   "dashboard": {
     "title": "Dashboard",
+    "greeting": "Hallo, {name}! 👋",
+    "pendingRequests": "Ausstehende Anfragen",
+    "quickActions": "Schnellzugriff",
+    "browseBikes": "Fahrräder durchsuchen",
     "tabs": {
       "overview": "Übersicht",
       "myBikes": "Meine Fahrräder",
@@ -185,7 +205,9 @@
       "deleteConfirm": "Dieses Fahrrad löschen? Dies kann nicht rückgängig gemacht werden.",
       "photos": "Fotos",
       "addPhoto": "Foto hinzufügen",
-      "maxPhotos": "Maximal 5 Fotos pro Fahrrad"
+      "maxPhotos": "Maximal 5 Fotos pro Fahrrad",
+      "bikeDeleted": "Fahrrad gelöscht",
+      "bikeNotFound": "Fahrrad nicht gefunden."
     },
     "bikeForm": {
       "createTitle": "Neues Fahrrad inserieren",
@@ -200,6 +222,16 @@
       "submit": "Fahrrad speichern",
       "titlePlaceholder": "z.B. Rotes Trek Stadtrad",
       "descriptionPlaceholder": "Beschreiben Sie Ihr Fahrrad — Zustand, Zubehör, geeignet für...",
+      "selectCategory": "Kategorie wählen",
+      "bikeListed": "Fahrrad inseriert! Wartet auf Prüfung.",
+      "bikeUpdated": "Fahrrad aktualisiert! Zurück zur Prüfung gesendet.",
+      "bikeNotFound": "Fahrrad nicht gefunden.",
+      "validation": {
+        "titleMin": "Titel muss mindestens 5 Zeichen haben",
+        "descriptionMin": "Beschreibung muss mindestens 20 Zeichen haben",
+        "priceMin": "Preis muss mindestens 1 € sein",
+        "cityRequired": "Stadt ist erforderlich"
+      },
       "hints": {
         "pending": "Ihr Fahrrad wird von unserem Team geprüft, bevor es live geht (normalerweise innerhalb von 24 Stunden).",
         "resetToApproval": "Inhaltsänderungen senden das Fahrrad erneut zur Prüfung."
@@ -210,13 +242,27 @@
       "avatar": "Profilfoto",
       "changeAvatar": "Foto ändern",
       "fullName": "Vollständiger Name",
+      "firstName": "Vorname",
+      "lastName": "Nachname",
       "email": "E-Mail",
       "phone": "Telefonnummer",
       "saveChanges": "Änderungen speichern",
       "changePassword": "Passwort ändern",
       "currentPassword": "Aktuelles Passwort",
       "newPassword": "Neues Passwort",
-      "confirmNewPassword": "Neues Passwort bestätigen"
+      "newPasswordHint": "Min. 8 Zeichen",
+      "confirmNewPassword": "Neues Passwort bestätigen",
+      "profileSaved": "Profil gespeichert",
+      "passwordChanged": "Passwort geändert",
+      "avatarUpdated": "Avatar aktualisiert",
+      "validation": {
+        "minTwoChars": "Min. 2 Zeichen",
+        "required": "Erforderlich"
+      }
+    },
+    "bookings": {
+      "noRenterBookings": "Sie haben noch keine Fahrräder gebucht.",
+      "noOwnerBookings": "Noch keine Buchungsanfragen."
     }
   },
   "reviews": {
@@ -233,16 +279,30 @@
   },
   "admin": {
     "title": "Admin-Panel",
+    "nav": {
+      "stats": "Statistiken",
+      "users": "Benutzer",
+      "bikes": "Fahrräder"
+    },
     "stats": {
       "title": "Plattformstatistiken",
       "totalUsers": "Gesamtbenutzer",
       "bannedUsers": "Gesperrte Benutzer",
+      "admins": "Admins",
       "totalBikes": "Gesamtfahrräder",
       "pendingBikes": "Ausstehende Prüfung",
       "approvedBikes": "Genehmigte Fahrräder",
       "totalBookings": "Gesamtbuchungen",
+      "pendingBookings": "Ausstehend",
       "completedBookings": "Abgeschlossen",
-      "totalRevenue": "Bruttoumsatz"
+      "totalRevenue": "Bruttoumsatz",
+      "completedBookingsSub": "{count, plural, one {# abgeschlossene Buchung} other {# abgeschlossene Buchungen}}",
+      "sectionUsers": "Benutzer",
+      "sectionBikes": "Fahrräder",
+      "sectionBookings": "Buchungen",
+      "lockedAccounts": "Gesperrte Konten",
+      "awaitingModeration": "Wartet auf Moderation",
+      "liveOnPlatform": "Live auf der Plattform"
     },
     "users": {
       "title": "Benutzerverwaltung",
@@ -255,7 +315,14 @@
       "role": "Rolle",
       "status": "Status",
       "active": "Aktiv",
-      "banned": "Gesperrt"
+      "banned": "Gesperrt",
+      "userColumn": "Benutzer",
+      "joined": "Beigetreten",
+      "actions": "Aktionen",
+      "noUsersFound": "Keine Benutzer gefunden.",
+      "userBanned": "Benutzer gesperrt",
+      "userUnbanned": "Benutzer entsperrt",
+      "userDeleted": "Benutzer gelöscht"
     },
     "bikes": {
       "title": "Fahrrad-Moderation",
@@ -268,7 +335,14 @@
         "pending": "Ausstehend",
         "approved": "Genehmigt",
         "rejected": "Abgelehnt"
-      }
+      },
+      "noBikesFound": "Keine Fahrräder gefunden.",
+      "noPhoto": "Kein Foto",
+      "ownerLabel": "Eigentümer: {name}",
+      "perDay": "/Tag",
+      "confirmReject": "Ablehnung bestätigen",
+      "bikeApproved": "Fahrrad genehmigt",
+      "bikeRejected": "Fahrrad abgelehnt"
     }
   },
   "errors": {
@@ -276,6 +350,7 @@
     "403": "Zugriff verweigert",
     "500": "Serverfehler",
     "networkError": "Netzwerkfehler — läuft das Backend?",
-    "goHome": "Zur Startseite"
+    "goHome": "Zur Startseite",
+    "tryAgain": "Erneut versuchen"
   }
 }

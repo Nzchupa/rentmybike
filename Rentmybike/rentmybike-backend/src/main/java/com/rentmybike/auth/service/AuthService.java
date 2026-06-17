@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -58,14 +59,34 @@ public class AuthService {
 
     /**
      * Registers a new user, saves them to the database (unverified),
-     * and sends a verification email asynchronously.
+     * and sends a verification email.
      * Registriert einen neuen Benutzer, speichert ihn in der Datenbank (unverifiziert)
-     * und sendet asynchron eine Verifizierungs-E-Mail.
+     * und sendet eine Verifizierungs-E-Mail.
+     *
+     * <p>The pre-check ({@code existsByEmail}) and the insert are two separate
+     * statements, so two concurrent registrations with the same email can both
+     * pass the check before either commits (TOCTOU). The DB's unique constraint
+     * on {@code email} is the real guard — we just translate the resulting
+     * {@link DataIntegrityViolationException} into a clean 400 instead of
+     * letting it bubble up as an unhandled 500.
+     * <p>Die Vorabprüfung ({@code existsByEmail}) und das Einfügen sind zwei
+     * getrennte Anweisungen, sodass zwei gleichzeitige Registrierungen mit
+     * derselben E-Mail beide die Prüfung bestehen können, bevor eine von beiden
+     * committet (TOCTOU). Der eindeutige DB-Constraint auf {@code email} ist die
+     * eigentliche Absicherung — wir übersetzen die resultierende
+     * {@link DataIntegrityViolationException} lediglich in ein sauberes 400,
+     * statt sie als unbehandeltes 500 durchschlagen zu lassen.
      *
      * @param request registration data / Registrierungsdaten
+     * @return true if the verification email was actually sent (false if the
+     *         user was created but the email failed, or if auto-verify is on
+     *         and no email was needed) / true, wenn die Verifizierungs-E-Mail
+     *         tatsächlich gesendet wurde (false, wenn der Benutzer erstellt wurde,
+     *         die E-Mail aber fehlschlug, oder wenn Auto-Verify aktiv ist und
+     *         keine E-Mail nötig war)
      * @throws BusinessException if email is already taken / wenn E-Mail bereits vergeben
      */
-    public void register(RegisterRequest request) {
+    public boolean register(RegisterRequest request) {
         // Check for duplicate email / Auf doppelte E-Mail prüfen
         if (userRepository.existsByEmail(request.getEmail().toLowerCase())) {
             throw new BusinessException("Email already registered / E-Mail bereits registriert: " + request.getEmail());
@@ -89,18 +110,31 @@ public class AuthService {
                 .emailVerificationTokenExpiry(autoVerify ? null : LocalDateTime.now().plusHours(24))
                 .build();
 
-        userRepository.save(user);
+        try {
+            userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            // Another request won the race and registered this email first /
+            // Eine andere Anfrage hat das Rennen gewonnen und diese E-Mail zuerst registriert
+            throw new BusinessException("Email already registered / E-Mail bereits registriert: " + request.getEmail());
+        }
+
         log.info("New user registered{}: {} / Neuer Benutzer registriert{}: {}",
                 autoVerify ? " (auto-verified)" : "",
                 user.getEmail(),
                 autoVerify ? " (auto-verifiziert)" : "",
                 user.getEmail());
 
-        // Send verification email only when not auto-verifying
-        // Verifizierungs-E-Mail nur senden, wenn nicht auto-verifiziert
-        if (!autoVerify) {
-            emailService.sendVerificationEmail(user, verificationToken);
+        // Send verification email only when not auto-verifying / Verifizierungs-E-Mail nur senden, wenn nicht auto-verifiziert
+        if (autoVerify) {
+            return false;
         }
+        boolean emailSent = emailService.sendVerificationEmail(user, verificationToken);
+        if (!emailSent) {
+            log.error("Verification email failed to send for new user: {} — account was still created / "
+                    + "Verifizierungs-E-Mail für neuen Benutzer konnte nicht gesendet werden: {} — Konto wurde trotzdem erstellt",
+                    user.getEmail(), user.getEmail());
+        }
+        return emailSent;
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -276,6 +310,11 @@ public class AuthService {
      * Generiert einen neuen Verifizierungstoken und sendet die E-Mail erneut.
      *
      * @param email the user's email address / E-Mail-Adresse des Benutzers
+     * @throws BusinessException if the user is not found, already verified, or
+     *                            if the email provider failed to accept the
+     *                            resend / wenn der Benutzer nicht gefunden,
+     *                            bereits verifiziert ist, oder der E-Mail-Anbieter
+     *                            den erneuten Versand nicht akzeptiert hat
      */
     public void resendVerification(String email) {
         User user = userRepository.findByEmail(email.toLowerCase())
@@ -291,7 +330,14 @@ public class AuthService {
         user.setEmailVerificationTokenExpiry(LocalDateTime.now().plusHours(24));
         userRepository.save(user);
 
-        emailService.resendVerificationEmail(user, newToken);
+        boolean emailSent = emailService.resendVerificationEmail(user, newToken);
+        if (!emailSent) {
+            // Don't tell the user "email sent" when it wasn't — let them retry.
+            // Dem Benutzer nicht "E-Mail gesendet" sagen, wenn es nicht stimmt — erneuten Versuch ermöglichen.
+            throw new BusinessException(
+                    "Failed to send verification email — please try again later / "
+                    + "Verifizierungs-E-Mail konnte nicht gesendet werden — bitte später erneut versuchen");
+        }
         log.info("Verification email resent to: {} / Verifizierungs-E-Mail erneut gesendet an: {}", email, email);
     }
 

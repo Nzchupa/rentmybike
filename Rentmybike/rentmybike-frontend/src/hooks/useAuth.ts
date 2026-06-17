@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import toast from "react-hot-toast";
 import { authApi, usersApi } from "@/lib/api";
 import { useAuthStore } from "@/store/auth.store";
@@ -16,6 +16,7 @@ export function useAuth() {
     useAuthStore();
   const router = useRouter();
   const locale = useLocale();
+  const t = useTranslations("common");
 
   /** Load the current user profile from the backend (called on app mount). */
   async function loadCurrentUser() {
@@ -54,7 +55,7 @@ export function useAuth() {
     } finally {
       clearUser();
       router.push(`/${locale}/auth/login`);
-      toast.success("Logged out / Abgemeldet");
+      toast.success(t("loggedOut"));
     }
   }
 

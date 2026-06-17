@@ -11,6 +11,7 @@ import { BookingCard } from "@/components/booking/BookingCard";
  */
 export default function RenterBookingsPage() {
   const t = useTranslations("dashboard.tabs");
+  const tb = useTranslations("dashboard.bookings");
 
   const { data, isLoading } = useQuery({
     queryKey: ["renter-bookings"],
@@ -32,7 +33,7 @@ export default function RenterBookingsPage() {
         </div>
       ) : bookings.length === 0 ? (
         <div className="card p-12 text-center text-slate-500">
-          <p>You haven&apos;t booked any bikes yet. / Sie haben noch keine Fahrräder gebucht.</p>
+          <p>{tb("noRenterBookings")}</p>
         </div>
       ) : (
         <div className="space-y-3">

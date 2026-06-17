@@ -17,7 +17,8 @@
     "from": "From",
     "to": "To",
     "days": "{count, plural, one {# day} other {# days}}",
-    "total": "Total"
+    "total": "Total",
+    "loggedOut": "Logged out"
   },
   "nav": {
     "home": "Home",
@@ -78,7 +79,9 @@
       "successMessage": "Your email has been verified. You can now log in.",
       "errorTitle": "Verification failed",
       "errorMessage": "The link is invalid or has expired. Please register again.",
-      "goToLogin": "Go to login"
+      "goToLogin": "Go to login",
+      "verifying": "Verifying...",
+      "registerAgain": "Register again"
     },
     "errors": {
       "invalidCredentials": "Invalid email or password",
@@ -86,7 +89,12 @@
       "passwordMismatch": "Passwords do not match",
       "weakPassword": "Password must be at least 8 characters",
       "accountLocked": "Your account has been suspended. Contact support.",
-      "emailNotVerified": "Please verify your email before logging in."
+      "emailNotVerified": "Please verify your email before logging in.",
+      "invalidEmail": "Invalid email",
+      "nameMin": "Min 2 characters",
+      "passwordRequired": "Password required",
+      "registrationFailed": "Registration failed",
+      "loginFailed": "Login failed"
     }
   },
   "bikes": {
@@ -122,7 +130,11 @@
       "available": "Available",
       "unavailable": "Not available",
       "pendingApproval": "Pending approval",
-      "pricePerDay": "Price per day"
+      "pricePerDay": "Price per day",
+      "backToSearch": "Back to search",
+      "reviewsCount": "{count, plural, one {# review} other {# reviews}}",
+      "ownerNotice": "This is your bike.",
+      "editInDashboard": "Edit in Dashboard"
     },
     "approvalStatus": {
       "PENDING": "Pending review",
@@ -142,9 +154,13 @@
       "pricePerDay": "Price per day",
       "totalPrice": "Total price",
       "submit": "Send booking request",
-      "loginRequired": "Please log in to book"
+      "loginRequired": "Please log in to book",
+      "selectDate": "Select date",
+      "done": "Done",
+      "requestSent": "Booking request sent!"
     },
     "status": {
+      "ALL": "All",
       "PENDING": "Pending",
       "ACCEPTED": "Accepted",
       "REJECTED": "Rejected",
@@ -169,6 +185,10 @@
   },
   "dashboard": {
     "title": "Dashboard",
+    "greeting": "Hey, {name}! 👋",
+    "pendingRequests": "Pending requests",
+    "quickActions": "Quick actions",
+    "browseBikes": "Browse bikes",
     "tabs": {
       "overview": "Overview",
       "myBikes": "My Bikes",
@@ -185,7 +205,9 @@
       "deleteConfirm": "Delete this bike? This cannot be undone.",
       "photos": "Photos",
       "addPhoto": "Add photo",
-      "maxPhotos": "Maximum 5 photos per bike"
+      "maxPhotos": "Maximum 5 photos per bike",
+      "bikeDeleted": "Bike deleted",
+      "bikeNotFound": "Bike not found."
     },
     "bikeForm": {
       "createTitle": "List a new bike",
@@ -200,6 +222,16 @@
       "submit": "Save bike",
       "titlePlaceholder": "e.g. Red Trek city bike",
       "descriptionPlaceholder": "Describe your bike — condition, accessories, suitable for...",
+      "selectCategory": "Select category",
+      "bikeListed": "Bike listed! Awaiting review.",
+      "bikeUpdated": "Bike updated! Sent back for review.",
+      "bikeNotFound": "Bike not found.",
+      "validation": {
+        "titleMin": "Title must be at least 5 characters",
+        "descriptionMin": "Description must be at least 20 characters",
+        "priceMin": "Price must be at least €1",
+        "cityRequired": "City is required"
+      },
       "hints": {
         "pending": "Your bike will be reviewed by our team before going live (usually within 24h).",
         "resetToApproval": "Editing content will send the bike back for review."
@@ -210,13 +242,27 @@
       "avatar": "Profile photo",
       "changeAvatar": "Change photo",
       "fullName": "Full name",
+      "firstName": "First name",
+      "lastName": "Last name",
       "email": "Email",
       "phone": "Phone number",
       "saveChanges": "Save changes",
       "changePassword": "Change password",
       "currentPassword": "Current password",
       "newPassword": "New password",
-      "confirmNewPassword": "Confirm new password"
+      "newPasswordHint": "Min. 8 characters",
+      "confirmNewPassword": "Confirm new password",
+      "profileSaved": "Profile saved",
+      "passwordChanged": "Password changed",
+      "avatarUpdated": "Avatar updated",
+      "validation": {
+        "minTwoChars": "Min. 2 characters",
+        "required": "Required"
+      }
+    },
+    "bookings": {
+      "noRenterBookings": "You haven't booked any bikes yet.",
+      "noOwnerBookings": "No booking requests yet."
     }
   },
   "reviews": {
@@ -233,16 +279,30 @@
   },
   "admin": {
     "title": "Admin Panel",
+    "nav": {
+      "stats": "Statistics",
+      "users": "Users",
+      "bikes": "Bikes"
+    },
     "stats": {
       "title": "Platform Statistics",
       "totalUsers": "Total Users",
       "bannedUsers": "Banned Users",
+      "admins": "Admins",
       "totalBikes": "Total Bikes",
       "pendingBikes": "Pending Review",
       "approvedBikes": "Approved Bikes",
       "totalBookings": "Total Bookings",
+      "pendingBookings": "Pending",
       "completedBookings": "Completed",
-      "totalRevenue": "Gross Revenue"
+      "totalRevenue": "Gross Revenue",
+      "completedBookingsSub": "{count, plural, one {# completed booking} other {# completed bookings}}",
+      "sectionUsers": "Users",
+      "sectionBikes": "Bikes",
+      "sectionBookings": "Bookings",
+      "lockedAccounts": "Locked accounts",
+      "awaitingModeration": "Awaiting moderation",
+      "liveOnPlatform": "Live on platform"
     },
     "users": {
       "title": "User Management",
@@ -255,7 +315,14 @@
       "role": "Role",
       "status": "Status",
       "active": "Active",
-      "banned": "Banned"
+      "banned": "Banned",
+      "userColumn": "User",
+      "joined": "Joined",
+      "actions": "Actions",
+      "noUsersFound": "No users found.",
+      "userBanned": "User banned",
+      "userUnbanned": "User unbanned",
+      "userDeleted": "User deleted"
     },
     "bikes": {
       "title": "Bike Moderation",
@@ -268,7 +335,14 @@
         "pending": "Pending",
         "approved": "Approved",
         "rejected": "Rejected"
-      }
+      },
+      "noBikesFound": "No bikes found.",
+      "noPhoto": "No photo",
+      "ownerLabel": "Owner: {name}",
+      "perDay": "/day",
+      "confirmReject": "Confirm reject",
+      "bikeApproved": "Bike approved",
+      "bikeRejected": "Bike rejected"
     }
   },
   "errors": {
@@ -276,6 +350,7 @@
     "403": "Access denied",
     "500": "Server error",
     "networkError": "Network error — is the backend running?",
-    "goHome": "Go home"
+    "goHome": "Go home",
+    "tryAgain": "Try again"
   }
 }

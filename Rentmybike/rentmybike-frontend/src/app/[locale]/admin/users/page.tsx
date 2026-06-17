@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Search, ShieldBan, ShieldCheck, Trash2 } from "lucide-react";
@@ -21,11 +21,27 @@ export default function AdminUsersPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const queryClient = useQueryClient();
 
-  // Debounce search
+  // Debounce search — a timer stashed on `window` leaked across remounts
+  // (e.g. fast nav away + back) and was never cleared on unmount, so a
+  // pending setDebouncedSearch could fire after the component was gone.
+  // useRef scopes the timer to this component instance and the cleanup
+  // effect clears it on unmount.
+  //
+  // Debounce-Suche — ein auf `window` abgelegter Timer überlebte Remounts
+  // (z. B. schnelle Navigation weg und zurück) und wurde beim Unmount nie
+  // gelöscht, sodass ein ausstehendes setDebouncedSearch nach dem
+  // Verschwinden der Komponente noch feuern konnte. useRef bindet den Timer
+  // an diese Komponenteninstanz, und der Cleanup-Effect löscht ihn beim Unmount.
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => {
+    return () => clearTimeout(debounceRef.current);
+  }, []);
+
   const handleSearchChange = (val: string) => {
     setSearch(val);
-    clearTimeout((window as typeof window & { _st?: ReturnType<typeof setTimeout> })._st);
-    (window as typeof window & { _st?: ReturnType<typeof setTimeout> })._st = setTimeout(() => setDebouncedSearch(val), 300);
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => setDebouncedSearch(val), 300);
   };
 
   const { data, isLoading } = useQuery({
@@ -39,19 +55,19 @@ export default function AdminUsersPage() {
 
   const { mutate: ban } = useMutation({
     mutationFn: adminApi.banUser,
-    onSuccess: () => { toast.success("User banned"); invalidate(); },
+    onSuccess: () => { toast.success(t("userBanned")); invalidate(); },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const { mutate: unban } = useMutation({
     mutationFn: adminApi.unbanUser,
-    onSuccess: () => { toast.success("User unbanned"); invalidate(); },
+    onSuccess: () => { toast.success(t("userUnbanned")); invalidate(); },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const { mutate: deleteUser } = useMutation({
     mutationFn: adminApi.deleteUser,
-    onSuccess: () => { toast.success("User deleted"); invalidate(); },
+    onSuccess: () => { toast.success(t("userDeleted")); invalidate(); },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -88,11 +104,11 @@ export default function AdminUsersPage() {
             <table className="w-full text-sm">
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">User</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600">{t("userColumn")}</th>
                   <th className="text-left px-4 py-3 font-medium text-slate-600">{t("role")}</th>
                   <th className="text-left px-4 py-3 font-medium text-slate-600">{t("status")}</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">Joined</th>
-                  <th className="text-right px-4 py-3 font-medium text-slate-600">Actions</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600">{t("joined")}</th>
+                  <th className="text-right px-4 py-3 font-medium text-slate-600">{t("actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -169,7 +185,7 @@ export default function AdminUsersPage() {
             </table>
 
             {users.length === 0 && (
-              <p className="text-center py-10 text-slate-500">No users found.</p>
+              <p className="text-center py-10 text-slate-500">{t("noUsersFound")}</p>
             )}
           </div>
         </div>

@@ -17,6 +17,7 @@ import { formatPrice } from "@/lib/utils";
  */
 export default function MyBikesPage() {
   const t = useTranslations("dashboard.bikes");
+  const tCommon = useTranslations("common");
   const locale = useLocale();
   const queryClient = useQueryClient();
 
@@ -29,7 +30,7 @@ export default function MyBikesPage() {
   const { mutate: deleteBike } = useMutation({
     mutationFn: bikesApi.delete,
     onSuccess: () => {
-      toast.success("Bike deleted / Fahrrad gelöscht");
+      toast.success(t("bikeDeleted"));
       queryClient.invalidateQueries({ queryKey: ["my-bikes"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -88,7 +89,7 @@ export default function MyBikesPage() {
                   <ApprovalStatusBadge status={bike.approvalStatus} />
                 </div>
                 <p className="text-sm text-slate-500">
-                  {bike.city} · {formatPrice(bike.pricePerDay)} / day
+                  {bike.city} · {formatPrice(bike.pricePerDay)}{tCommon("perDay")}
                 </p>
                 {bike.approvalStatus === "REJECTED" && bike.rejectionReason && (
                   <p className="text-xs text-red-600 mt-1 line-clamp-1">

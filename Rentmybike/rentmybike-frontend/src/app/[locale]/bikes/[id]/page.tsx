@@ -77,7 +77,7 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
         className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 mb-6"
       >
         <ChevronLeft size={16} />
-        Back to search / Zurück zur Suche
+        {t("backToSearch")}
       </Link>
 
       <div className="grid lg:grid-cols-3 gap-8">
@@ -142,7 +142,7 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
               <div className="flex items-center gap-2 mt-2">
                 <StarRating rating={ratingData.averageRating} size="sm" />
                 <span className="text-sm text-slate-500">
-                  {ratingData.averageRating.toFixed(1)} ({ratingData.reviewCount} reviews)
+                  {ratingData.averageRating.toFixed(1)} ({t("reviewsCount", { count: ratingData.reviewCount })})
                 </span>
               </div>
             )}
@@ -208,10 +208,10 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
               <BookingForm bike={bike} />
             ) : isOwner ? (
               <div className="card p-6 text-center text-slate-500">
-                <p className="mb-4">This is your bike.</p>
+                <p className="mb-4">{t("ownerNotice")}</p>
                 <Button variant="outline" asChild>
                   <Link href={`/${locale}/dashboard/bikes`}>
-                    Edit in Dashboard
+                    {t("editInDashboard")}
                   </Link>
                 </Button>
               </div>

@@ -1,6 +1,6 @@
 package com.rentmybike.booking.dto;
 
-import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -23,7 +23,7 @@ public class CreateBookingRequest {
      * Startdatum — muss heute oder in der Zukunft liegen.
      */
     @NotNull(message = "Start date is required / Startdatum ist erforderlich")
-    @Future(message = "Start date must be in the future / Startdatum muss in der Zukunft liegen")
+    @FutureOrPresent(message = "Start date cannot be in the past / Startdatum darf nicht in der Vergangenheit liegen")
     private LocalDate startDate;
 
     /**

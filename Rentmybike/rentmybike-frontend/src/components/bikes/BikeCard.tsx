@@ -19,6 +19,7 @@ interface BikeCardProps {
 export function BikeCard({ bike }: BikeCardProps) {
   const locale = useLocale();
   const t = useTranslations("bikes.card");
+  const tc = useTranslations("bikes.categories");
 
   // Previously StarRating below was hardcoded to 0 for every card, even
   // though GET /api/v1/reviews/bike/{id}/rating already existed and was
@@ -61,7 +62,7 @@ export function BikeCard({ bike }: BikeCardProps) {
 
           {/* Category badge */}
           <div className="absolute top-3 left-3 rounded-full bg-white/90 backdrop-blur px-2.5 py-1 text-xs font-medium text-slate-700 shadow">
-            {bike.category}
+            {tc(bike.category)}
           </div>
         </div>
 

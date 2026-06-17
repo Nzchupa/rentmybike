@@ -31,7 +31,7 @@ export default function EditBikePage({ params }: EditBikePageProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-bikes"] });
       queryClient.invalidateQueries({ queryKey: ["bike", id] });
-      toast.success("Bike updated! Sent back for review. / Fahrrad aktualisiert! Zurück zur Prüfung gesendet.");
+      toast.success(t("bikeUpdated"));
       router.push(`/${locale}/dashboard/bikes`);
     },
     onError: (e: Error) => toast.error(e.message),
@@ -40,7 +40,7 @@ export default function EditBikePage({ params }: EditBikePageProps) {
   if (isLoading) {
     return <div className="animate-pulse h-96 rounded-2xl bg-slate-100" />;
   }
-  if (!bike) return <p>Bike not found.</p>;
+  if (!bike) return <p>{t("bikeNotFound")}</p>;
 
   return (
     <div className="max-w-2xl">

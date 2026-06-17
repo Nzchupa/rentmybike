@@ -78,6 +78,38 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             @Param("excludeId") UUID excludeId
     );
 
+    /**
+     * Checks whether a bike has any active (PENDING/ACCEPTED) bookings.
+     * Used to block deletion of a bike that still has outstanding rentals.
+     *
+     * Überprüft, ob ein Fahrrad aktive (PENDING/ACCEPTED) Buchungen hat.
+     * Wird verwendet, um die Löschung eines Fahrrads mit ausstehenden Mieten zu verhindern.
+     */
+    @Query("""
+            SELECT COUNT(b) > 0 FROM Booking b
+            WHERE b.bike.id = :bikeId
+              AND b.status IN (com.rentmybike.booking.entity.BookingStatus.PENDING, com.rentmybike.booking.entity.BookingStatus.ACCEPTED)
+              AND b.deletedAt IS NULL
+            """)
+    boolean existsActiveBookingsForBike(@Param("bikeId") UUID bikeId);
+
+    /**
+     * All active (PENDING/ACCEPTED) bookings where the given user is either the
+     * renter or the owner — used to cancel a user's outstanding bookings when
+     * their account is deleted (admin cascade).
+     *
+     * Alle aktiven (PENDING/ACCEPTED) Buchungen, bei denen der gegebene Benutzer
+     * entweder Mieter oder Eigentümer ist — wird verwendet, um die ausstehenden
+     * Buchungen eines Benutzers bei Kontolöschung zu stornieren (Admin-Kaskade).
+     */
+    @Query("""
+            SELECT b FROM Booking b
+            WHERE (b.renter.id = :userId OR b.owner.id = :userId)
+              AND b.status IN (com.rentmybike.booking.entity.BookingStatus.PENDING, com.rentmybike.booking.entity.BookingStatus.ACCEPTED)
+              AND b.deletedAt IS NULL
+            """)
+    List<Booking> findActiveBookingsByUserId(@Param("userId") UUID userId);
+
     // ──────────────────────────────────────────────────────────────────────────
     // Renter queries / Mieter-Abfragen
     // ──────────────────────────────────────────────────────────────────────────

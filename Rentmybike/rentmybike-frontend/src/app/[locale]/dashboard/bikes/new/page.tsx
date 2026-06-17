@@ -21,7 +21,7 @@ export default function NewBikePage() {
     mutationFn: bikesApi.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-bikes"] });
-      toast.success("Bike listed! Awaiting review. / Fahrrad inseriert! Wartet auf Prüfung.");
+      toast.success(t("bikeListed"));
       router.push(`/${locale}/dashboard/bikes`);
     },
     onError: (e: Error) => toast.error(e.message),

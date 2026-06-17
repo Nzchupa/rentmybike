@@ -97,5 +97,19 @@ management:
 server:
   port: ${PORT:8080}
   error:
-    include-message: always    # Show error messages in responses / Fehlermeldungen in Antworten zeigen
-    include-binding-errors: always
+    # All controlled error paths already go through GlobalExceptionHandler,
+    # which builds its own safe, translated ApiResponse and never leaks
+    # ex.getMessage() for unexpected exceptions. "always" here additionally
+    # exposed raw Spring Boot default-error-page messages (e.g. for requests
+    # that never reach a controller, like malformed routing) to every client —
+    # "never" closes that leak without affecting the handled-exception paths.
+    #
+    # Alle kontrollierten Fehlerpfade laufen bereits durch GlobalExceptionHandler,
+    # der eine eigene sichere, übersetzte ApiResponse erstellt und niemals
+    # ex.getMessage() für unerwartete Ausnahmen offenlegt. "always" hat hier
+    # zusätzlich rohe Spring-Boot-Standardfehlerseiten-Nachrichten (z. B. für
+    # Anfragen, die nie einen Controller erreichen, wie fehlerhaftes Routing)
+    # an jeden Client offengelegt — "never" schließt dieses Leck, ohne die
+    # behandelten Ausnahmepfade zu beeinträchtigen.
+    include-message: never
+    include-binding-errors: never

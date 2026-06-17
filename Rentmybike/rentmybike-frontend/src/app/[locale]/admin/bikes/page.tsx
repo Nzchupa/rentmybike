@@ -14,12 +14,21 @@ import type { ApprovalStatus } from "@/types";
 
 const STATUS_TABS: (ApprovalStatus | "ALL")[] = ["ALL", "PENDING", "APPROVED", "REJECTED"];
 
+const STATUS_TAB_KEYS: Record<ApprovalStatus | "ALL", string> = {
+  ALL: "filter.all",
+  PENDING: "filter.pending",
+  APPROVED: "filter.approved",
+  REJECTED: "filter.rejected",
+};
+
 /**
  * Admin bike moderation page.
  * Admin-Fahrrad-Moderationsseite.
  */
 export default function AdminBikesPage() {
   const t = useTranslations("admin.bikes");
+  const tCommon = useTranslations("common");
+  const tc = useTranslations("bikes.categories");
   const [filter, setFilter] = useState<ApprovalStatus | undefined>(undefined);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
@@ -36,7 +45,7 @@ export default function AdminBikesPage() {
 
   const { mutate: approve, isPending: approving } = useMutation({
     mutationFn: bikesApi.adminApprove,
-    onSuccess: () => { toast.success("Bike approved"); invalidate(); },
+    onSuccess: () => { toast.success(t("bikeApproved")); invalidate(); },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -44,7 +53,7 @@ export default function AdminBikesPage() {
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       bikesApi.adminReject(id, reason),
     onSuccess: () => {
-      toast.success("Bike rejected");
+      toast.success(t("bikeRejected"));
       setRejectingId(null);
       setRejectReason("");
       invalidate();
@@ -69,7 +78,7 @@ export default function AdminBikesPage() {
             }
             onClick={() => setFilter(s === "ALL" ? undefined : (s as ApprovalStatus))}
           >
-            {s}
+            {t(STATUS_TAB_KEYS[s])}
           </Button>
         ))}
       </div>
@@ -83,7 +92,7 @@ export default function AdminBikesPage() {
         </div>
       ) : bikes.length === 0 ? (
         <div className="card p-12 text-center text-slate-500">
-          No bikes found. / Keine Fahrräder gefunden.
+          {t("noBikesFound")}
         </div>
       ) : (
         <div className="space-y-3">
@@ -102,7 +111,7 @@ export default function AdminBikesPage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">
-                      No photo
+                      {t("noPhoto")}
                     </div>
                   )}
                 </div>
@@ -113,10 +122,10 @@ export default function AdminBikesPage() {
                     <div>
                       <p className="font-semibold text-slate-900 truncate">{bike.title}</p>
                       <p className="text-sm text-slate-500">
-                        {bike.city} · {bike.category} · {formatPrice(bike.pricePerDay)}/day
+                        {bike.city} · {tc(bike.category)} · {formatPrice(bike.pricePerDay)}{t("perDay")}
                       </p>
                       <p className="text-xs text-slate-400 mt-0.5">
-                        Owner: {bike.ownerName}
+                        {t("ownerLabel", { name: bike.ownerName })}
                       </p>
                     </div>
                     <ApprovalStatusBadge status={bike.approvalStatus} />
@@ -168,14 +177,14 @@ export default function AdminBikesPage() {
                           reject({ id: bike.id, reason: rejectReason.trim() })
                         }
                       >
-                        Confirm reject
+                        {t("confirmReject")}
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={() => setRejectingId(null)}
                       >
-                        Cancel
+                        {tCommon("cancel")}
                       </Button>
                     </div>
                   )}
