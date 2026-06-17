@@ -72,7 +72,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 )}
               >
                 <Icon size={18} />
-                {t(key as keyof typeof t)}
+                {t(key)}
               </Link>
             );
           })}
@@ -93,7 +93,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 )}
               >
                 <Icon size={20} />
-                <span>{t(key as keyof typeof t).slice(0, 6)}</span>
+                <span>{t(key).slice(0, 6)}</span>
               </Link>
             );
           })}

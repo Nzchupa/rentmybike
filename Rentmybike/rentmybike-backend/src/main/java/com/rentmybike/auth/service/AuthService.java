@@ -429,10 +429,15 @@ public class AuthService {
     private AuthResponse buildAuthResponse(User user) {
         return AuthResponse.builder()
                 .userId(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
+                .phone(user.getPhone())
                 .role(user.getRole())
                 .avatarUrl(user.getAvatarUrl())
+                .emailVerified(user.isEmailVerified())
+                .createdAt(user.getCreatedAt())
                 .build();
     }
 }

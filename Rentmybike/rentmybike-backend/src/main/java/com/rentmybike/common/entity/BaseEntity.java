@@ -3,11 +3,13 @@ package com.rentmybike.common.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.proxy.HibernateProxy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -89,5 +91,47 @@ public abstract class BaseEntity {
      */
     public void softDelete() {
         this.deletedAt = LocalDateTime.now();
+    }
+
+    /**
+     * Entity equality based on persistent identity (id), not field values.
+     * Two transient (unsaved, id == null) entities are never equal to each
+     * other — only to themselves — to avoid colliding in a Set before they
+     * have a real identity. Handles Hibernate proxies so that a proxy and
+     * its initialized counterpart compare equal.
+     * Entitätsgleichheit basierend auf der persistenten Identität (id), nicht
+     * auf Feldwerten. Zwei transiente (nicht gespeicherte, id == null)
+     * Entitäten sind niemals gleich zueinander — nur zu sich selbst —, um
+     * Kollisionen in einem Set zu vermeiden, bevor sie eine echte Identität
+     * haben. Behandelt Hibernate-Proxys, damit ein Proxy und sein
+     * initialisiertes Gegenstück als gleich verglichen werden.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        Class<?> thisClass = this instanceof HibernateProxy
+                ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
+                : this.getClass();
+        Class<?> otherClass = o instanceof HibernateProxy
+                ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass()
+                : o.getClass();
+        if (!thisClass.equals(otherClass)) return false;
+        BaseEntity other = (BaseEntity) o;
+        return id != null && id.equals(other.getId());
+    }
+
+    /**
+     * Constant hash code so that an entity's hash never changes as it
+     * transitions from transient (id == null) to persistent — required by
+     * the Set/Map contract, since {@link #equals} depends on id.
+     * Konstanter Hashcode, damit sich der Hash einer Entität nie ändert,
+     * wenn sie von transient (id == null) zu persistent übergeht —
+     * erforderlich durch den Set/Map-Vertrag, da {@link #equals} von id
+     * abhängt.
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(getClass().hashCode());
     }
 }

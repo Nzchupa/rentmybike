@@ -26,8 +26,7 @@ export default function EditBikePage({ params }: EditBikePageProps) {
   });
 
   const { mutateAsync: updateBike } = useMutation({
-    mutationFn: (values: BikeFormValues) =>
-      bikesApi.update(id, { ...values, available: values.available }),
+    mutationFn: (values: BikeFormValues) => bikesApi.update(id, values),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-bikes"] });
       queryClient.invalidateQueries({ queryKey: ["bike", id] });

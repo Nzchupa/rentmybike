@@ -17,6 +17,7 @@ import com.rentmybike.user.entity.User;
 import com.rentmybike.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -77,6 +78,23 @@ public class ReviewService {
         User reviewee = resolveRevieweeAndValidateCaller(booking, reviewer, request.getType());
 
         // Prevent duplicate reviews / Doppelte Bewertungen verhindern
+        //
+        // This pre-check and the insert below are two separate statements, so
+        // two concurrent submissions for the same booking+type can both pass
+        // the check before either commits (TOCTOU) — the DB UNIQUE constraint
+        // is the real guard. We keep the pre-check for the common case (fast,
+        // friendly error without round-tripping to the DB constraint), and
+        // additionally catch the constraint violation below so a genuine race
+        // still surfaces as a clean 400 instead of an unhandled 500.
+        //
+        // Diese Vorabprüfung und der Insert unten sind zwei getrennte
+        // Anweisungen, sodass zwei gleichzeitige Einreichungen für dieselbe
+        // Buchung+Typ beide die Prüfung bestehen können, bevor eine von beiden
+        // committet (TOCTOU) — der UNIQUE-Constraint der DB ist die eigentliche
+        // Absicherung. Wir behalten die Vorabprüfung für den Normalfall (schnell,
+        // freundliche Fehlermeldung ohne Roundtrip zum DB-Constraint) und fangen
+        // zusätzlich die Constraint-Verletzung unten ab, damit ein echtes
+        // Rennen weiterhin als saubere 400 statt als unbehandelte 500 erscheint.
         if (reviewRepository.existsByBookingIdAndType(booking.getId(), request.getType())) {
             throw new BusinessException(
                     "You have already reviewed this booking / Sie haben diese Buchung bereits bewertet");
@@ -91,7 +109,15 @@ public class ReviewService {
                 .type(request.getType())
                 .build();
 
-        reviewRepository.save(review);
+        try {
+            reviewRepository.save(review);
+        } catch (DataIntegrityViolationException e) {
+            // Another concurrent request won the race and inserted first /
+            // Eine andere gleichzeitige Anfrage hat das Rennen gewonnen und zuerst eingefügt
+            throw new BusinessException(
+                    "You have already reviewed this booking / Sie haben diese Buchung bereits bewertet");
+        }
+
         log.info("Review created: type={} for booking: {} by reviewer: {} / Bewertung erstellt: Typ={} für Buchung: {} von Bewerter: {}",
                 request.getType(), booking.getId(), reviewerId,
                 request.getType(), booking.getId(), reviewerId);

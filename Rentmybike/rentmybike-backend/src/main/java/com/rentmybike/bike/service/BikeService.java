@@ -393,6 +393,14 @@ public class BikeService {
         Bike bike = bikeRepository.findByIdWithDetails(bikeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bike", bikeId));
 
+        // Guard against re-rejecting an already-rejected bike — symmetric
+        // with the already-approved guard in approveBike() above.
+        // Schutz vor erneuter Ablehnung eines bereits abgelehnten Fahrrads —
+        // symmetrisch zum "bereits genehmigt"-Schutz in approveBike() oben.
+        if (bike.getApprovalStatus() == ApprovalStatus.REJECTED) {
+            throw new BusinessException("Bike is already rejected / Fahrrad ist bereits abgelehnt");
+        }
+
         bike.setApprovalStatus(ApprovalStatus.REJECTED);
         bike.setRejectionReason(request.getReason().strip());
         bikeRepository.save(bike);

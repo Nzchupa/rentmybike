@@ -31,10 +31,14 @@ export function useAuth() {
   }
 
   async function login(data: LoginRequest) {
-    // authApi.login sets the httpOnly cookie; then load the full profile
-    await authApi.login(data);
-    const profileRes = await usersApi.getMe();
-    setUser(profileRes.data.data);
+    // authApi.login sets the httpOnly cookie and already returns the full
+    // user profile, so there's no need for a separate getMe() round trip.
+    // authApi.login setzt das httpOnly-Cookie und gibt bereits das
+    // vollständige Benutzerprofil zurück, daher ist kein separater
+    // getMe()-Roundtrip nötig.
+    const res = await authApi.login(data);
+    const { userId, ...profile } = res.data.data;
+    setUser({ id: userId, ...profile });
     router.push(`/${locale}/dashboard`);
   }
 

@@ -79,10 +79,15 @@ export interface RegisterRequest {
 /** Shape returned by POST /api/auth/login and POST /api/auth/refresh */
 export interface AuthResponse {
   userId: string;
+  firstName: string;
+  lastName: string;
   fullName: string;
   email: string;
+  phone: string | null;
   role: UserRole;
   avatarUrl: string | null;
+  emailVerified: boolean;
+  createdAt: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
