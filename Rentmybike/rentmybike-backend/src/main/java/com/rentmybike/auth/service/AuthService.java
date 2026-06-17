@@ -394,10 +394,39 @@ public class AuthService {
         boolean secure = appProperties.isSecureCookie();
         String sameSite = secure ? "None" : "Lax";
 
+        // Without an explicit Domain attribute these cookies are host-only —
+        // scoped to api.rentmybike.xyz only. That's fine for the backend
+        // itself (it's the only one reading the JWT), but our Next.js
+        // middleware (middleware.ts) runs on the frontend host
+        // (rentmybike.xyz) and checks request.cookies.has("access_token") to
+        // guard /dashboard and /admin — a request to rentmybike.xyz never
+        // carries a cookie scoped to api.rentmybike.xyz, so that check always
+        // saw "no session" and redirected straight to /auth/login even for
+        // logged-in users. Setting the same shared Domain used for the
+        // XSRF-TOKEN cookie (app.cookie-domain) makes access_token/
+        // refresh_token visible to requests on rentmybike.xyz too.
+        //
+        // Ohne explizites Domain-Attribut sind diese Cookies host-only — nur
+        // für api.rentmybike.xyz gültig. Das ist für das Backend selbst kein
+        // Problem, aber unsere Next.js-Middleware (middleware.ts) läuft auf
+        // dem Frontend-Host (rentmybike.xyz) und prüft
+        // request.cookies.has("access_token"), um /dashboard und /admin zu
+        // schützen — eine Anfrage an rentmybike.xyz trägt nie ein Cookie, das
+        // für api.rentmybike.xyz reserviert ist, daher sah diese Prüfung
+        // immer "keine Sitzung" und leitete selbst eingeloggte Benutzer sofort
+        // zu /auth/login um. Die gleiche gemeinsame Domain wie beim
+        // XSRF-TOKEN-Cookie (app.cookie-domain) zu setzen, macht access_token/
+        // refresh_token auch für Anfragen an rentmybike.xyz sichtbar.
+        String cookieDomain = appProperties.getCookieDomain();
+        String domainAttr = (cookieDomain != null && !cookieDomain.isBlank())
+                ? "; Domain=" + cookieDomain
+                : "";
+
         String header = String.format(
-                "%s=%s; Max-Age=%d; Path=/; HttpOnly%s; SameSite=%s",
+                "%s=%s; Max-Age=%d; Path=/; HttpOnly%s%s; SameSite=%s",
                 name, value, maxAge,
                 secure ? "; Secure" : "",
+                domainAttr,
                 sameSite
         );
         response.addHeader("Set-Cookie", header);
