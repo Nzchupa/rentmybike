@@ -67,36 +67,40 @@ export default function MyBikesPage() {
         <div className="space-y-3">
           {bikes.map((bike) => (
             <div key={bike.id} className="card p-4 flex items-center gap-4">
-              {/* Photo */}
-              <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-slate-100 shrink-0">
-                {bike.primaryPhotoUrl && (
-                  <Image
-                    src={bike.primaryPhotoUrl}
-                    alt={bike.title}
-                    fill
-                    className="object-cover"
-                    sizes="64px"
-                  />
-                )}
-              </div>
-
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <span className="font-semibold text-slate-900 line-clamp-1">
-                    {bike.title}
-                  </span>
-                  <ApprovalStatusBadge status={bike.approvalStatus} />
+              {/* Photo + Info — link to the bike's public listing page */}
+              <Link
+                href={`/${locale}/bikes/${bike.id}`}
+                className="flex items-center gap-4 flex-1 min-w-0 hover:opacity-80"
+              >
+                <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-slate-100 shrink-0">
+                  {bike.primaryPhotoUrl && (
+                    <Image
+                      src={bike.primaryPhotoUrl}
+                      alt={bike.title}
+                      fill
+                      className="object-cover"
+                      sizes="64px"
+                    />
+                  )}
                 </div>
-                <p className="text-sm text-slate-500">
-                  {bike.city} · {formatPrice(bike.pricePerDay)}{tCommon("perDay")}
-                </p>
-                {bike.approvalStatus === "REJECTED" && bike.rejectionReason && (
-                  <p className="text-xs text-red-600 mt-1 line-clamp-1">
-                    ✗ {bike.rejectionReason}
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="font-semibold text-slate-900 line-clamp-1">
+                      {bike.title}
+                    </span>
+                    <ApprovalStatusBadge status={bike.approvalStatus} />
+                  </div>
+                  <p className="text-sm text-slate-500">
+                    {bike.city} · {formatPrice(bike.pricePerDay)}{tCommon("perDay")}
                   </p>
-                )}
-              </div>
+                  {bike.approvalStatus === "REJECTED" && bike.rejectionReason && (
+                    <p className="text-xs text-red-600 mt-1 line-clamp-1">
+                      ✗ {bike.rejectionReason}
+                    </p>
+                  )}
+                </div>
+              </Link>
 
               {/* Actions */}
               <div className="flex items-center gap-2 shrink-0">

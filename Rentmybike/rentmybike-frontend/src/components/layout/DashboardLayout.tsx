@@ -9,17 +9,19 @@ import {
   Bike,
   CalendarSearch,
   CalendarCheck,
+  Bell,
   User,
 } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { cn } from "@/lib/utils";
 
 const tabs = [
-  { key: "overview",   icon: LayoutDashboard, href: "/dashboard" },
-  { key: "myBikes",    icon: Bike,            href: "/dashboard/bikes" },
-  { key: "asRenter",   icon: CalendarSearch,  href: "/dashboard/bookings/renter" },
-  { key: "asOwner",    icon: CalendarCheck,   href: "/dashboard/bookings/owner" },
-  { key: "profile",    icon: User,            href: "/dashboard/profile" },
+  { key: "overview",      icon: LayoutDashboard, href: "/dashboard" },
+  { key: "myBikes",       icon: Bike,            href: "/dashboard/bikes" },
+  { key: "asRenter",      icon: CalendarSearch,  href: "/dashboard/bookings/renter" },
+  { key: "asOwner",       icon: CalendarCheck,   href: "/dashboard/bookings/owner" },
+  { key: "notifications", icon: Bell,            href: "/dashboard/notifications" },
+  { key: "profile",       icon: User,            href: "/dashboard/profile" },
 ];
 
 /**

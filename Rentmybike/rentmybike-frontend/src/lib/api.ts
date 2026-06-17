@@ -38,6 +38,101 @@ export const api = axios.create({
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// CSRF cookie priming — fixes "403 on first mutation of the session"
+// CSRF-Cookie-Priming — behebt "403 bei erster Mutation der Sitzung"
+//
+// The backend only writes the XSRF-TOKEN cookie lazily (CsrfCookieFilter
+// forces it on every request, but the cookie still has to round-trip back
+// from a *prior* response before the browser has it to echo on the *next*
+// request). In practice the app-boot AuthLoader fires a GET /users/me that
+// would normally prime this cookie — but that GET runs in a fire-and-forget
+// useEffect, so a user who lands directly on a page and submits a mutation
+// (e.g. PUT /bikes/{id}) immediately can have their very first request go
+// out before that priming GET has resolved and the cookie has been stored.
+// The result: no X-XSRF-TOKEN header on that first PUT/POST/DELETE → 403 from
+// Spring's CsrfFilter. The retry then succeeds because the cookie is in place
+// by then — exactly the "fails once, then works" symptom.
+//
+// This interceptor closes the gap structurally: before any state-changing
+// request, if no XSRF-TOKEN cookie is present yet, it fires a lightweight GET
+// to obtain one and waits for it, so the mutation that follows always has a
+// token to echo back — regardless of whether AuthLoader's own priming request
+// has completed yet.
+//
+// Das Backend schreibt das XSRF-TOKEN-Cookie nur lazy (CsrfCookieFilter
+// erzwingt es bei jeder Anfrage, aber das Cookie muss erst aus einer
+// *vorherigen* Antwort zurückkommen, bevor der Browser es bei der *nächsten*
+// Anfrage zurücksenden kann). In der Praxis löst der App-Start-AuthLoader ein
+// GET /users/me aus, das dieses Cookie normalerweise vorab setzen würde —
+// aber dieses GET läuft in einem Fire-and-Forget-useEffect, sodass ein
+// Benutzer, der direkt auf einer Seite landet und sofort eine Mutation
+// absendet (z. B. PUT /bikes/{id}), seine allererste Anfrage abschicken kann,
+// bevor diese Priming-GET-Anfrage abgeschlossen und das Cookie gespeichert
+// wurde. Ergebnis: kein X-XSRF-TOKEN-Header bei diesem ersten PUT/POST/DELETE
+// → 403 von Spring's CsrfFilter. Der Wiederholungsversuch klappt dann, weil
+// das Cookie inzwischen vorhanden ist — genau das Symptom "schlägt einmal
+// fehl, funktioniert dann".
+//
+// Dieser Interceptor schließt die Lücke strukturell: Vor jeder
+// zustandsändernden Anfrage wird, falls noch kein XSRF-TOKEN-Cookie vorhanden
+// ist, ein leichtgewichtiges GET ausgelöst, um eines zu erhalten, und
+// abgewartet — sodass die nachfolgende Mutation immer ein Token zum
+// Zurücksenden hat, unabhängig davon, ob die eigene Priming-Anfrage von
+// AuthLoader schon abgeschlossen ist.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const CSRF_SAFE_METHODS = new Set(["get", "head", "options"]);
+
+function readCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(
+    new RegExp("(?:^|; )" + name.replace(/([.$?*|{}()[\]\\/+^])/g, "\\$1") + "=([^;]*)")
+  );
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+let csrfPrimingPromise: Promise<void> | null = null;
+
+/**
+ * Fires (once, shared) a cheap GET so the backend issues the XSRF-TOKEN
+ * cookie. Reuses /api/v1/users/me rather than adding a new endpoint: it
+ * already passes through the full security filter chain (so
+ * CsrfCookieFilter forces the token to be resolved and the cookie written),
+ * works whether the visitor is authenticated or not (skipAuthRedirect avoids
+ * the 401→refresh→redirect dance for an anonymous caller), and costs nothing
+ * extra since AuthLoader already calls it once per session anyway.
+ *
+ * Löst (einmal, gemeinsam genutzt) ein günstiges GET aus, damit das Backend
+ * das XSRF-TOKEN-Cookie ausstellt. Nutzt /api/v1/users/me wieder, statt einen
+ * neuen Endpunkt hinzuzufügen: durchläuft bereits die vollständige
+ * Sicherheits-Filterkette (sodass CsrfCookieFilter das Token auflöst und das
+ * Cookie schreibt), funktioniert unabhängig davon, ob der Besucher
+ * authentifiziert ist (skipAuthRedirect vermeidet den
+ * 401→Refresh→Redirect-Ablauf für einen anonymen Aufrufer), und kostet
+ * nichts zusätzlich, da AuthLoader es ohnehin einmal pro Sitzung aufruft.
+ */
+function primeCsrfCookie(): Promise<void> {
+  if (!csrfPrimingPromise) {
+    csrfPrimingPromise = api
+      .get("/api/v1/users/me", { skipAuthRedirect: true } as unknown as AxiosRequestConfig)
+      .then(() => undefined)
+      .catch(() => undefined) // best-effort — the mutation's own error handling covers failure
+      .finally(() => {
+        csrfPrimingPromise = null;
+      });
+  }
+  return csrfPrimingPromise;
+}
+
+api.interceptors.request.use(async (config) => {
+  const method = (config.method ?? "get").toLowerCase();
+  if (!CSRF_SAFE_METHODS.has(method) && !readCookie("XSRF-TOKEN")) {
+    await primeCsrfCookie();
+  }
+  return config;
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // 401 → refresh → retry
 // 401 → Aktualisieren → Wiederholen
 //
@@ -230,6 +325,8 @@ import type {
   UserRatingResponse,
   AdminUserResponse,
   AdminStatsResponse,
+  NotificationResponse,
+  UnreadCountResponse,
 } from "@/types";
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
@@ -296,6 +393,20 @@ export const bikesApi = {
 
   getById: (id: string) =>
     api.get<ApiResponse<BikeResponse>>(`/api/v1/bikes/${id}`),
+
+  // Owner-scoped variant — returns the bike regardless of approval status
+  // (PENDING/REJECTED/APPROVED) plus owner-only fields. Use this instead of
+  // getById() whenever the caller is the bike's owner (e.g. the edit page),
+  // since getById() hits the public endpoint which 404s for anything that
+  // isn't APPROVED.
+  // Eigentümer-spezifische Variante — gibt das Fahrrad unabhängig vom
+  // Genehmigungsstatus zurück (PENDING/REJECTED/APPROVED) plus
+  // eigentümer-spezifische Felder. Anstelle von getById() verwenden, wenn
+  // der Aufrufer der Fahrrad-Eigentümer ist (z. B. die Bearbeitungsseite),
+  // da getById() den öffentlichen Endpunkt aufruft, der bei allem außer
+  // APPROVED mit 404 antwortet.
+  getOwnerById: (id: string) =>
+    api.get<ApiResponse<BikeResponse>>(`/api/v1/bikes/${id}/owner`),
 
   getMyBikes: (page = 0, size = 20) =>
     api.get<ApiResponse<PageResponse<BikeResponse>>>("/api/v1/bikes/my", {
@@ -432,4 +543,22 @@ export const adminApi = {
 
   deleteUser: (id: string) =>
     api.delete<ApiResponse<null>>(`/api/v1/admin/users/${id}`),
+};
+
+// ── Notifications ─────────────────────────────────────────────────────────────
+
+export const notificationsApi = {
+  list: (page = 0, size = 20) =>
+    api.get<ApiResponse<PageResponse<NotificationResponse>>>("/api/v1/notifications", {
+      params: { page, size },
+    }),
+
+  getUnreadCount: () =>
+    api.get<ApiResponse<UnreadCountResponse>>("/api/v1/notifications/unread-count"),
+
+  markAsRead: (id: string) =>
+    api.post<ApiResponse<null>>(`/api/v1/notifications/${id}/read`),
+
+  markAllAsRead: () =>
+    api.post<ApiResponse<null>>("/api/v1/notifications/read-all"),
 };

@@ -22,7 +22,18 @@ export default function OwnerBookingsPage() {
   const tBookings = useTranslations("dashboard.bookings");
   const [statusFilter, setStatusFilter] = useState<BookingStatus | undefined>(undefined);
 
-  const { data, isLoading } = useQuery({
+  // Surface isError instead of letting a failed request render identically to
+  // "you have no incoming bookings" — see the BookingService.getOwnerBookings
+  // fix (readOnly transaction + bulk-update conflict) for the bug this used to
+  // mask: before that backend fix, the very first call here reliably threw a
+  // 500 and this page just showed the empty state.
+  // isError anzeigen, statt eine fehlgeschlagene Anfrage identisch zu "Sie
+  // haben keine eingehenden Buchungen" darzustellen — siehe die Korrektur in
+  // BookingService.getOwnerBookings (readOnly-Transaktion + Massen-Update-
+  // Konflikt) für den Fehler, den dies vorher verschleiert hat: vor dieser
+  // Backend-Korrektur warf der allererste Aufruf hier zuverlässig einen 500er,
+  // und diese Seite zeigte einfach den Leerzustand.
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["owner-bookings", statusFilter],
     queryFn: () => bookingsApi.getMyOwnerBookings(statusFilter, 0, 50),
     select: (r) => r.data.data,
@@ -57,6 +68,10 @@ export default function OwnerBookingsPage() {
           {[1, 2, 3].map((i) => (
             <div key={i} className="card h-32 animate-pulse bg-slate-100" />
           ))}
+        </div>
+      ) : isError ? (
+        <div className="card p-12 text-center text-red-600">
+          <p>{error instanceof Error ? error.message : tBookings("loadError")}</p>
         </div>
       ) : bookings.length === 0 ? (
         <div className="card p-12 text-center text-slate-500">

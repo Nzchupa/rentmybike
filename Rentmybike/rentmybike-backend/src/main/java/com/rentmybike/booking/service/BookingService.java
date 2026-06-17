@@ -12,6 +12,7 @@ import com.rentmybike.common.exception.AccessDeniedException;
 import com.rentmybike.common.exception.BusinessException;
 import com.rentmybike.common.exception.ResourceNotFoundException;
 import com.rentmybike.common.response.PageResponse;
+import com.rentmybike.notification.service.NotificationService;
 import com.rentmybike.user.entity.User;
 import com.rentmybike.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,7 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final BikeRepository bikeRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     // ──────────────────────────────────────────────────────────────────────────
     // CREATE / ERSTELLEN
@@ -131,6 +133,15 @@ public class BookingService {
                 booking.getId(), renterId, bike.getId(),
                 booking.getId(), renterId, bike.getId());
 
+        // Bug 5: notify the bike owner (in-app + email) that a renter requested
+        // their bike — previously there was no signal at all here, so owners
+        // only found out by manually re-checking "As Owner" bookings.
+        // Bug 5: den Fahrrad-Eigentümer (In-App + E-Mail) benachrichtigen, dass
+        // ein Mieter sein Fahrrad angefragt hat — vorher gab es hier gar kein
+        // Signal, sodass Eigentümer es nur durch manuelles erneutes Prüfen der
+        // "Als Eigentümer"-Buchungen erfuhren.
+        notificationService.notifyOwnerOfNewBookingRequest(booking);
+
         return toBookingResponse(booking);
     }
 
@@ -179,8 +190,35 @@ public class BookingService {
     /**
      * Renter's booking history (all their rentals).
      * Buchungshistorie des Mieters (alle seine Mieten).
+     *
+     * <p>Bug fix: this used to be {@code @Transactional(readOnly = true)}, but it
+     * calls {@link #expireStaleBookings()} first, which runs a bulk {@code UPDATE}
+     * (see {@code BookingRepository.expireStaleBookings}). Spring sets the actual
+     * JDBC connection to read-only for a {@code readOnly = true} transaction, and
+     * PostgreSQL rejects any write statement on a read-only connection ("cannot
+     * execute UPDATE in a read-only transaction"). That exception aborted the
+     * whole request with a 500 — which the frontend's axios error handling turned
+     * into a rejected promise that the bookings pages never checked
+     * ({@code isError} was never read), so the UI just rendered the "no bookings"
+     * empty state. This is why owners (and renters) appeared to have no bookings
+     * at all even though bookings existed. Removing {@code readOnly = true} lets
+     * the class-level (read-write) {@code @Transactional} apply instead.
+     *
+     * <p>Bugfix: dies war vorher {@code @Transactional(readOnly = true)}, ruft
+     * aber zuerst {@link #expireStaleBookings()} auf, das ein Massen-{@code UPDATE}
+     * ausführt (siehe {@code BookingRepository.expireStaleBookings}). Spring setzt
+     * die tatsächliche JDBC-Verbindung bei {@code readOnly = true} auf
+     * schreibgeschützt, und PostgreSQL lehnt jede Schreibanweisung auf einer
+     * schreibgeschützten Verbindung ab ("cannot execute UPDATE in a read-only
+     * transaction"). Diese Exception brach die gesamte Anfrage mit einem 500 ab —
+     * was die Axios-Fehlerbehandlung im Frontend in ein abgelehntes Promise
+     * verwandelte, das die Buchungsseiten nie prüften ({@code isError} wurde nie
+     * gelesen), sodass die UI einfach den leeren "keine Buchungen"-Zustand
+     * anzeigte. Deshalb wirkte es, als hätten Eigentümer (und Mieter) gar keine
+     * Buchungen, obwohl welche existierten. Das Entfernen von
+     * {@code readOnly = true} lässt das (lese-schreibende) Klassen-Level-
+     * {@code @Transactional} stattdessen greifen.
      */
-    @Transactional(readOnly = true)
     public PageResponse<BookingResponse> getRenterBookings(UUID renterId, Pageable pageable) {
         expireStaleBookings(); // lazy expiry / lazy Ablauf
         Page<Booking> page = bookingRepository.findByRenterIdOrderByCreatedAtDesc(renterId, pageable);
@@ -190,8 +228,23 @@ public class BookingService {
     /**
      * Owner's incoming booking requests, optionally filtered by status.
      * Eingehende Buchungsanfragen des Eigentümers, optional nach Status gefiltert.
+     *
+     * <p>Same read-only/bulk-update conflict fixed as in {@link #getRenterBookings}
+     * above — see that javadoc for the full explanation. This was the direct cause
+     * of "owner sees no reservations/bookings even though renters successfully
+     * made them": the very first call to this method (which is virtually
+     * guaranteed to also be the first call that triggers a stale-booking sweep)
+     * threw and the page silently showed an empty list.
+     *
+     * <p>Derselbe Readonly-/Massen-Update-Konflikt behoben wie in
+     * {@link #getRenterBookings} oben — siehe dortiges Javadoc für die vollständige
+     * Erklärung. Dies war die direkte Ursache dafür, dass "Eigentümer keine
+     * Reservierungen/Buchungen sehen, obwohl Mieter erfolgreich welche
+     * vorgenommen haben": der allererste Aufruf dieser Methode (der mit hoher
+     * Wahrscheinlichkeit auch der erste Aufruf ist, der einen
+     * Abgelaufene-Buchungen-Sweep auslöst) warf eine Exception, und die Seite
+     * zeigte stillschweigend eine leere Liste.
      */
-    @Transactional(readOnly = true)
     public PageResponse<BookingResponse> getOwnerBookings(UUID ownerId, BookingStatus status, Pageable pageable) {
         expireStaleBookings(); // lazy expiry / lazy Ablauf
         Page<Booking> page = bookingRepository.findByOwnerIdAndStatus(ownerId, status, pageable);

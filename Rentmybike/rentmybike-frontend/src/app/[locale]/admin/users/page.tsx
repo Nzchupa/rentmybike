@@ -44,7 +44,20 @@ export default function AdminUsersPage() {
     debounceRef.current = setTimeout(() => setDebouncedSearch(val), 300);
   };
 
-  const { data, isLoading } = useQuery({
+  // isError was previously never read here, so any failed request (auth/CORS/
+  // cookie-domain problem in production, or a transient 500) rendered exactly
+  // like "there are simply no users" — the empty-state message — instead of
+  // surfacing the real problem. Showing the error explicitly turns a silent,
+  // hard-to-diagnose "Benutzerverwaltung shows no data" report into something
+  // actionable.
+  // isError wurde hier vorher nie ausgelesen, daher sah jede fehlgeschlagene
+  // Anfrage (Auth-/CORS-/Cookie-Domain-Problem in Produktion oder ein
+  // vorübergehender 500er) exakt so aus wie "es gibt einfach keine
+  // Benutzer" — die Leerzustand-Meldung — statt das eigentliche Problem
+  // offenzulegen. Den Fehler explizit anzuzeigen macht aus einem stillen,
+  // schwer diagnostizierbaren "Benutzerverwaltung zeigt keine Daten"-Bericht
+  // etwas Handlungsfähiges.
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["admin-users", debouncedSearch],
     queryFn: () => adminApi.listUsers(debouncedSearch || undefined, 0, 50),
     select: (r) => r.data.data,
@@ -97,6 +110,10 @@ export default function AdminUsersPage() {
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="h-14 rounded-xl bg-slate-100 animate-pulse" />
           ))}
+        </div>
+      ) : isError ? (
+        <div className="card p-10 text-center text-red-600">
+          <p>{error instanceof Error ? error.message : t("loadError")}</p>
         </div>
       ) : (
         <div className="card overflow-hidden">

@@ -104,6 +104,51 @@ public class EmailService {
     }
 
     // ──────────────────────────────────────────────────────────────────────────
+    // New booking request notification / Benachrichtigung über neue Buchungsanfrage
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Notifies a bike owner by email that a renter has requested to rent their bike.
+     * Bug 5: previously the owner had no way to find out about a new request
+     * short of manually re-checking the "As Owner" bookings page — no email,
+     * no in-app signal. This is the email half of that fix (see
+     * {@code NotificationService} for the in-app half).
+     * Benachrichtigt einen Fahrrad-Eigentümer per E-Mail, dass ein Mieter sein
+     * Fahrrad anfragen möchte. Bug 5: vorher hatte der Eigentümer keine
+     * Möglichkeit, von einer neuen Anfrage zu erfahren, außer manuell die
+     * "Als Eigentümer"-Buchungsseite erneut zu prüfen — keine E-Mail, kein
+     * In-App-Signal. Dies ist die E-Mail-Hälfte dieser Korrektur (siehe
+     * {@code NotificationService} für die In-App-Hälfte).
+     *
+     * <p>Synchronous, same reasoning as {@link #sendVerificationEmail}: the
+     * caller ({@code BookingService.createBooking}) logs/uses the boolean
+     * result, and a failed notification email must never roll back or block
+     * the booking itself — see how it's wrapped at the call site.
+     * <p>Synchron, gleiche Begründung wie bei {@link #sendVerificationEmail}:
+     * der Aufrufer ({@code BookingService.createBooking}) protokolliert/nutzt
+     * das boolesche Ergebnis, und eine fehlgeschlagene Benachrichtigungs-E-Mail
+     * darf die Buchung selbst niemals zurückrollen oder blockieren — siehe
+     * Einbindung an der Aufrufstelle.
+     *
+     * @param owner       the bike owner to notify / der zu benachrichtigende Fahrrad-Eigentümer
+     * @param renterName  the renter's full name / vollständiger Name des Mieters
+     * @param bikeTitle   the bike's listing title / Titel des Fahrrad-Inserats
+     * @param startDate   requested start date (ISO) / angefragtes Startdatum (ISO)
+     * @param endDate     requested end date (ISO) / angefragtes Enddatum (ISO)
+     * @return true if the email was accepted by Resend / true, wenn die E-Mail von Resend angenommen wurde
+     */
+    public boolean sendNewBookingRequestEmail(User owner, String renterName, String bikeTitle,
+                                               String startDate, String endDate) {
+        String bookingsUrl = appProperties.getFrontendUrl() + "/dashboard/bookings/owner";
+
+        String subject = "New rental request for " + bikeTitle + " / Neue Mietanfrage für " + bikeTitle;
+        String htmlBody = buildNewBookingRequestEmailHtml(
+                owner.getFirstName(), renterName, bikeTitle, startDate, endDate, bookingsUrl);
+
+        return sendHtmlEmail(owner.getEmail(), subject, htmlBody);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
     // Private helpers / Private Hilfsmethoden
     // ──────────────────────────────────────────────────────────────────────────
 
@@ -240,5 +285,85 @@ public class EmailService {
                 </body>
                 </html>
                 """.formatted(firstName, verificationUrl, verificationUrl, verificationUrl);
+    }
+
+    /**
+     * Builds the HTML body for the new-booking-request notification email.
+     * Erstellt den HTML-Body für die Benachrichtigungs-E-Mail über eine neue Buchungsanfrage.
+     *
+     * @param ownerFirstName owner's first name for personalization / Vorname des Eigentümers zur Personalisierung
+     * @param renterName     renter's full name / vollständiger Name des Mieters
+     * @param bikeTitle      the bike's listing title / Titel des Fahrrad-Inserats
+     * @param startDate      requested start date / angefragtes Startdatum
+     * @param endDate        requested end date / angefragtes Enddatum
+     * @param bookingsUrl    link to the owner's incoming-requests page / Link zur Anfragenseite des Eigentümers
+     * @return HTML string / HTML-String
+     */
+    private String buildNewBookingRequestEmailHtml(String ownerFirstName, String renterName, String bikeTitle,
+                                                     String startDate, String endDate, String bookingsUrl) {
+        return """
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>New rental request</title>
+                </head>
+                <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                             background-color: #f5f5f5; margin: 0; padding: 20px;">
+                    <div style="max-width: 600px; margin: 0 auto; background: white;
+                                border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+
+                        <!-- Header / Kopfzeile -->
+                        <div style="background: linear-gradient(135deg, #0057FF, #4D8FFF);
+                                    padding: 32px; text-align: center;">
+                            <h1 style="color: white; margin: 0; font-size: 28px;">🚲 RentMyBike</h1>
+                        </div>
+
+                        <!-- Body / Inhalt -->
+                        <div style="padding: 40px 32px;">
+                            <h2 style="color: #1a1a2e; margin-top: 0;">
+                                Hi %s! You've got a new rental request 🎉
+                            </h2>
+                            <p style="color: #4a4a4a; line-height: 1.6;">
+                                <strong>%s</strong> wants to rent your bike "<strong>%s</strong>"
+                                from <strong>%s</strong> to <strong>%s</strong>.
+                            </p>
+                            <p style="color: #4a4a4a; line-height: 1.6; font-size: 14px;">
+                                <em>%s möchte dein Fahrrad "%s" vom %s bis %s mieten.</em>
+                            </p>
+
+                            <!-- CTA Button / Aktionsschaltfläche -->
+                            <div style="text-align: center; margin: 40px 0;">
+                                <a href="%s"
+                                   style="background: #0057FF; color: white; text-decoration: none;
+                                          padding: 16px 40px; border-radius: 8px; font-size: 16px;
+                                          font-weight: 600; display: inline-block;">
+                                    View request / Anfrage ansehen
+                                </a>
+                            </div>
+
+                            <!-- Fallback link / Ausweich-Link -->
+                            <p style="color: #888; font-size: 13px; text-align: center;">
+                                If the button doesn't work, copy this link:<br>
+                                <em>Falls die Schaltfläche nicht funktioniert, kopiere diesen Link:</em><br>
+                                <a href="%s" style="color: #0057FF; word-break: break-all;">%s</a>
+                            </p>
+                        </div>
+
+                        <!-- Footer / Fußzeile -->
+                        <div style="background: #f9f9f9; padding: 20px 32px; text-align: center;
+                                    border-top: 1px solid #eee;">
+                            <p style="color: #aaa; font-size: 12px; margin: 0;">
+                                © 2024 RentMyBike — P2P Bike Rental Marketplace
+                            </p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """.formatted(
+                ownerFirstName, renterName, bikeTitle, startDate, endDate,
+                renterName, bikeTitle, startDate, endDate,
+                bookingsUrl, bookingsUrl, bookingsUrl);
     }
 }

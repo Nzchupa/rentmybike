@@ -97,6 +97,15 @@
       "loginFailed": "Login failed"
     }
   },
+  "users": {
+    "profile": {
+      "back": "Back to search",
+      "notFound": "User not found.",
+      "memberSince": "Member since {date}",
+      "reviewsCount": "{count, plural, one {# review} other {# reviews}}",
+      "reviews": "Reviews"
+    }
+  },
   "bikes": {
     "search": {
       "placeholder": "City or location...",
@@ -194,6 +203,7 @@
       "myBikes": "My Bikes",
       "asRenter": "As Renter",
       "asOwner": "As Owner",
+      "notifications": "Notifications",
       "profile": "Profile"
     },
     "bikes": {
@@ -265,7 +275,8 @@
     },
     "bookings": {
       "noRenterBookings": "You haven't booked any bikes yet.",
-      "noOwnerBookings": "No booking requests yet."
+      "noOwnerBookings": "No booking requests yet.",
+      "loadError": "Couldn't load your bookings — please try again."
     }
   },
   "reviews": {
@@ -323,6 +334,7 @@
       "joined": "Joined",
       "actions": "Actions",
       "noUsersFound": "No users found.",
+      "loadError": "Couldn't load users — please try again.",
       "userBanned": "User banned",
       "userUnbanned": "User unbanned",
       "userDeleted": "User deleted"
@@ -346,6 +358,17 @@
       "confirmReject": "Confirm reject",
       "bikeApproved": "Bike approved",
       "bikeRejected": "Bike rejected"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "bellLabel": "Notifications",
+    "empty": "No notifications yet.",
+    "loadError": "Couldn't load notifications — please try again.",
+    "markAllRead": "Mark all as read",
+    "viewAll": "View all notifications",
+    "types": {
+      "NEW_BOOKING_REQUEST": "New rental request"
     }
   },
   "errors": {

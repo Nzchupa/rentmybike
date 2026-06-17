@@ -97,6 +97,15 @@
       "loginFailed": "Anmeldung fehlgeschlagen"
     }
   },
+  "users": {
+    "profile": {
+      "back": "Zurück zur Suche",
+      "notFound": "Benutzer nicht gefunden.",
+      "memberSince": "Mitglied seit {date}",
+      "reviewsCount": "{count, plural, one {# Bewertung} other {# Bewertungen}}",
+      "reviews": "Bewertungen"
+    }
+  },
   "bikes": {
     "search": {
       "placeholder": "Stadt oder Ort...",
@@ -194,6 +203,7 @@
       "myBikes": "Meine Fahrräder",
       "asRenter": "Als Mieter",
       "asOwner": "Als Eigentümer",
+      "notifications": "Benachrichtigungen",
       "profile": "Profil"
     },
     "bikes": {
@@ -265,7 +275,8 @@
     },
     "bookings": {
       "noRenterBookings": "Sie haben noch keine Fahrräder gebucht.",
-      "noOwnerBookings": "Noch keine Buchungsanfragen."
+      "noOwnerBookings": "Noch keine Buchungsanfragen.",
+      "loadError": "Buchungen konnten nicht geladen werden — bitte versuchen Sie es erneut."
     }
   },
   "reviews": {
@@ -323,6 +334,7 @@
       "joined": "Beigetreten",
       "actions": "Aktionen",
       "noUsersFound": "Keine Benutzer gefunden.",
+      "loadError": "Benutzer konnten nicht geladen werden — bitte versuchen Sie es erneut.",
       "userBanned": "Benutzer gesperrt",
       "userUnbanned": "Benutzer entsperrt",
       "userDeleted": "Benutzer gelöscht"
@@ -346,6 +358,17 @@
       "confirmReject": "Ablehnung bestätigen",
       "bikeApproved": "Fahrrad genehmigt",
       "bikeRejected": "Fahrrad abgelehnt"
+    }
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "bellLabel": "Benachrichtigungen",
+    "empty": "Noch keine Benachrichtigungen.",
+    "loadError": "Benachrichtigungen konnten nicht geladen werden — bitte versuchen Sie es erneut.",
+    "markAllRead": "Alle als gelesen markieren",
+    "viewAll": "Alle Benachrichtigungen ansehen",
+    "types": {
+      "NEW_BOOKING_REQUEST": "Neue Mietanfrage"
     }
   },
   "errors": {

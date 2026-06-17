@@ -241,6 +241,28 @@ export interface AdminUserResponse {
   deletedAt: string | null;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Notifications / Benachrichtigungen
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type NotificationType = "NEW_BOOKING_REQUEST";
+
+export interface NotificationResponse {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+  bookingId: string | null;
+  bikeId: string | null;
+  bikeTitle: string | null;
+}
+
+export interface UnreadCountResponse {
+  unreadCount: number;
+}
+
 export interface AdminStatsResponse {
   totalUsers: number;
   bannedUsers: number;

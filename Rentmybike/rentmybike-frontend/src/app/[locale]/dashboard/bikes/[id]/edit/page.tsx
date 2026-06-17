@@ -22,9 +22,24 @@ export default function EditBikePage({ params }: EditBikePageProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
+  // Owner-scoped fetch — bikesApi.getById() hits the PUBLIC endpoint, which
+  // only returns APPROVED bikes (BikeService.getPublicBike). A bike that's
+  // still PENDING (e.g. right after creation, or after a previous edit reset
+  // it to PENDING) would 404 here, so the owner could never load their own
+  // bike to edit it. getOwnerById() hits /api/v1/bikes/{id}/owner, which
+  // returns the bike for any approval status as long as the caller owns it.
+  //
+  // Eigentümer-spezifischer Abruf — bikesApi.getById() ruft den ÖFFENTLICHEN
+  // Endpunkt auf, der nur APPROVED-Fahrräder zurückgibt (BikeService.
+  // getPublicBike). Ein Fahrrad, das noch PENDING ist (z. B. direkt nach der
+  // Erstellung oder weil eine vorherige Bearbeitung es auf PENDING
+  // zurückgesetzt hat), würde hier mit 404 antworten, sodass der Eigentümer
+  // sein eigenes Fahrrad nie zum Bearbeiten laden könnte. getOwnerById() ruft
+  // /api/v1/bikes/{id}/owner auf, das das Fahrrad für jeden Genehmigungsstatus
+  // zurückgibt, solange der Aufrufer der Eigentümer ist.
   const { data: bike, isLoading } = useQuery({
-    queryKey: ["bike", id],
-    queryFn: () => bikesApi.getById(id),
+    queryKey: ["bike", id, "owner"],
+    queryFn: () => bikesApi.getOwnerById(id),
     select: (r) => r.data.data,
   });
 

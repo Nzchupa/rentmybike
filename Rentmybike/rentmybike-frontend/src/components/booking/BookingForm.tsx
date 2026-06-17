@@ -59,7 +59,27 @@ export function BookingForm({ bike }: BookingFormProps) {
       setRange({});
       setMessage("");
       setShowCalendar(false);
-      queryClient.invalidateQueries({ queryKey: ["my-renter-bookings"] });
+      // Query key mismatch bug: this used to invalidate ["my-renter-bookings"],
+      // but RenterBookingsPage (dashboard/bookings/renter/page.tsx) actually
+      // queries under ["renter-bookings"]. Since the keys never matched, the
+      // renter's booking list cache was never invalidated after a successful
+      // request, so the newly booked bike didn't appear in "My Rentals" until
+      // the 60s staleTime lapsed or a hard refresh happened — looking exactly
+      // like "bike missing from the list after booking".
+      // Schlüssel-Diskrepanz-Bug: dies hat vorher ["my-renter-bookings"]
+      // invalidiert, aber RenterBookingsPage (dashboard/bookings/renter/
+      // page.tsx) fragt tatsächlich unter ["renter-bookings"] ab. Da die
+      // Schlüssel nie übereinstimmten, wurde der Buchungslisten-Cache des
+      // Mieters nach einer erfolgreichen Anfrage nie invalidiert, sodass das
+      // neu gebuchte Fahrrad erst nach Ablauf der 60s staleTime oder einem
+      // harten Refresh in "Meine Mieten" erschien.
+      queryClient.invalidateQueries({ queryKey: ["renter-bookings"] });
+      // Also invalidate the booked-date ranges for this bike so the calendar
+      // immediately reflects the new reservation if the user stays on the page.
+      // Auch die belegten Datumsbereiche für dieses Fahrrad invalidieren,
+      // damit der Kalender die neue Reservierung sofort widerspiegelt, falls
+      // der Benutzer auf der Seite bleibt.
+      queryClient.invalidateQueries({ queryKey: ["booked-dates", bike.id] });
     },
     onError: (err: Error) => {
       toast.error(err.message);

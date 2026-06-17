@@ -9,6 +9,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import { cn } from "@/lib/utils";
 
 /**
@@ -102,6 +103,7 @@ export function Navbar() {
 
             {authenticated && user ? (
               <div className="flex items-center gap-3">
+                <NotificationBell />
                 <Link href={localePath("/dashboard/profile")}>
                   <Avatar name={user.fullName} avatarUrl={user.avatarUrl} size="sm" />
                 </Link>
