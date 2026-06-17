@@ -1,6 +1,5 @@
 "use client";
 
-import { use } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
@@ -18,7 +17,20 @@ import type { BikePhotoResponse } from "@/types";
 import { BookingForm } from "@/components/booking/BookingForm";
 
 interface BikeDetailPageProps {
-  params: Promise<{ id: string }>;
+  // Next.js 14 passes route params as a plain (already-resolved) object —
+  // the Promise<...> + use() pattern is a Next.js 15 App Router feature.
+  // This project is on next@14.2.29 (see package.json), so wrapping params
+  // in a Promise and unwrapping it with React's use() throws minified React
+  // error #438 ("An unsupported type was passed to use()"), since a plain
+  // object isn't a thenable.
+  // Next.js 14 übergibt Routen-Parameter als einfaches (bereits aufgelöstes)
+  // Objekt — das Promise<...> + use()-Muster ist ein Next.js 15 App
+  // Router-Feature. Dieses Projekt läuft auf next@14.2.29 (siehe
+  // package.json), daher wirft das Einpacken von params in ein Promise und
+  // das Entpacken mit Reacts use() den minimierten React-Fehler #438 ("An
+  // unsupported type was passed to use()"), da ein einfaches Objekt kein
+  // Thenable ist.
+  params: { id: string };
 }
 
 /**
@@ -26,7 +38,7 @@ interface BikeDetailPageProps {
  * Öffentliche Fahrrad-Detailseite — Fotogalerie, Info, Buchungspanel, Bewertungen.
  */
 export default function BikeDetailPage({ params }: BikeDetailPageProps) {
-  const { id } = use(params);
+  const { id } = params;
   const t = useTranslations("bikes.detail");
   const locale = useLocale();
   const { user } = useAuthStore();

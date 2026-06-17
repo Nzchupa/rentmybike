@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
@@ -11,7 +11,11 @@ import { bikesApi } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 
 interface BikePhotosPageProps {
-  params: Promise<{ id: string }>;
+  // Next.js 14 (this project's version) passes params synchronously, not as
+  // a Promise — see the matching comment in bikes/[id]/page.tsx.
+  // Next.js 14 (Version dieses Projekts) übergibt params synchron, nicht
+  // als Promise — siehe entsprechenden Kommentar in bikes/[id]/page.tsx.
+  params: { id: string };
 }
 
 const MAX_PHOTOS = 5;
@@ -31,7 +35,7 @@ const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
  * bikesApi.uploadPhoto / deletePhoto an, aber es gab keine Seite, die sie aufruft.
  */
 export default function BikePhotosPage({ params }: BikePhotosPageProps) {
-  const { id } = use(params);
+  const { id } = params;
   const t = useTranslations("dashboard.bikes");
   const tCommon = useTranslations("common");
   const locale = useLocale();

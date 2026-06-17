@@ -1,6 +1,5 @@
 "use client";
 
-import { use } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -9,11 +8,15 @@ import { bikesApi } from "@/lib/api";
 import { BikeForm, type BikeFormValues } from "@/components/bikes/BikeForm";
 
 interface EditBikePageProps {
-  params: Promise<{ id: string }>;
+  // Next.js 14 (this project's version) passes params synchronously, not as
+  // a Promise — see the matching comment in bikes/[id]/page.tsx.
+  // Next.js 14 (Version dieses Projekts) übergibt params synchron, nicht
+  // als Promise — siehe entsprechenden Kommentar in bikes/[id]/page.tsx.
+  params: { id: string };
 }
 
 export default function EditBikePage({ params }: EditBikePageProps) {
-  const { id } = use(params);
+  const { id } = params;
   const t = useTranslations("dashboard.bikeForm");
   const locale = useLocale();
   const router = useRouter();
