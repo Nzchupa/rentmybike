@@ -110,13 +110,13 @@ export function BikeForm({ defaultValues, existingBike, onSubmit, isEditing }: B
           type="number"
           min={1}
           step={0.5}
-          placeholder="25"
+          placeholder={t("pricePlaceholder")}
           error={errors.pricePerDay?.message}
           {...register("pricePerDay")}
         />
         <Input
           label={t("city")}
-          placeholder="Berlin"
+          placeholder={t("cityPlaceholder")}
           error={errors.city?.message}
           {...register("city")}
         />
@@ -124,7 +124,7 @@ export function BikeForm({ defaultValues, existingBike, onSubmit, isEditing }: B
 
       <Input
         label={t("address")}
-        placeholder="Alexanderplatz 1 (optional)"
+        placeholder={t("addressPlaceholder")}
         error={errors.address?.message}
         {...register("address")}
       />

@@ -19,10 +19,18 @@ export default function NewBikePage() {
 
   const { mutateAsync: createBike } = useMutation({
     mutationFn: bikesApi.create,
-    onSuccess: () => {
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ["my-bikes"] });
       toast.success(t("bikeListed"));
-      router.push(`/${locale}/dashboard/bikes`);
+      // Send the owner straight to the photo-upload page instead of the
+      // plain list — a bike with zero photos is much less likely to get
+      // booked, and without this most owners wouldn't realize photos are
+      // a separate step.
+      // Eigentümer direkt zur Foto-Upload-Seite schicken statt zur reinen
+      // Liste — ein Fahrrad ohne Fotos wird viel seltener gebucht, und ohne
+      // dies würden die meisten Eigentümer nicht merken, dass Fotos ein
+      // separater Schritt sind.
+      router.push(`/${locale}/dashboard/bikes/${res.data.data.id}/photos`);
     },
     onError: (e: Error) => toast.error(e.message),
   });

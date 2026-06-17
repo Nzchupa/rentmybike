@@ -122,6 +122,18 @@ public class UserService {
         }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+
+        // Bump tokenVersion so every refresh token issued before this point
+        // is rejected (see AuthService.refresh()'s tokenVersion check) —
+        // otherwise a stolen/leaked refresh token would keep working after
+        // the user changes their password specifically to invalidate it.
+        // tokenVersion erhöhen, damit jeder zuvor ausgestellte Refresh-Token
+        // abgelehnt wird (siehe tokenVersion-Prüfung in AuthService.refresh())
+        // — sonst würde ein gestohlener/geleakter Refresh-Token weiterhin
+        // funktionieren, nachdem der Benutzer sein Passwort genau deshalb
+        // geändert hat, um ihn zu invalidieren.
+        user.setTokenVersion(user.getTokenVersion() + 1);
+
         userRepository.save(user);
 
         log.info("Password changed for user: {} / Passwort geändert für Benutzer: {}", userId, userId);

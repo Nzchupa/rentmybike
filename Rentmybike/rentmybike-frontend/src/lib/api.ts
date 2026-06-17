@@ -57,7 +57,27 @@ export const api = axios.create({
 // Auth-Zustand gelöscht und der Benutzer zu /login geschickt.
 // ─────────────────────────────────────────────────────────────────────────────
 
-type RetryableConfig = AxiosRequestConfig & { _retry?: boolean };
+// `skipAuthRedirect` marks a request as a "silent" auth check — used by the
+// app-boot /users/me probe (AuthLoader), which runs on EVERY page including
+// fully public ones. Without this flag, a first-time/anonymous visitor (no
+// cookies at all) hitting any page would trigger: 401 on /users/me → this
+// interceptor tries /auth/refresh → that also 401s (no refresh cookie) →
+// the catch block below called redirectToLogin() unconditionally, hard-
+// navigating an anonymous visitor browsing the homepage straight to /login.
+// With the flag set, a failure here is treated as "simply not logged in"
+// and resolved silently — no refresh attempt, no redirect.
+//
+// `skipAuthRedirect` markiert eine Anfrage als "stillen" Auth-Check —
+// verwendet vom App-Start-/users/me-Check (AuthLoader), der auf JEDER
+// Seite läuft, auch vollständig öffentlichen. Ohne dieses Flag würde ein
+// Erstbesucher/anonymer Besucher (keine Cookies) auf jeder Seite Folgendes
+// auslösen: 401 bei /users/me → dieser Interceptor versucht /auth/refresh →
+// das gibt ebenfalls 401 (kein Refresh-Cookie) → der catch-Block unten rief
+// bedingungslos redirectToLogin() auf und navigierte einen anonymen, die
+// Startseite besuchenden Nutzer hart zu /login. Mit gesetztem Flag wird ein
+// Fehlschlag hier still als "einfach nicht angemeldet" behandelt — kein
+// Refresh-Versuch, kein Redirect.
+type RetryableConfig = AxiosRequestConfig & { _retry?: boolean; skipAuthRedirect?: boolean };
 
 /**
  * Error thrown by the response interceptor. Carries the original HTTP status
@@ -140,10 +160,26 @@ api.interceptors.response.use(
               refreshPromise = null;
             });
         }
+        // Still attempt the refresh even for a "silent" request (e.g. the
+        // AuthLoader boot check) — a returning user with an expired access
+        // token but a still-valid refresh token must get their session
+        // restored. Only the *redirect on ultimate failure* is skipped for
+        // silent requests, since a 401 there can legitimately mean
+        // "anonymous visitor", not "session expired".
+        //
+        // Versuche das Refresh auch bei einer "stillen" Anfrage (z. B. der
+        // AuthLoader-Boot-Check) — ein wiederkehrender Nutzer mit
+        // abgelaufenem Zugriffstoken, aber noch gültigem Refresh-Token, muss
+        // seine Sitzung wiederherstellen können. Nur das *Redirect bei
+        // endgültigem Fehlschlag* wird bei stillen Anfragen übersprungen, da
+        // ein 401 dort legitim "anonymer Besucher" bedeuten kann, nicht
+        // "Sitzung abgelaufen".
         await refreshPromise;
         return api(originalRequest);
       } catch {
-        redirectToLogin();
+        if (!originalRequest.skipAuthRedirect) {
+          redirectToLogin();
+        }
         return Promise.reject(
           new ApiError(FALLBACK_MESSAGES[getCurrentLocale()].sessionExpired, 401)
         );
@@ -218,8 +254,14 @@ export const authApi = {
 // ── Users ─────────────────────────────────────────────────────────────────────
 
 export const usersApi = {
-  getMe: () =>
-    api.get<ApiResponse<UserProfileResponse>>("/api/v1/users/me"),
+  // `silent`: pass true for the app-boot auth probe (AuthLoader) so an
+  // anonymous visitor's 401 here doesn't trigger a refresh attempt or a
+  // hard redirect to /login — see the `skipAuthRedirect` comment in
+  // api.ts's response interceptor for the full story.
+  getMe: (silent = false) =>
+    api.get<ApiResponse<UserProfileResponse>>("/api/v1/users/me", {
+      skipAuthRedirect: silent,
+    } as unknown as AxiosRequestConfig),
 
   updateProfile: (data: UpdateProfileRequest) =>
     api.put<ApiResponse<UserProfileResponse>>("/api/v1/users/me", data),

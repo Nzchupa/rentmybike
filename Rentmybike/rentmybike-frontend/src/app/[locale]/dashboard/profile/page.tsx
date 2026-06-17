@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -58,6 +58,7 @@ export default function ProfilePage() {
   const {
     register: regProfile,
     handleSubmit: handleProfile,
+    reset: resetProfile,
     formState: { errors: profileErrors, isSubmitting: savingProfile },
   } = useForm({
     resolver: zodResolver(makeProfileSchema(tRoot)),
@@ -67,6 +68,26 @@ export default function ProfilePage() {
       phone:     user?.phone ?? "",
     },
   });
+
+  // `user` is null on first render (it's still loading from /users/me when
+  // this page mounts) and useForm's defaultValues are only read once, at
+  // mount time — so without this, the form would stay stuck on empty
+  // strings even after the real profile data arrives a moment later.
+  //
+  // `user` ist beim ersten Rendern null (wird noch von /users/me geladen,
+  // wenn diese Seite mountet), und die defaultValues von useForm werden nur
+  // einmal, beim Mounten, gelesen — ohne dies würde das Formular bei leeren
+  // Strings bleiben, selbst nachdem die echten Profildaten kurz danach
+  // eintreffen.
+  useEffect(() => {
+    if (user) {
+      resetProfile({
+        firstName: user.firstName ?? "",
+        lastName: user.lastName ?? "",
+        phone: user.phone ?? "",
+      });
+    }
+  }, [user, resetProfile]);
 
   // Password form
   const {

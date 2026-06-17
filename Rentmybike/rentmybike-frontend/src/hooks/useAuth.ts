@@ -18,11 +18,24 @@ export function useAuth() {
   const locale = useLocale();
   const t = useTranslations("common");
 
-  /** Load the current user profile from the backend (called on app mount). */
+  /**
+   * Load the current user profile from the backend (called on app mount).
+   *
+   * Uses the "silent" variant of getMe(): this runs on every page, including
+   * fully public ones, so a 401 here just means "anonymous visitor" — it
+   * must not trigger the global refresh-then-redirect-to-login behavior
+   * that the axios interceptor applies to normal authenticated requests.
+   *
+   * Verwendet die "stille" Variante von getMe(): läuft auf jeder Seite,
+   * auch vollständig öffentlichen, daher bedeutet ein 401 hier einfach
+   * "anonymer Besucher" — es darf nicht das globale
+   * Refresh-dann-Redirect-zu-Login-Verhalten auslösen, das der
+   * Axios-Interceptor auf normale authentifizierte Anfragen anwendet.
+   */
   async function loadCurrentUser() {
     setLoading(true);
     try {
-      const res = await usersApi.getMe();
+      const res = await usersApi.getMe(true);
       setUser(res.data.data);
     } catch {
       // 401 = not logged in — clear state silently

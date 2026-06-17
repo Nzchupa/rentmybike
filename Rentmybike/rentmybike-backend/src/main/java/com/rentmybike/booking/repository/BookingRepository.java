@@ -117,8 +117,25 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
     /**
      * All bookings made by a renter (their rental history).
      * Alle Buchungen eines Mieters (seine Miethistorie).
+     *
+     * <p>Same Hibernate pitfall as previously fixed in {@code BikeRepository}:
+     * a {@code LEFT JOIN FETCH} on a {@code @OneToMany}/collection together
+     * with {@code Pageable} makes Hibernate paginate in-memory (after loading
+     * ALL matching rows) instead of in the database, because the generated
+     * COUNT query can't reuse the fetch join. An explicit {@code countQuery}
+     * without the collection fetch fixes the count, while the main query
+     * keeps the fetch join for efficient photo loading.
+     * <p>Dieselbe Hibernate-Falle wie zuvor in {@code BikeRepository}
+     * behoben: ein {@code LEFT JOIN FETCH} auf eine
+     * {@code @OneToMany}/Collection zusammen mit {@code Pageable} lässt
+     * Hibernate im Speicher paginieren (nach Laden ALLER passenden Zeilen),
+     * da die generierte COUNT-Abfrage den Fetch-Join nicht wiederverwenden
+     * kann. Eine explizite {@code countQuery} ohne den Collection-Fetch
+     * behebt die Zählung, während die Hauptabfrage den Fetch-Join für
+     * effizientes Foto-Laden behält.
      */
-    @Query("""
+    @Query(
+            value = """
             SELECT b FROM Booking b
             JOIN FETCH b.bike bike
             JOIN FETCH bike.owner
@@ -126,7 +143,13 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             WHERE b.renter.id = :renterId
               AND b.deletedAt IS NULL
             ORDER BY b.createdAt DESC
-            """)
+            """,
+            countQuery = """
+            SELECT COUNT(b) FROM Booking b
+            WHERE b.renter.id = :renterId
+              AND b.deletedAt IS NULL
+            """
+    )
     Page<Booking> findByRenterIdOrderByCreatedAtDesc(
             @Param("renterId") UUID renterId,
             Pageable pageable
@@ -139,8 +162,16 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
     /**
      * All incoming booking requests for a bike owner.
      * Alle eingehenden Buchungsanfragen für einen Fahrrad-Eigentümer.
+     *
+     * <p>Same collection-fetch + Pageable pitfall as
+     * {@link #findByRenterIdOrderByCreatedAtDesc} above — fixed the same way
+     * with an explicit {@code countQuery}.
+     * <p>Dieselbe Collection-Fetch + Pageable-Falle wie
+     * {@link #findByRenterIdOrderByCreatedAtDesc} oben — auf die gleiche
+     * Weise mit einer expliziten {@code countQuery} behoben.
      */
-    @Query("""
+    @Query(
+            value = """
             SELECT b FROM Booking b
             JOIN FETCH b.bike bike
             JOIN FETCH b.renter
@@ -149,7 +180,14 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
               AND b.deletedAt IS NULL
               AND (:status IS NULL OR b.status = :status)
             ORDER BY b.createdAt DESC
-            """)
+            """,
+            countQuery = """
+            SELECT COUNT(b) FROM Booking b
+            WHERE b.owner.id = :ownerId
+              AND b.deletedAt IS NULL
+              AND (:status IS NULL OR b.status = :status)
+            """
+    )
     Page<Booking> findByOwnerIdAndStatus(
             @Param("ownerId") UUID ownerId,
             @Param("status")  BookingStatus status,
