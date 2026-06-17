@@ -59,11 +59,16 @@ public class Bike extends BaseEntity {
     private String description;
 
     /**
-     * Bike category — maps to PostgreSQL ENUM {@code bike_category}.
-     * Fahrradkategorie — entspricht dem PostgreSQL-ENUM {@code bike_category}.
+     * Bike category — stored as VARCHAR(50) since V5 (Hibernate 6 cannot write
+     * native Postgres ENUM types via JDBC). Must stay in sync with all values
+     * of {@link BikeCategory} — adding a new enum constant here requires no
+     * migration since the column is a plain VARCHAR.
+     * Fahrradkategorie — seit V5 als VARCHAR(50) gespeichert (Hibernate 6 kann
+     * native Postgres-ENUM-Typen nicht per JDBC schreiben). Muss mit allen
+     * Werten von {@link BikeCategory} übereinstimmen.
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "bike_category")
+    @Column(nullable = false, columnDefinition = "VARCHAR(50)")
     private BikeCategory category;
 
     /**
@@ -112,7 +117,7 @@ public class Bike extends BaseEntity {
      * Admin-Genehmigungsstatus — nur APPROVED-Fahrräder erscheinen in öffentlicher Suche.
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "approval_status", nullable = false, columnDefinition = "approval_status")
+    @Column(name = "approval_status", nullable = false, columnDefinition = "VARCHAR(20)")
     @Builder.Default
     private ApprovalStatus approvalStatus = ApprovalStatus.PENDING;
 

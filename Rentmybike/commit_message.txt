@@ -1,0 +1,11 @@
+fix: resolve critical security and data-integrity bugs
+
+- Require JWT_SECRET in prod with no insecure fallback (app would
+  silently use the hardcoded default secret if the env var was unset)
+- Clean up stale columnDefinition annotations on Bike/Booking/Review
+  entities left over from the V5 enum-to-varchar migration
+- Add pessimistic row lock on bike during createBooking to prevent
+  concurrent requests from double-booking overlapping dates
+- Add missing dashboard/bikes/[id]/photos page so bike photo
+  upload/delete (already wired up in the API client) is reachable
+  from the UI instead of 404ing

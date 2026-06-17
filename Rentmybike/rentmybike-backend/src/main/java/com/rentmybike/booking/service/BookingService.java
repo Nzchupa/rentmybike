@@ -86,6 +86,22 @@ public class BookingService {
             throw new BusinessException("You cannot rent your own bike / Sie können Ihr eigenes Fahrrad nicht mieten");
         }
 
+        // Lock the bike row for the rest of this transaction (SELECT ... FOR UPDATE).
+        // This serializes concurrent createBooking calls for the same bike: a second
+        // request blocks here until the first one commits or rolls back, so the
+        // conflict check below can never race with another insert for the same bike.
+        // Without this lock, two requests could both read "no conflict" before either
+        // commits, resulting in a double-booking for overlapping dates.
+        //
+        // Sperrt die Fahrrad-Zeile für den Rest dieser Transaktion (SELECT ... FOR UPDATE).
+        // Dies serialisiert gleichzeitige createBooking-Aufrufe für dasselbe Fahrrad: eine
+        // zweite Anfrage blockiert hier, bis die erste committet oder zurückgerollt wird,
+        // sodass die folgende Konfliktprüfung niemals mit einem anderen Insert für dasselbe
+        // Fahrrad in Konflikt geraten kann. Ohne diese Sperre könnten beide Anfragen "kein
+        // Konflikt" lesen, bevor eine von beiden committet — das führt zu einer Doppelbuchung.
+        bikeRepository.findByIdForUpdate(bike.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Bike", request.getBikeId()));
+
         // Date conflict check / Datumskonflikt-Prüfung
         boolean hasConflict = bookingRepository.existsDateConflict(
                 bike.getId(), request.getStartDate(), request.getEndDate());

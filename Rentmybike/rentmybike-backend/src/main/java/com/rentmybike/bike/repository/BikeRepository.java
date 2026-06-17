@@ -3,9 +3,11 @@ package com.rentmybike.bike.repository;
 import com.rentmybike.bike.entity.ApprovalStatus;
 import com.rentmybike.bike.entity.Bike;
 import com.rentmybike.bike.entity.BikeCategory;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -113,6 +115,24 @@ public interface BikeRepository extends JpaRepository<Bike, UUID> {
               AND b.deletedAt IS NULL
             """)
     Optional<Bike> findByIdWithDetails(@Param("id") UUID id);
+
+    /**
+     * Locks the bike row (SELECT ... FOR UPDATE) for the duration of the
+     * caller's transaction. Used by BookingService.createBooking() to
+     * serialize concurrent booking attempts for the same bike — without this,
+     * two requests can both pass the date-conflict check before either
+     * commits, resulting in a double-booking.
+     *
+     * Sperrt die Fahrrad-Zeile (SELECT ... FOR UPDATE) für die Dauer der
+     * Transaktion des Aufrufers. Wird von BookingService.createBooking()
+     * verwendet, um gleichzeitige Buchungsversuche für dasselbe Fahrrad zu
+     * serialisieren — ohne dies können zwei Anfragen die
+     * Datumskonflikt-Prüfung bestehen, bevor eine von beiden committet,
+     * was zu einer Doppelbuchung führt.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT b FROM Bike b WHERE b.id = :id AND b.deletedAt IS NULL")
+    Optional<Bike> findByIdForUpdate(@Param("id") UUID id);
 
     /**
      * Verify ownership without loading full entity (used for auth checks).

@@ -115,7 +115,7 @@ public class Booking extends BaseEntity {
      * Aktueller Buchungsstatus — siehe {@link BookingStatus} für die Zustandsmaschine.
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "booking_status")
+    @Column(nullable = false, columnDefinition = "VARCHAR(20)")
     @Builder.Default
     private BookingStatus status = BookingStatus.PENDING;
 

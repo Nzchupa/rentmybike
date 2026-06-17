@@ -97,7 +97,7 @@ public class Review {
      * Richtung der Bewertung — bestimmt, wer Bewerter und wer Bewerteter ist.
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, updatable = false, columnDefinition = "review_type")
+    @Column(nullable = false, updatable = false, columnDefinition = "VARCHAR(20)")
     private ReviewType type;
 
     // ──────────────────────────────────────────────────────────────────────────

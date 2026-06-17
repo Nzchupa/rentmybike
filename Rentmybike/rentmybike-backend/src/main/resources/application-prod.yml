@@ -71,6 +71,13 @@ management:
 
 app:
   secure-cookie: true   # HTTPS only in production / Nur HTTPS in der Produktion
+  jwt:
+    # No fallback here on purpose: if JWT_SECRET is not set in Railway, startup
+    # MUST fail loudly instead of silently using the insecure default from
+    # application.yml. Kein Fallback hier absichtlich: fehlt JWT_SECRET in
+    # Railway, MUSS der Start laut fehlschlagen statt den unsicheren Standard
+    # aus application.yml zu verwenden.
+    secret: ${JWT_SECRET}
 
 logging:
   level:
