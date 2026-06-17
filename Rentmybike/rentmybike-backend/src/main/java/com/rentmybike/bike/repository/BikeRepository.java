@@ -53,7 +53,7 @@ public interface BikeRepository extends JpaRepository<Bike, UUID> {
             WHERE b.deletedAt IS NULL
               AND b.approvalStatus = 'APPROVED'
               AND b.available = true
-              AND (:city       IS NULL OR LOWER(b.city) LIKE LOWER(CONCAT('%', :city, '%')))
+              AND (:city       IS NULL OR LOWER(b.city) LIKE LOWER(CONCAT('%', CAST(:city AS string), '%')))
               AND (:category   IS NULL OR b.category = :category)
               AND (:minPrice   IS NULL OR b.pricePerDay >= :minPrice)
               AND (:maxPrice   IS NULL OR b.pricePerDay <= :maxPrice)
