@@ -30,6 +30,57 @@
     "logout": "Log out",
     "myProfile": "My Profile"
   },
+  "footer": {
+    "tagline": "Peer-to-peer bike rental marketplace.",
+    "quickLinks": "Quick links",
+    "home": "Home",
+    "bikes": "Browse bikes",
+    "company": "Company",
+    "about": "About",
+    "contact": "Contact",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "rights": "All rights reserved.",
+    "studentProject": "A student project."
+  },
+  "pages": {
+    "about": {
+      "title": "About RentMyBike",
+      "body1": "RentMyBike is a peer-to-peer bike rental marketplace built as a student project. It connects bike owners — individuals and small rental businesses — with people who want to rent a bike for a day, a week, or longer.",
+      "body2": "The goal is to make short-term bike rental simple and affordable, without going through a traditional rental shop: owners set their own prices and availability, and renters book directly with them."
+    },
+    "contact": {
+      "title": "Contact",
+      "body1": "This project is currently maintained by a single developer as a student project.",
+      "emailLabel": "Email",
+      "body2": "For questions, bug reports, or feedback, feel free to reach out by email."
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "intro": "This is a student project. The notes below describe how data is currently handled — this is not a substitute for formal legal advice.",
+      "section1Title": "What we collect",
+      "section1Body": "Account information you provide (name, email, phone), bike listings, booking details, messages exchanged through the in-app chat, and photos uploaded for rentals.",
+      "section2Title": "How it's used",
+      "section2Body": "Solely to operate the marketplace: creating bookings, showing listings, enabling communication between renters and owners, and account management.",
+      "section3Title": "Sharing",
+      "section3Body": "Your data is not sold or shared with third parties for advertising. Information visible to other users (like your name and reviews) is limited to what's needed to complete a rental.",
+      "section4Title": "Contact",
+      "section4Body": "If you have questions about your data, reach out via the Contact page."
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "intro": "These terms are provided as a baseline for this student project and may not cover every legal scenario.",
+      "section1Title": "The service",
+      "section1Body": "RentMyBike is a platform that connects bike owners and renters. RentMyBike is not the owner of the bikes listed and is not a party to the rental agreement between users.",
+      "section2Title": "User responsibilities",
+      "section2Body": "Owners are responsible for the accuracy of their listings and the condition of their bikes. Renters are responsible for returning bikes in the condition received and for any damage caused during the rental period.",
+      "section3Title": "Bookings",
+      "section3Body": "A booking request is not confirmed until the owner accepts it. Either party can use the in-app chat to coordinate pickup, return, and any issues.",
+      "section4Title": "Changes",
+      "section4Body": "These terms may be updated as the project evolves."
+    }
+  },
   "home": {
     "hero": {
       "title": "Rent a Bike, Explore Your City",
@@ -45,6 +96,54 @@
       "flexibleDesc": "Book for a day, a week, or longer. Cancel anytime before acceptance.",
       "trusted": "Trusted community",
       "trustedDesc": "Verified reviews from real renters and owners."
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "step1Title": "Find a bike",
+      "step1Desc": "Search by city and dates to see what's available near you.",
+      "step2Title": "Send a request",
+      "step2Desc": "Pick your dates and send a booking request to the owner.",
+      "step3Title": "Meet up and ride",
+      "step3Desc": "Once accepted, meet the owner, get the bike, and go explore."
+    },
+    "safety": {
+      "title": "Safe and transparent rentals",
+      "subtitle": "Every booking is backed by features built to protect both sides.",
+      "photosTitle": "Before & after photos",
+      "photosDesc": "Owners and renters can document the bike's condition at handover and return.",
+      "reviewsTitle": "Real reviews",
+      "reviewsDesc": "Renters and owners rate each other after every completed booking.",
+      "directTitle": "Direct communication",
+      "directDesc": "Chat with the owner or renter directly about pickup details and questions."
+    },
+    "audience": {
+      "ownersTitle": "For bike owners",
+      "ownersDesc": "Turn your bike into income.",
+      "owner1": "Earn money from a bike you're not using every day",
+      "owner2": "Set your own price per day",
+      "owner3": "Choose your own availability and dates",
+      "ownersCta": "List your bike",
+      "rentersTitle": "For renters",
+      "rentersDesc": "Skip the rental shop markup.",
+      "renter1": "Often cheaper than traditional rental shops",
+      "renter2": "Wide selection of bike types across cities",
+      "renter3": "Rent directly from real local owners",
+      "rentersCta": "Browse bikes"
+    },
+    "business": {
+      "title": "Have a bike rental business?",
+      "subtitle": "RentMyBike has a dedicated toolkit for businesses managing multiple bikes.",
+      "item1": "Business dashboard with revenue and booking stats",
+      "item2": "Booking calendar across all your bikes",
+      "item3": "Bulk inventory management",
+      "item4": "Rent out accessories like helmets, child seats, and locks",
+      "cta": "Become a partner"
+    },
+    "popularBikes": {
+      "title": "Popular bikes",
+      "subtitle": "A few bikes available right now",
+      "viewAll": "View all bikes",
+      "empty": "No bikes available yet — be the first to list one."
     }
   },
   "auth": {

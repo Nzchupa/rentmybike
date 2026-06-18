@@ -30,6 +30,57 @@
     "logout": "Abmelden",
     "myProfile": "Mein Profil"
   },
+  "footer": {
+    "tagline": "Peer-to-Peer-Marktplatz für Fahrradverleih.",
+    "quickLinks": "Schnellzugriff",
+    "home": "Startseite",
+    "bikes": "Fahrräder durchsuchen",
+    "company": "Unternehmen",
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "legal": "Rechtliches",
+    "privacy": "Datenschutz",
+    "terms": "Nutzungsbedingungen",
+    "rights": "Alle Rechte vorbehalten.",
+    "studentProject": "Ein Studienprojekt."
+  },
+  "pages": {
+    "about": {
+      "title": "Über RentMyBike",
+      "body1": "RentMyBike ist ein Peer-to-Peer-Marktplatz für Fahrradverleih, der als Studienprojekt entwickelt wurde. Er verbindet Fahrradbesitzer — Privatpersonen und kleine Verleihbetriebe — mit Menschen, die ein Fahrrad für einen Tag, eine Woche oder länger mieten möchten.",
+      "body2": "Das Ziel ist es, kurzfristigen Fahrradverleih einfach und günstig zu machen, ohne den Umweg über einen klassischen Verleihladen: Eigentümer legen ihren eigenen Preis und ihre Verfügbarkeit fest, und Mieter buchen direkt bei ihnen."
+    },
+    "contact": {
+      "title": "Kontakt",
+      "body1": "Dieses Projekt wird derzeit von einem einzelnen Entwickler als Studienprojekt betreut.",
+      "emailLabel": "E-Mail",
+      "body2": "Bei Fragen, Fehlermeldungen oder Feedback kannst du gerne per E-Mail Kontakt aufnehmen."
+    },
+    "privacy": {
+      "title": "Datenschutz",
+      "intro": "Dies ist ein Studienprojekt. Die folgenden Hinweise beschreiben den aktuellen Umgang mit Daten — sie ersetzen keine rechtliche Beratung.",
+      "section1Title": "Was wir erfassen",
+      "section1Body": "Von dir angegebene Kontoinformationen (Name, E-Mail, Telefon), Fahrradangebote, Buchungsdetails, Nachrichten über den In-App-Chat sowie für Vermietungen hochgeladene Fotos.",
+      "section2Title": "Wie es verwendet wird",
+      "section2Body": "Ausschließlich zum Betrieb des Marktplatzes: zum Erstellen von Buchungen, Anzeigen von Angeboten, zur Kommunikation zwischen Mietern und Eigentümern sowie zur Kontoverwaltung.",
+      "section3Title": "Weitergabe",
+      "section3Body": "Deine Daten werden nicht verkauft oder zu Werbezwecken an Dritte weitergegeben. Für andere Nutzer sichtbare Informationen (z. B. Name und Bewertungen) sind auf das für die Vermietung Notwendige beschränkt.",
+      "section4Title": "Kontakt",
+      "section4Body": "Bei Fragen zu deinen Daten wende dich bitte über die Kontaktseite an uns."
+    },
+    "terms": {
+      "title": "Nutzungsbedingungen",
+      "intro": "Diese Bedingungen dienen als Grundlage für dieses Studienprojekt und decken möglicherweise nicht jeden rechtlichen Fall ab.",
+      "section1Title": "Der Dienst",
+      "section1Body": "RentMyBike ist eine Plattform, die Fahrradbesitzer und Mieter verbindet. RentMyBike ist nicht Eigentümer der gelisteten Fahrräder und ist nicht Vertragspartei des Mietvertrags zwischen den Nutzern.",
+      "section2Title": "Verantwortlichkeiten der Nutzer",
+      "section2Body": "Eigentümer sind für die Richtigkeit ihrer Angebote und den Zustand ihrer Fahrräder verantwortlich. Mieter sind dafür verantwortlich, Fahrräder im erhaltenen Zustand zurückzugeben und für während der Mietdauer verursachte Schäden.",
+      "section3Title": "Buchungen",
+      "section3Body": "Eine Buchungsanfrage ist erst bestätigt, wenn der Eigentümer sie annimmt. Beide Seiten können den In-App-Chat nutzen, um Abholung, Rückgabe und etwaige Probleme zu klären.",
+      "section4Title": "Änderungen",
+      "section4Body": "Diese Bedingungen können sich im Laufe des Projekts ändern."
+    }
+  },
   "home": {
     "hero": {
       "title": "Fahrrad mieten, Stadt entdecken",
@@ -45,6 +96,54 @@
       "flexibleDesc": "Für einen Tag, eine Woche oder länger buchen. Jederzeit vor Annahme stornieren.",
       "trusted": "Vertrauenswürdige Community",
       "trustedDesc": "Verifizierte Bewertungen von echten Mietern und Eigentümern."
+    },
+    "howItWorks": {
+      "title": "So funktioniert's",
+      "step1Title": "Fahrrad finden",
+      "step1Desc": "Suche nach Stadt und Datum, um verfügbare Fahrräder in deiner Nähe zu sehen.",
+      "step2Title": "Anfrage senden",
+      "step2Desc": "Wähle deine Termine und sende eine Buchungsanfrage an den Eigentümer.",
+      "step3Title": "Treffen und losfahren",
+      "step3Desc": "Nach der Annahme triffst du den Eigentümer, holst das Fahrrad ab und fährst los."
+    },
+    "safety": {
+      "title": "Sichere und transparente Vermietung",
+      "subtitle": "Jede Buchung wird durch Funktionen abgesichert, die beide Seiten schützen.",
+      "photosTitle": "Fotos vorher & nachher",
+      "photosDesc": "Eigentümer und Mieter können den Zustand des Fahrrads bei Übergabe und Rückgabe dokumentieren.",
+      "reviewsTitle": "Echte Bewertungen",
+      "reviewsDesc": "Mieter und Eigentümer bewerten sich nach jeder abgeschlossenen Buchung gegenseitig.",
+      "directTitle": "Direkte Kommunikation",
+      "directDesc": "Chatte direkt mit dem Eigentümer oder Mieter über Abholdetails und Fragen."
+    },
+    "audience": {
+      "ownersTitle": "Für Fahrradbesitzer",
+      "ownersDesc": "Verwandle dein Fahrrad in Einkommen.",
+      "owner1": "Verdiene Geld mit einem Fahrrad, das du nicht jeden Tag nutzt",
+      "owner2": "Lege deinen eigenen Preis pro Tag fest",
+      "owner3": "Wähle deine eigene Verfügbarkeit und Termine",
+      "ownersCta": "Fahrrad inserieren",
+      "rentersTitle": "Für Mieter",
+      "rentersDesc": "Spare dir den Aufschlag beim Fahrradverleih.",
+      "renter1": "Oft günstiger als klassische Fahrradverleihe",
+      "renter2": "Große Auswahl an Fahrradtypen in vielen Städten",
+      "renter3": "Direkt von echten lokalen Eigentümern mieten",
+      "rentersCta": "Fahrräder durchsuchen"
+    },
+    "business": {
+      "title": "Du hast einen Fahrradverleih?",
+      "subtitle": "RentMyBike bietet ein eigenes Toolkit für Unternehmen mit mehreren Fahrrädern.",
+      "item1": "Business-Dashboard mit Umsatz- und Buchungsstatistiken",
+      "item2": "Buchungskalender für alle deine Fahrräder",
+      "item3": "Massenverwaltung des Inventars",
+      "item4": "Zubehör wie Helme, Kindersitze und Schlösser vermieten",
+      "cta": "Partner werden"
+    },
+    "popularBikes": {
+      "title": "Beliebte Fahrräder",
+      "subtitle": "Einige Fahrräder, die gerade verfügbar sind",
+      "viewAll": "Alle Fahrräder ansehen",
+      "empty": "Noch keine Fahrräder verfügbar — sei der Erste, der eines inseriert."
     }
   },
   "auth": {
