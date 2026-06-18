@@ -1,15 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MapPin, Calendar } from "lucide-react";
+import { MapPin, Calendar, Camera, MessageCircle, ChevronDown, ChevronUp } from "lucide-react";
 import toast from "react-hot-toast";
 import { bookingsApi } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { BookingStatusBadge } from "@/components/ui/Badge";
 import { Avatar } from "@/components/ui/Avatar";
+import { BookingPhotosPanel } from "@/components/booking/BookingPhotosPanel";
+import { ChatPanel } from "@/components/booking/ChatPanel";
 import { formatPrice, formatDate } from "@/lib/utils";
 import type { BookingResponse } from "@/types";
 
@@ -28,6 +31,26 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
   const t = useTranslations("booking");
   const locale = useLocale();
   const queryClient = useQueryClient();
+  const [showPhotos, setShowPhotos] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+
+  // Condition photos only make sense once a booking is confirmed — there's
+  // nothing to document before that, and the booking record disappears from
+  // active use after rejection/cancellation.
+  // Zustandsfotos sind erst sinnvoll, sobald eine Buchung bestätigt ist — vorher
+  // gibt es nichts zu dokumentieren, und der Buchungsdatensatz wird nach
+  // Ablehnung/Stornierung nicht mehr aktiv genutzt.
+  const photosEnabled = booking.status === "ACCEPTED" || booking.status === "COMPLETED";
+
+  // Chat opens earlier than photos — renters may want to ask the owner
+  // something before the request is even accepted — but closes once the
+  // booking is dead (rejected/cancelled), since there's nothing left to
+  // coordinate.
+  // Der Chat öffnet früher als die Fotos — Mieter möchten dem Eigentümer
+  // vielleicht etwas fragen, bevor die Anfrage überhaupt akzeptiert wurde —
+  // schließt aber, sobald die Buchung erledigt ist (abgelehnt/storniert), da
+  // es nichts mehr zu koordinieren gibt.
+  const chatEnabled = booking.status !== "REJECTED" && booking.status !== "CANCELLED";
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["owner-bookings"] });
@@ -167,6 +190,48 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
         <p className="mt-3 text-sm text-slate-500 border-t border-slate-100 pt-3 italic">
           "{booking.message}"
         </p>
+      )}
+
+      {/* Before/after condition photos */}
+      {photosEnabled && (
+        <div className="mt-3 border-t border-slate-100 pt-3">
+          <button
+            type="button"
+            onClick={() => setShowPhotos((v) => !v)}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900"
+          >
+            <Camera size={15} />
+            {t("photos.title")}
+            {showPhotos ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+          </button>
+
+          {showPhotos && (
+            <div className="mt-3">
+              <BookingPhotosPanel bookingId={booking.id} />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Chat with the other party */}
+      {chatEnabled && (
+        <div className="mt-3 border-t border-slate-100 pt-3">
+          <button
+            type="button"
+            onClick={() => setShowChat((v) => !v)}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900"
+          >
+            <MessageCircle size={15} />
+            {t("chat.title")}
+            {showChat ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+          </button>
+
+          {showChat && (
+            <div className="mt-3">
+              <ChatPanel bookingId={booking.id} />
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

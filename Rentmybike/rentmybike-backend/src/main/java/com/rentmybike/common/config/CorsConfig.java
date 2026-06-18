@@ -40,13 +40,7 @@ public class CorsConfig {
         // unlike setAllowedOrigins("*").
         // Erlaubt die konfigurierte Frontend-URL sowie alle Vercel-Preview-Deployments dieses
         // Projekts (jeder Push erhält eine eigene *-nzchupas-projects.vercel.app URL).
-        config.setAllowedOriginPatterns(List.of(
-                appProperties.getFrontendUrl(),                          // Vercel production / Vercel-Produktion
-                "https://rentmybike.xyz",                                 // Custom domain (apex) / Eigene Domain (apex)
-                "https://www.rentmybike.xyz",                             // Custom domain (www) / Eigene Domain (www)
-                "https://rentmybike-*-nzchupas-projects.vercel.app",     // Vercel previews / Vercel-Vorschauen
-                "http://localhost:3000"                                   // Local dev / Lokale Entwicklung
-        ));
+        config.setAllowedOriginPatterns(allowedOriginPatterns());
 
         // Allow standard HTTP methods used by the REST API
         // Standardmäßige HTTP-Methoden für die REST-API erlauben
@@ -67,5 +61,27 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", config);
         return source;
+    }
+
+    /**
+     * The shared allowed-origin pattern list — extracted so other components
+     * that need their own origin check (e.g. {@link WebSocketConfig}'s STOMP/
+     * SockJS endpoint, which is registered outside the {@code /api/**} CORS
+     * mapping above) can reuse the exact same allowlist instead of drifting
+     * out of sync with it.
+     * Die gemeinsame Liste erlaubter Origin-Muster — ausgelagert, damit
+     * andere Komponenten mit eigener Origin-Prüfung (z. B. der STOMP-/SockJS-
+     * Endpunkt von {@link WebSocketConfig}, der außerhalb der obigen
+     * {@code /api/**}-CORS-Zuordnung registriert wird) dieselbe Allowlist
+     * wiederverwenden können, statt davon abzuweichen.
+     */
+    public List<String> allowedOriginPatterns() {
+        return List.of(
+                appProperties.getFrontendUrl(),                          // Vercel production / Vercel-Produktion
+                "https://rentmybike.xyz",                                 // Custom domain (apex) / Eigene Domain (apex)
+                "https://www.rentmybike.xyz",                             // Custom domain (www) / Eigene Domain (www)
+                "https://rentmybike-*-nzchupas-projects.vercel.app",     // Vercel previews / Vercel-Vorschauen
+                "http://localhost:3000"                                   // Local dev / Lokale Entwicklung
+        );
     }
 }

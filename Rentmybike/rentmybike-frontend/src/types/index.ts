@@ -191,6 +191,35 @@ export interface CreateBookingRequest {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Booking photos (before/after) / Buchungsfotos (Vorher/Nachher)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type BookingPhotoPhase = "BEFORE" | "AFTER";
+
+export interface BookingPhotoResponse {
+  id: string;
+  phase: BookingPhotoPhase;
+  photoUrl: string;
+  uploaderId: string;
+  uploaderName: string;
+  createdAt: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Chat / Chat
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface ChatMessageResponse {
+  id: string;
+  bookingId: string;
+  senderId: string;
+  senderName: string;
+  senderAvatarUrl: string | null;
+  content: string;
+  createdAt: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Review / Bewertung
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -261,6 +290,15 @@ export interface NotificationResponse {
 
 export interface UnreadCountResponse {
   unreadCount: number;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Favorites / Favoriten
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface FavoriteStatusResponse {
+  favorited: boolean;
+  favoriteCount: number;
 }
 
 export interface AdminStatsResponse {

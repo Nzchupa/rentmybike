@@ -6,6 +6,7 @@ import { MapPin } from "lucide-react";
 import { StarRating } from "@/components/ui/StarRating";
 import { formatPrice } from "@/lib/utils";
 import { reviewsApi } from "@/lib/api";
+import { FavoriteButton } from "@/components/bikes/FavoriteButton";
 import type { BikeResponse } from "@/types";
 
 interface BikeCardProps {
@@ -64,6 +65,9 @@ export function BikeCard({ bike }: BikeCardProps) {
           <div className="absolute top-3 left-3 rounded-full bg-white/90 backdrop-blur px-2.5 py-1 text-xs font-medium text-slate-700 shadow">
             {tc(bike.category)}
           </div>
+
+          {/* Favorite toggle */}
+          <FavoriteButton bikeId={bike.id} className="absolute top-3 right-3" />
         </div>
 
         {/* Info */}

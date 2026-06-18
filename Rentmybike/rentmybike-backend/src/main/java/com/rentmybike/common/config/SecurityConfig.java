@@ -121,7 +121,8 @@ public class SecurityConfig {
                             "/api/v1/auth/refresh",
                             "/api/v1/auth/verify-email",
                             "/api/v1/auth/resend-verification",
-                            "/actuator/**"
+                            "/actuator/**",
+                            "/ws/**"
                     )
             )
             .addFilterAfter(new CsrfCookieFilter(), CsrfFilter.class)
@@ -156,6 +157,12 @@ public class SecurityConfig {
 
                 // Public user profiles / Öffentliche Benutzerprofile
                 .requestMatchers(HttpMethod.GET, "/api/v1/users/*/public").permitAll()
+
+                // Public favorite count/status — bike detail page shows the
+                // heart + count to anonymous visitors too (favorited=false for them)
+                // Öffentlicher Favoriten-Status/Zähler — die Fahrrad-Detailseite
+                // zeigt Herz + Zähler auch anonymen Besuchern (favorited=false für sie)
+                .requestMatchers(HttpMethod.GET, "/api/v1/favorites/*/status").permitAll()
 
                 // Admin-only endpoints / Nur-Admin-Endpunkte
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")

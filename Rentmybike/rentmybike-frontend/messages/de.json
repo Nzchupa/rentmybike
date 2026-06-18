@@ -190,7 +190,23 @@
     },
     "cancelConfirm": "Möchten Sie diese Buchung wirklich stornieren?",
     "acceptConfirm": "Diese Buchungsanfrage akzeptieren?",
-    "rejectConfirm": "Diese Buchungsanfrage ablehnen?"
+    "rejectConfirm": "Diese Buchungsanfrage ablehnen?",
+    "photos": {
+      "title": "Zustandsfotos",
+      "before": "Vor der Abholung",
+      "after": "Nach der Rückgabe",
+      "addPhoto": "Foto hinzufügen",
+      "noPhotos": "Noch keine Fotos.",
+      "uploaded": "Foto hochgeladen",
+      "delete": "Foto löschen"
+    },
+    "chat": {
+      "title": "Chat",
+      "empty": "Noch keine Nachrichten. Sag hallo!",
+      "placeholder": "Nachricht eingeben...",
+      "send": "Senden",
+      "loadError": "Chatverlauf konnte nicht geladen werden — bitte versuchen Sie es erneut."
+    }
   },
   "dashboard": {
     "title": "Dashboard",
@@ -203,8 +219,13 @@
       "myBikes": "Meine Fahrräder",
       "asRenter": "Als Mieter",
       "asOwner": "Als Eigentümer",
+      "favorites": "Favoriten",
       "notifications": "Benachrichtigungen",
       "profile": "Profil"
+    },
+    "favorites": {
+      "title": "Meine Favoriten",
+      "empty": "Sie haben noch keine Fahrräder favorisiert."
     },
     "bikes": {
       "title": "Meine Fahrräder",

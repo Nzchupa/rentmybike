@@ -10,6 +10,7 @@ import {
   CalendarSearch,
   CalendarCheck,
   Bell,
+  Heart,
   User,
 } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
@@ -20,6 +21,7 @@ const tabs = [
   { key: "myBikes",       icon: Bike,            href: "/dashboard/bikes" },
   { key: "asRenter",      icon: CalendarSearch,  href: "/dashboard/bookings/renter" },
   { key: "asOwner",       icon: CalendarCheck,   href: "/dashboard/bookings/owner" },
+  { key: "favorites",     icon: Heart,           href: "/dashboard/favorites" },
   { key: "notifications", icon: Bell,            href: "/dashboard/notifications" },
   { key: "profile",       icon: User,            href: "/dashboard/profile" },
 ];

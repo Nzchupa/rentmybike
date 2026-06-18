@@ -190,7 +190,23 @@
     },
     "cancelConfirm": "Are you sure you want to cancel this booking?",
     "acceptConfirm": "Accept this booking request?",
-    "rejectConfirm": "Reject this booking request?"
+    "rejectConfirm": "Reject this booking request?",
+    "photos": {
+      "title": "Condition photos",
+      "before": "Before pickup",
+      "after": "After return",
+      "addPhoto": "Add photo",
+      "noPhotos": "No photos yet.",
+      "uploaded": "Photo uploaded",
+      "delete": "Delete photo"
+    },
+    "chat": {
+      "title": "Chat",
+      "empty": "No messages yet. Say hello!",
+      "placeholder": "Type a message...",
+      "send": "Send",
+      "loadError": "Couldn't load chat history — please try again."
+    }
   },
   "dashboard": {
     "title": "Dashboard",
@@ -203,8 +219,13 @@
       "myBikes": "My Bikes",
       "asRenter": "As Renter",
       "asOwner": "As Owner",
+      "favorites": "Favorites",
       "notifications": "Notifications",
       "profile": "Profile"
+    },
+    "favorites": {
+      "title": "My Favorites",
+      "empty": "You haven't favorited any bikes yet."
     },
     "bikes": {
       "title": "My Bikes",

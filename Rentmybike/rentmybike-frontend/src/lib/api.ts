@@ -327,6 +327,10 @@ import type {
   AdminStatsResponse,
   NotificationResponse,
   UnreadCountResponse,
+  FavoriteStatusResponse,
+  BookingPhotoResponse,
+  BookingPhotoPhase,
+  ChatMessageResponse,
 } from "@/types";
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
@@ -490,6 +494,38 @@ export const bookingsApi = {
     ),
 };
 
+// ── Booking photos (before/after) ───────────────────────────────────────────
+
+export const bookingPhotosApi = {
+  list: (bookingId: string) =>
+    api.get<ApiResponse<BookingPhotoResponse[]>>(`/api/v1/bookings/${bookingId}/photos`),
+
+  upload: (bookingId: string, file: File, phase: BookingPhotoPhase) => {
+    const form = new FormData();
+    form.append("file", file);
+    form.append("phase", phase);
+    return api.post<ApiResponse<BookingPhotoResponse>>(
+      `/api/v1/bookings/${bookingId}/photos`,
+      form,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+  },
+
+  remove: (bookingId: string, photoId: string) =>
+    api.delete<ApiResponse<null>>(`/api/v1/bookings/${bookingId}/photos/${photoId}`),
+};
+
+// ── Chat ──────────────────────────────────────────────────────────────────────
+// Sending happens over the STOMP /app/chat/{bookingId}/send destination
+// (see ChatPanel) — this REST call only loads the initial history.
+// Senden erfolgt über das STOMP-Ziel /app/chat/{bookingId}/send (siehe
+// ChatPanel) — dieser REST-Aufruf lädt nur den initialen Verlauf.
+
+export const chatApi = {
+  getHistory: (bookingId: string) =>
+    api.get<ApiResponse<ChatMessageResponse[]>>(`/api/v1/bookings/${bookingId}/chat`),
+};
+
 // ── Reviews ───────────────────────────────────────────────────────────────────
 
 export const reviewsApi = {
@@ -561,4 +597,24 @@ export const notificationsApi = {
 
   markAllAsRead: () =>
     api.post<ApiResponse<null>>("/api/v1/notifications/read-all"),
+};
+
+// ── Favorites ────────────────────────────────────────────────────────────────
+
+export const favoritesApi = {
+  add: (bikeId: string) =>
+    api.post<ApiResponse<null>>(`/api/v1/favorites/${bikeId}`),
+
+  remove: (bikeId: string) =>
+    api.delete<ApiResponse<null>>(`/api/v1/favorites/${bikeId}`),
+
+  // Public — works for anonymous visitors too (favorited is always false for them).
+  // Öffentlich — funktioniert auch für anonyme Besucher (favorited ist für sie immer false).
+  getStatus: (bikeId: string) =>
+    api.get<ApiResponse<FavoriteStatusResponse>>(`/api/v1/favorites/${bikeId}/status`),
+
+  list: (page = 0, size = 20) =>
+    api.get<ApiResponse<PageResponse<BikeResponse>>>("/api/v1/favorites", {
+      params: { page, size },
+    }),
 };

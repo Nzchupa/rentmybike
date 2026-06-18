@@ -15,6 +15,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { useState } from "react";
 import type { BikePhotoResponse } from "@/types";
 import { BookingForm } from "@/components/booking/BookingForm";
+import { FavoriteButton } from "@/components/bikes/FavoriteButton";
 
 interface BikeDetailPageProps {
   // Next.js 14 passes route params as a plain (already-resolved) object —
@@ -145,9 +146,12 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 mt-2 text-slate-500">
-              <MapPin size={16} />
-              <span>{bike.city}{bike.address ? `, ${bike.address}` : ""}</span>
+            <div className="flex items-center justify-between mt-2">
+              <div className="flex items-center gap-2 text-slate-500">
+                <MapPin size={16} />
+                <span>{bike.city}{bike.address ? `, ${bike.address}` : ""}</span>
+              </div>
+              {!isOwner && <FavoriteButton bikeId={bike.id} variant="full" />}
             </div>
 
             {ratingData && ratingData.reviewCount > 0 && (

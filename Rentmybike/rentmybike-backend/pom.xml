@@ -54,6 +54,12 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
+        <!-- ── WebSocket — real-time chat (STOMP over SockJS) / Echtzeit-Chat -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
         <!-- ── Validation (Jakarta Bean Validation / Hibernate Validator) -->
         <!-- Validierung (Jakarta Bean Validation / Hibernate Validator)   -->
         <dependency>
