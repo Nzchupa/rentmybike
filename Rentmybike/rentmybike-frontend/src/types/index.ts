@@ -24,7 +24,7 @@ export interface PageResponse<T> {
 // User / Benutzer
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type UserRole = "USER" | "ADMIN";
+export type UserRole = "USER" | "BUSINESS" | "ADMIN";
 
 export interface UserProfileResponse {
   id: string;
@@ -36,7 +36,16 @@ export interface UserProfileResponse {
   avatarUrl: string | null;
   role: UserRole;
   emailVerified: boolean;
+  banned: boolean;
+  /** Business display name — null unless role is BUSINESS / Geschäftsname — null außer bei Rolle BUSINESS */
+  businessName: string | null;
+  /** Whether an admin verified this business / Ob ein Admin dieses Unternehmen verifiziert hat */
+  businessVerified: boolean;
   createdAt: string;
+}
+
+export interface UpgradeToBusinessRequest {
+  businessName: string;
 }
 
 export interface PublicUserResponse {
@@ -149,6 +158,11 @@ export interface UpdateBikeRequest extends CreateBikeRequest {
   available: boolean;
 }
 
+/** BUSINESS-only — POST /api/v1/bikes/bulk, up to 50 bikes per batch */
+export interface BulkCreateBikeRequest {
+  bikes: CreateBikeRequest[];
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Booking / Buchung
 // ─────────────────────────────────────────────────────────────────────────────
@@ -178,6 +192,8 @@ export interface BookingResponse {
   totalPrice: number;
   status: BookingStatus;
   message: string | null;
+  /** Accessory add-ons (Stage 3 "Business accounts") / Zubehör-Add-ons (Stage 3 "Business-Konten") */
+  accessories: BookingAccessoryResponse[];
   cancellable: boolean;
   reviewable: boolean;
   createdAt: string;
@@ -188,6 +204,48 @@ export interface CreateBookingRequest {
   startDate: string;   // ISO date
   endDate: string;
   message?: string;
+  accessories?: AccessorySelectionRequest[];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Accessories (Stage 3 "Business accounts") / Zubehör (Stage 3 "Business-Konten")
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type AccessoryType = "HELMET" | "CHILD_SEAT" | "LOCK";
+
+export interface AccessoryResponse {
+  id: string;
+  ownerId: string;
+  ownerName: string;
+  type: AccessoryType;
+  name: string;
+  quantityTotal: number;
+  pricePerDay: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateAccessoryRequest {
+  type: AccessoryType;
+  name: string;
+  quantityTotal: number;
+  pricePerDay: number;
+}
+
+export interface UpdateAccessoryRequest extends CreateAccessoryRequest {}
+
+export interface AccessorySelectionRequest {
+  accessoryId: string;
+  quantity: number;
+}
+
+export interface BookingAccessoryResponse {
+  accessoryId: string;
+  type: AccessoryType;
+  name: string;
+  quantity: number;
+  pricePerDayAtBooking: number;
+  lineTotal: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -266,6 +324,10 @@ export interface AdminUserResponse {
   emailVerified: boolean;
   banned: boolean;
   bannedAt: string | null;
+  /** Business display name — null unless role is BUSINESS / Geschäftsname — null außer bei Rolle BUSINESS */
+  businessName: string | null;
+  /** Whether an admin verified this business / Ob ein Admin dieses Unternehmen verifiziert hat */
+  businessVerified: boolean;
   createdAt: string;
   deletedAt: string | null;
 }
@@ -316,4 +378,15 @@ export interface AdminStatsResponse {
   cancelledBookings: number;
   rejectedBookings: number;
   totalRevenue: number;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Business dashboard (Stage 3 "Business accounts") / Business-Dashboard
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface BusinessDashboardSummaryResponse {
+  totalRevenue: number;
+  activeBikes: number;
+  totalBookings: number;
+  averageRating: number;
 }

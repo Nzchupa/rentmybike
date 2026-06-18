@@ -1,0 +1,3 @@
+ALTER TABLE users
+    ADD COLUMN business_name VARCHAR(150),
+    ADD COLUMN business_verified BOOLEAN NOT NULL DEFAULT FALSE;

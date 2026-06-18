@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -101,6 +102,26 @@ public class BikeController {
         BikeResponse created = bikeService.createBike(currentUser.getId(), request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(created, "Bike listing created — pending admin review / Inserat erstellt — wartet auf Admin-Prüfung"));
+    }
+
+    /**
+     * Bulk-create bike listings — BUSINESS accounts only.
+     * Fahrrad-Inserate massenhaft erstellen — nur für BUSINESS-Konten.
+     *
+     * <p>POST /api/v1/bikes/bulk → 201 Created
+     * Each bike starts in PENDING status, same as a single create.
+     */
+    @PostMapping("/api/v1/bikes/bulk")
+    @PreAuthorize("hasRole('BUSINESS')")
+    public ResponseEntity<ApiResponse<List<BikeResponse>>> bulkCreateBikes(
+            @AuthenticationPrincipal User currentUser,
+            @Valid @RequestBody BulkCreateBikeRequest request) {
+
+        List<BikeResponse> created = bikeService.bulkCreateBikes(currentUser.getId(), request.getBikes());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(created,
+                        created.size() + " bikes created — pending admin review / "
+                                + created.size() + " Fahrräder erstellt — warten auf Admin-Prüfung"));
     }
 
     /**

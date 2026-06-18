@@ -12,11 +12,12 @@ import {
   Bell,
   Heart,
   User,
+  Briefcase,
 } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { cn } from "@/lib/utils";
 
-const tabs = [
+const baseTabs = [
   { key: "overview",      icon: LayoutDashboard, href: "/dashboard" },
   { key: "myBikes",       icon: Bike,            href: "/dashboard/bikes" },
   { key: "asRenter",      icon: CalendarSearch,  href: "/dashboard/bookings/renter" },
@@ -25,6 +26,11 @@ const tabs = [
   { key: "notifications", icon: Bell,            href: "/dashboard/notifications" },
   { key: "profile",       icon: User,            href: "/dashboard/profile" },
 ];
+
+// Shown only for BUSINESS-role users — links to the Business Dashboard
+// (stats, bike management, calendar, accessories). Nur für BUSINESS-Rolle —
+// verlinkt zum Business-Dashboard.
+const businessTab = { key: "business", icon: Briefcase, href: "/dashboard/business" };
 
 /**
  * Shared dashboard layout — sidebar/tabs + auth guard.
@@ -35,7 +41,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isLoading } = useAuthStore();
+  const { user, isLoading, isBusiness } = useAuthStore();
+  const tabs = isBusiness() ? [...baseTabs, businessTab] : baseTabs;
 
   // Auth guard
   useEffect(() => {

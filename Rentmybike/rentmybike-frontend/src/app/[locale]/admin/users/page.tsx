@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Search, ShieldBan, ShieldCheck, Trash2 } from "lucide-react";
+import { Search, ShieldBan, ShieldCheck, Trash2, BadgeCheck, BadgeX } from "lucide-react";
 import toast from "react-hot-toast";
 import { adminApi } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
@@ -84,6 +84,18 @@ export default function AdminUsersPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const { mutate: verifyBusiness } = useMutation({
+    mutationFn: adminApi.verifyBusiness,
+    onSuccess: () => { toast.success(t("businessVerified")); invalidate(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const { mutate: unverifyBusiness } = useMutation({
+    mutationFn: adminApi.unverifyBusiness,
+    onSuccess: () => { toast.success(t("businessUnverified")); invalidate(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const users = data?.content ?? [];
 
   return (
@@ -143,9 +155,16 @@ export default function AdminUsersPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <Badge variant={user.role === "ADMIN" ? "blue" : "gray"}>
-                        {user.role}
-                      </Badge>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <Badge variant={user.role === "ADMIN" ? "blue" : "gray"}>
+                          {user.role}
+                        </Badge>
+                        {user.role === "BUSINESS" && (
+                          <Badge variant={user.businessVerified ? "green" : "yellow"}>
+                            {user.businessVerified ? t("businessVerifiedBadge") : t("businessPendingBadge")}
+                          </Badge>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       {user.banned ? (
@@ -159,6 +178,27 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
+                        {user.role === "BUSINESS" && (
+                          user.businessVerified ? (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              title={t("unverifyBusiness")}
+                              onClick={() => unverifyBusiness(user.id)}
+                            >
+                              <BadgeX size={15} className="text-slate-500" />
+                            </Button>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              title={t("verifyBusiness")}
+                              onClick={() => verifyBusiness(user.id)}
+                            >
+                              <BadgeCheck size={15} className="text-emerald-600" />
+                            </Button>
+                          )
+                        )}
                         {user.role !== "ADMIN" && (
                           <>
                             {user.banned ? (

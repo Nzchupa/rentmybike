@@ -39,5 +39,12 @@ public class UserProfileResponse {
     /** Whether the account is banned / Ob das Konto gesperrt ist */
     private boolean banned;
 
+    /** Business display name — null unless role is BUSINESS / Geschäftsname — null außer bei Rolle BUSINESS */
+    private String businessName;
+
+    /** Whether an admin verified this business — meaningless unless role is BUSINESS
+     * Ob ein Admin dieses Unternehmen verifiziert hat — bedeutungslos außer bei Rolle BUSINESS */
+    private boolean businessVerified;
+
     private LocalDateTime createdAt;
 }

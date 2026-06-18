@@ -101,6 +101,14 @@ public interface BikeRepository extends JpaRepository<Bike, UUID> {
             """)
     List<Bike> findActiveBikesByOwnerId(@Param("ownerId") UUID ownerId);
 
+    /**
+     * Count of non-deleted bikes owned by a user — used for the business
+     * dashboard summary's "active bikes" figure.
+     * Anzahl nicht gelöschter Fahrräder eines Benutzers — wird für die Kennzahl
+     * "aktive Fahrräder" im Business-Dashboard verwendet.
+     */
+    long countByOwnerIdAndDeletedAtIsNull(@Param("ownerId") UUID ownerId);
+
     // ──────────────────────────────────────────────────────────────────────────
     // Admin queries / Admin-Abfragen
     // ──────────────────────────────────────────────────────────────────────────

@@ -26,6 +26,12 @@ interface AuthState {
   /** Whether the current user is an admin / Ob der aktuelle Benutzer Admin ist */
   isAdmin: () => boolean;
 
+  /** Whether the current user has a Business account / Ob der aktuelle Benutzer ein Business-Konto hat */
+  isBusiness: () => boolean;
+
+  /** Whether the current user's business has been admin-verified / Ob das Unternehmen admin-verifiziert wurde */
+  isVerifiedBusiness: () => boolean;
+
   setLoading: (loading: boolean) => void;
   logout: () => void;
 }
@@ -41,6 +47,10 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: () => get().user !== null,
 
       isAdmin: () => get().user?.role === "ADMIN",
+
+      isBusiness: () => get().user?.role === "BUSINESS",
+
+      isVerifiedBusiness: () => get().user?.role === "BUSINESS" && get().user?.businessVerified === true,
 
       setLoading: (isLoading) => set({ isLoading }),
 

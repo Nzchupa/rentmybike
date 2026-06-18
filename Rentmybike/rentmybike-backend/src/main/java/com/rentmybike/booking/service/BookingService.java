@@ -1,12 +1,18 @@
 package com.rentmybike.booking.service;
 
+import com.rentmybike.accessory.entity.Accessory;
+import com.rentmybike.accessory.repository.AccessoryRepository;
 import com.rentmybike.bike.entity.Bike;
 import com.rentmybike.bike.entity.BikePhoto;
 import com.rentmybike.bike.repository.BikeRepository;
+import com.rentmybike.booking.dto.AccessorySelectionRequest;
+import com.rentmybike.booking.dto.BookingAccessoryResponse;
 import com.rentmybike.booking.dto.BookingResponse;
 import com.rentmybike.booking.dto.CreateBookingRequest;
 import com.rentmybike.booking.entity.Booking;
+import com.rentmybike.booking.entity.BookingAccessory;
 import com.rentmybike.booking.entity.BookingStatus;
+import com.rentmybike.booking.repository.BookingAccessoryRepository;
 import com.rentmybike.booking.repository.BookingRepository;
 import com.rentmybike.common.exception.AccessDeniedException;
 import com.rentmybike.common.exception.BusinessException;
@@ -23,7 +29,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -53,6 +62,8 @@ public class BookingService {
     private final BikeRepository bikeRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final AccessoryRepository accessoryRepository;
+    private final BookingAccessoryRepository bookingAccessoryRepository;
 
     // ──────────────────────────────────────────────────────────────────────────
     // CREATE / ERSTELLEN
@@ -117,6 +128,37 @@ public class BookingService {
                 request.getStartDate(), request.getEndDate()) + 1;
         BigDecimal totalPrice = bike.getPricePerDay().multiply(BigDecimal.valueOf(days));
 
+        // Accessory add-ons (Stage 3 "Business accounts") — validate stock and
+        // ownership, lock the per-day price, and fold each line into the total.
+        // Zubehör-Add-ons (Stage 3 "Business-Konten") — Bestand und Eigentum
+        // prüfen, den Tagespreis sperren und jede Position in die Summe einrechnen.
+        List<Accessory> selectedAccessories = new ArrayList<>();
+        List<Integer> selectedQuantities = new ArrayList<>();
+        if (request.getAccessories() != null) {
+            for (AccessorySelectionRequest selection : request.getAccessories()) {
+                Accessory accessory = accessoryRepository.findActiveById(selection.getAccessoryId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Accessory", selection.getAccessoryId()));
+
+                if (!accessory.getOwner().getId().equals(bike.getOwner().getId())) {
+                    throw new BusinessException(
+                            "Accessory does not belong to this bike's owner / Zubehör gehört nicht dem Eigentümer dieses Fahrrads");
+                }
+                if (selection.getQuantity() > accessory.getQuantityTotal()) {
+                    throw new BusinessException(
+                            "Not enough stock for accessory: " + accessory.getName()
+                            + " / Nicht genug Bestand für Zubehör: " + accessory.getName());
+                }
+
+                BigDecimal lineTotal = accessory.getPricePerDay()
+                        .multiply(BigDecimal.valueOf(selection.getQuantity()))
+                        .multiply(BigDecimal.valueOf(days));
+                totalPrice = totalPrice.add(lineTotal);
+
+                selectedAccessories.add(accessory);
+                selectedQuantities.add(selection.getQuantity());
+            }
+        }
+
         Booking booking = Booking.builder()
                 .bike(bike)
                 .renter(renter)
@@ -129,6 +171,21 @@ public class BookingService {
                 .build();
 
         bookingRepository.save(booking);
+
+        // Persist accessory line items now that the booking has an ID.
+        // Zubehör-Positionszeilen jetzt persistieren, da die Buchung eine ID hat.
+        for (int i = 0; i < selectedAccessories.size(); i++) {
+            Accessory accessory = selectedAccessories.get(i);
+            int quantity = selectedQuantities.get(i);
+            BookingAccessory bookingAccessory = BookingAccessory.builder()
+                    .booking(booking)
+                    .accessory(accessory)
+                    .quantity(quantity)
+                    .pricePerDayAtBooking(accessory.getPricePerDay())
+                    .build();
+            bookingAccessoryRepository.save(bookingAccessory);
+        }
+
         log.info("Booking created: {} by renter: {} for bike: {} / Buchung erstellt: {} von Mieter: {} für Fahrrad: {}",
                 booking.getId(), renterId, bike.getId(),
                 booking.getId(), renterId, bike.getId());
@@ -249,6 +306,19 @@ public class BookingService {
         expireStaleBookings(); // lazy expiry / lazy Ablauf
         Page<Booking> page = bookingRepository.findByOwnerIdAndStatus(ownerId, status, pageable);
         return PageResponse.from(page.map(this::toBookingResponse));
+    }
+
+    /**
+     * Bookings for a business owner's bikes overlapping [from, to] — backs the
+     * business rental calendar (Stage 3 "Business accounts").
+     * Buchungen für die Fahrräder eines Business-Eigentümers, die sich mit
+     * [from, to] überschneiden — Grundlage für den Business-Mietkalender
+     * (Stage 3 "Business-Konten").
+     */
+    @Transactional(readOnly = true)
+    public List<BookingResponse> getOwnerBookingCalendar(UUID ownerId, LocalDate from, LocalDate to) {
+        List<Booking> bookings = bookingRepository.findByOwnerIdAndDateRange(ownerId, from, to);
+        return bookings.stream().map(this::toBookingResponse).toList();
     }
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -441,6 +511,19 @@ public class BookingService {
                 .findFirst()
                 .orElse(null);
 
+        long rentalDays = booking.getRentalDays();
+        List<BookingAccessoryResponse> accessoryResponses = bookingAccessoryRepository
+                .findByBookingId(booking.getId()).stream()
+                .map(ba -> BookingAccessoryResponse.builder()
+                        .accessoryId(ba.getAccessory().getId())
+                        .type(ba.getAccessory().getType())
+                        .name(ba.getAccessory().getName())
+                        .quantity(ba.getQuantity())
+                        .pricePerDayAtBooking(ba.getPricePerDayAtBooking())
+                        .lineTotal(ba.getLineTotal(rentalDays))
+                        .build())
+                .toList();
+
         return BookingResponse.builder()
                 .id(booking.getId())
                 // Bike / Fahrrad
@@ -462,6 +545,7 @@ public class BookingService {
                 .totalPrice(booking.getTotalPrice())
                 .status(booking.getStatus())
                 .message(booking.getMessage())
+                .accessories(accessoryResponses)
                 // Timestamps / Zeitstempel
                 .createdAt(booking.getCreatedAt())
                 .updatedAt(booking.getUpdatedAt())

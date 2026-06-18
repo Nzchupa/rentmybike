@@ -8,7 +8,9 @@ import com.rentmybike.user.dto.ChangePasswordRequest;
 import com.rentmybike.user.dto.PublicUserResponse;
 import com.rentmybike.user.dto.UpdateProfileRequest;
 import com.rentmybike.user.dto.UserProfileResponse;
+import com.rentmybike.user.dto.UpgradeToBusinessRequest;
 import com.rentmybike.user.entity.User;
+import com.rentmybike.user.entity.UserRole;
 import com.rentmybike.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -170,6 +172,51 @@ public class UserService {
     }
 
     // ──────────────────────────────────────────────────────────────────────────
+    // Business accounts / Geschäftskonten
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Upgrades the authenticated USER account to a BUSINESS account.
+     * Upgradet das authentifizierte USER-Konto auf ein BUSINESS-Konto.
+     *
+     * <p>Idempotent for existing business accounts (just updates the name).
+     * ADMIN accounts cannot be downgraded/converted via this path.
+     * <p>Idempotent für bestehende Geschäftskonten (aktualisiert nur den Namen).
+     * ADMIN-Konten können über diesen Weg nicht umgewandelt werden.
+     *
+     * <p>Newly-upgraded accounts start with {@code businessVerified = false} —
+     * verification is a separate, admin-only step (see AdminService.verifyBusiness).
+     * <p>Neu hochgestufte Konten starten mit {@code businessVerified = false} —
+     * die Verifizierung ist ein separater, nur für Admins zugänglicher Schritt.
+     */
+    public UserProfileResponse upgradeToBusiness(UUID userId, UpgradeToBusinessRequest request) {
+        User user = findActiveUser(userId);
+
+        if (user.getRole() == UserRole.ADMIN) {
+            throw new BusinessException(
+                    "Admin accounts cannot become business accounts / Admin-Konten können keine Geschäftskonten werden");
+        }
+
+        boolean alreadyBusiness = user.getRole() == UserRole.BUSINESS;
+        user.setRole(UserRole.BUSINESS);
+        user.setBusinessName(request.getBusinessName().strip());
+        if (!alreadyBusiness) {
+            // Re-verification required after a fresh upgrade — name changes on an
+            // already-verified business don't need to reset the badge.
+            // Nach einem frischen Upgrade ist eine erneute Verifizierung
+            // erforderlich — Namensänderungen bei einem bereits verifizierten
+            // Unternehmen setzen das Siegel nicht zurück.
+            user.setBusinessVerified(false);
+        }
+
+        userRepository.save(user);
+        log.info("User {} upgraded to BUSINESS ({}) / Benutzer {} auf BUSINESS hochgestuft ({})",
+                userId, request.getBusinessName(), userId, request.getBusinessName());
+
+        return toUserProfileResponse(user);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
     // Private helpers / Private Hilfsmethoden
     // ──────────────────────────────────────────────────────────────────────────
 
@@ -210,6 +257,8 @@ public class UserService {
                 .role(user.getRole())
                 .emailVerified(user.isEmailVerified())
                 .banned(user.isBanned())
+                .businessName(user.getBusinessName())
+                .businessVerified(user.isBusinessVerified())
                 .createdAt(user.getCreatedAt())
                 .build();
     }

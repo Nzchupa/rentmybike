@@ -167,6 +167,54 @@ public class AdminService {
     }
 
     // ──────────────────────────────────────────────────────────────────────────
+    // Business verification / Geschäftsverifizierung
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Marks a BUSINESS account as verified — a simple admin-granted trust badge
+     * (no document upload/review flow in this MVP).
+     * Markiert ein BUSINESS-Konto als verifiziert — ein einfaches, vom Admin
+     * vergebenes Vertrauenssiegel (kein Dokumenten-Upload/Prüfungsablauf in
+     * diesem MVP).
+     */
+    public AdminUserResponse verifyBusiness(UUID userId) {
+        User target = findActiveUser(userId);
+
+        if (target.getRole() != UserRole.BUSINESS) {
+            throw new BusinessException(
+                    "User is not a business account / Benutzer ist kein Geschäftskonto");
+        }
+        if (target.isBusinessVerified()) {
+            throw new BusinessException(
+                    "Business is already verified / Unternehmen ist bereits verifiziert");
+        }
+
+        target.setBusinessVerified(true);
+        log.info("Admin verified business account {} / Admin hat Geschäftskonto {} verifiziert", userId, userId);
+
+        return toAdminUserResponse(target);
+    }
+
+    /**
+     * Revokes a BUSINESS account's verified badge.
+     * Entzieht einem BUSINESS-Konto das Verifizierungssiegel.
+     */
+    public AdminUserResponse unverifyBusiness(UUID userId) {
+        User target = findActiveUser(userId);
+
+        if (target.getRole() != UserRole.BUSINESS) {
+            throw new BusinessException(
+                    "User is not a business account / Benutzer ist kein Geschäftskonto");
+        }
+
+        target.setBusinessVerified(false);
+        log.info("Admin revoked verification for business account {} / "
+                + "Admin hat Verifizierung für Geschäftskonto {} entzogen", userId, userId);
+
+        return toAdminUserResponse(target);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
     // Platform statistics / Plattformstatistiken
     // ──────────────────────────────────────────────────────────────────────────
 
@@ -226,6 +274,8 @@ public class AdminService {
                 .emailVerified(user.isEmailVerified())
                 .banned(user.isBanned())
                 .bannedAt(user.getBannedAt())
+                .businessName(user.getBusinessName())
+                .businessVerified(user.isBusinessVerified())
                 .createdAt(user.getCreatedAt())
                 .deletedAt(user.getDeletedAt())
                 .build();

@@ -96,6 +96,52 @@ public class BikeService {
         return toBikeResponse(bike, true);
     }
 
+    /**
+     * Creates multiple bike listings at once for the authenticated BUSINESS
+     * owner — lets bike shops onboard their fleet in one request instead of
+     * one-by-one. Each entry gets the same PENDING approval workflow as a
+     * single-bike create.
+     * Erstellt mehrere Fahrrad-Inserate gleichzeitig für den authentifizierten
+     * BUSINESS-Eigentümer — ermöglicht es Fahrradläden, ihre Flotte in einer
+     * Anfrage anzulegen, statt einzeln. Jeder Eintrag erhält denselben
+     * PENDING-Genehmigungsablauf wie eine Einzel-Erstellung.
+     *
+     * <p>Not wrapped in a single all-or-nothing check beyond the surrounding
+     * {@code @Transactional} on the class — a validation failure on any one
+     * entry (handled by {@code @Valid} at the controller) rejects the whole
+     * batch before any row is written.
+     *
+     * @param ownerId  owner's UUID / UUID des Eigentümers
+     * @param requests list of listing data, 1–50 entries / Liste der Inserat-Daten, 1–50 Einträge
+     * @return created bike responses, same order as the request / erstellte Fahrrad-Antworten, gleiche Reihenfolge wie die Anfrage
+     */
+    public List<BikeResponse> bulkCreateBikes(UUID ownerId, List<CreateBikeRequest> requests) {
+        User owner = userRepository.findById(ownerId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", ownerId));
+
+        List<Bike> bikes = requests.stream()
+                .map(request -> Bike.builder()
+                        .owner(owner)
+                        .title(request.getTitle().strip())
+                        .description(request.getDescription().strip())
+                        .category(request.getCategory())
+                        .pricePerDay(request.getPricePerDay())
+                        .city(request.getCity().strip())
+                        .address(request.getAddress())
+                        .latitude(request.getLatitude())
+                        .longitude(request.getLongitude())
+                        .available(true)
+                        .approvalStatus(ApprovalStatus.PENDING)
+                        .build())
+                .toList();
+
+        bikeRepository.saveAll(bikes);
+        log.info("{} bikes bulk-created by owner: {} / {} Fahrräder massenhaft erstellt von Eigentümer: {}",
+                bikes.size(), ownerId, bikes.size(), ownerId);
+
+        return bikes.stream().map(bike -> toBikeResponse(bike, true)).toList();
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // READ / LESEN
     // ──────────────────────────────────────────────────────────────────────────

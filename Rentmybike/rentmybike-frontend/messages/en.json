@@ -221,7 +221,8 @@
       "asOwner": "As Owner",
       "favorites": "Favorites",
       "notifications": "Notifications",
-      "profile": "Profile"
+      "profile": "Profile",
+      "business": "Business"
     },
     "favorites": {
       "title": "My Favorites",
@@ -292,12 +293,79 @@
       "validation": {
         "minTwoChars": "Min. 2 characters",
         "required": "Required"
+      },
+      "business": {
+        "title": "Business account",
+        "pitch": "Run a bike shop or rental company? Upgrade to a Business account for a dashboard with bike management, a rental calendar, stats, and accessory rentals (helmets, child seats, locks).",
+        "businessName": "Business name",
+        "businessNamePlaceholder": "e.g. Berlin Bike Rentals GmbH",
+        "upgradeButton": "Upgrade to Business",
+        "upgraded": "Upgraded to Business account!",
+        "currentBadgeVerified": "Verified Business",
+        "currentBadgePending": "Business (verification pending)",
+        "pendingNotice": "Your business is awaiting admin verification. You already have full Business Dashboard access in the meantime.",
+        "goToDashboard": "Go to Business Dashboard"
       }
     },
     "bookings": {
       "noRenterBookings": "You haven't booked any bikes yet.",
       "noOwnerBookings": "No booking requests yet.",
       "loadError": "Couldn't load your bookings — please try again."
+    }
+  },
+  "business": {
+    "title": "Business Dashboard",
+    "verifiedBadge": "Verified Business",
+    "pendingBadge": "Verification pending",
+    "summary": {
+      "totalRevenue": "Total revenue",
+      "activeBikes": "Active bikes",
+      "totalBookings": "Total bookings",
+      "averageRating": "Average rating"
+    },
+    "quickLinks": {
+      "bikes": "Manage bikes",
+      "bulkAdd": "Bulk-add bikes",
+      "accessories": "Accessories",
+      "calendar": "Rental calendar"
+    },
+    "bulkAdd": {
+      "title": "Bulk-add bikes",
+      "subtitle": "Add up to 50 bikes at once. Each will go through the usual review process.",
+      "addRow": "Add another bike",
+      "removeRow": "Remove",
+      "submit": "Submit all",
+      "success": "{count, plural, one {# bike submitted} other {# bikes submitted}} for review!",
+      "maxReached": "Maximum 50 bikes per batch"
+    },
+    "accessories": {
+      "title": "Accessories",
+      "subtitle": "Helmets, child seats, and locks renters can add to a booking.",
+      "addAccessory": "Add accessory",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this accessory? This cannot be undone.",
+      "noAccessories": "You haven't added any accessories yet.",
+      "type": "Type",
+      "name": "Name",
+      "quantityTotal": "Quantity",
+      "pricePerDay": "Price per day (€)",
+      "save": "Save",
+      "added": "Accessory added",
+      "updated": "Accessory updated",
+      "deleted": "Accessory deleted",
+      "types": {
+        "HELMET": "Helmet",
+        "CHILD_SEAT": "Child seat",
+        "LOCK": "Lock"
+      }
+    },
+    "calendar": {
+      "title": "Rental calendar",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "noBookings": "No bookings on this day.",
+      "bookingsOnDay": "Bookings on {date}"
     }
   },
   "reviews": {
@@ -358,7 +426,13 @@
       "loadError": "Couldn't load users — please try again.",
       "userBanned": "User banned",
       "userUnbanned": "User unbanned",
-      "userDeleted": "User deleted"
+      "userDeleted": "User deleted",
+      "verifyBusiness": "Verify business",
+      "unverifyBusiness": "Unverify business",
+      "businessVerified": "Business verified",
+      "businessUnverified": "Business verification removed",
+      "businessVerifiedBadge": "Verified",
+      "businessPendingBadge": "Pending verification"
     },
     "bikes": {
       "title": "Bike Moderation",

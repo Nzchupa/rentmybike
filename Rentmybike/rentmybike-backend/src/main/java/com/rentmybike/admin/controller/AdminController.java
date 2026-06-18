@@ -122,6 +122,38 @@ public class AdminController {
     }
 
     // ──────────────────────────────────────────────────────────────────────────
+    // Business verification / Geschäftsverifizierung
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Grants the "verified" badge to a BUSINESS account.
+     * Vergibt das "verifiziert"-Siegel an ein BUSINESS-Konto.
+     *
+     * <p>PATCH /api/v1/admin/business/{id}/verify
+     */
+    @PatchMapping("/business/{id}/verify")
+    public ResponseEntity<ApiResponse<AdminUserResponse>> verifyBusiness(
+            @PathVariable("id") UUID userId) {
+
+        AdminUserResponse response = adminService.verifyBusiness(userId);
+        return ResponseEntity.ok(ApiResponse.success(response, "Business verified / Unternehmen verifiziert"));
+    }
+
+    /**
+     * Revokes the "verified" badge from a BUSINESS account.
+     * Entzieht einem BUSINESS-Konto das "verifiziert"-Siegel.
+     *
+     * <p>PATCH /api/v1/admin/business/{id}/unverify
+     */
+    @PatchMapping("/business/{id}/unverify")
+    public ResponseEntity<ApiResponse<AdminUserResponse>> unverifyBusiness(
+            @PathVariable("id") UUID userId) {
+
+        AdminUserResponse response = adminService.unverifyBusiness(userId);
+        return ResponseEntity.ok(ApiResponse.success(response, "Business verification revoked / Verifizierung entzogen"));
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
     // Platform statistics / Plattformstatistiken
     // ──────────────────────────────────────────────────────────────────────────
 

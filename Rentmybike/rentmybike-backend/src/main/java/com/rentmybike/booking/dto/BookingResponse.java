@@ -7,6 +7,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -46,6 +47,9 @@ public class BookingResponse {
     private BigDecimal totalPrice;
     private BookingStatus status;
     private String message;
+
+    // Accessory add-ons (Stage 3 "Business accounts") / Zubehör-Add-ons (Stage 3 "Business-Konten")
+    private List<BookingAccessoryResponse> accessories;
 
     // Timestamps / Zeitstempel
     private LocalDateTime createdAt;

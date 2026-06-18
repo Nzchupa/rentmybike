@@ -221,7 +221,8 @@
       "asOwner": "Als Eigentümer",
       "favorites": "Favoriten",
       "notifications": "Benachrichtigungen",
-      "profile": "Profil"
+      "profile": "Profil",
+      "business": "Business"
     },
     "favorites": {
       "title": "Meine Favoriten",
@@ -292,12 +293,79 @@
       "validation": {
         "minTwoChars": "Min. 2 Zeichen",
         "required": "Erforderlich"
+      },
+      "business": {
+        "title": "Geschäftskonto",
+        "pitch": "Betreiben Sie einen Fahrradladen oder eine Vermietfirma? Upgraden Sie auf ein Geschäftskonto für ein Dashboard mit Fahrradverwaltung, Mietkalender, Statistiken und Zubehörvermietung (Helme, Kindersitze, Schlösser).",
+        "businessName": "Firmenname",
+        "businessNamePlaceholder": "z.B. Berlin Bike Rentals GmbH",
+        "upgradeButton": "Auf Business upgraden",
+        "upgraded": "Auf Geschäftskonto hochgestuft!",
+        "currentBadgeVerified": "Verifiziertes Unternehmen",
+        "currentBadgePending": "Unternehmen (Verifizierung ausstehend)",
+        "pendingNotice": "Ihr Unternehmen wartet auf die Admin-Verifizierung. Sie haben in der Zwischenzeit bereits vollen Zugriff auf das Business-Dashboard.",
+        "goToDashboard": "Zum Business-Dashboard"
       }
     },
     "bookings": {
       "noRenterBookings": "Sie haben noch keine Fahrräder gebucht.",
       "noOwnerBookings": "Noch keine Buchungsanfragen.",
       "loadError": "Buchungen konnten nicht geladen werden — bitte versuchen Sie es erneut."
+    }
+  },
+  "business": {
+    "title": "Business-Dashboard",
+    "verifiedBadge": "Verifiziertes Unternehmen",
+    "pendingBadge": "Verifizierung ausstehend",
+    "summary": {
+      "totalRevenue": "Gesamtumsatz",
+      "activeBikes": "Aktive Fahrräder",
+      "totalBookings": "Buchungen insgesamt",
+      "averageRating": "Durchschnittsbewertung"
+    },
+    "quickLinks": {
+      "bikes": "Fahrräder verwalten",
+      "bulkAdd": "Fahrräder im Stapel hinzufügen",
+      "accessories": "Zubehör",
+      "calendar": "Mietkalender"
+    },
+    "bulkAdd": {
+      "title": "Fahrräder im Stapel hinzufügen",
+      "subtitle": "Fügen Sie bis zu 50 Fahrräder gleichzeitig hinzu. Jedes durchläuft die übliche Prüfung.",
+      "addRow": "Weiteres Fahrrad hinzufügen",
+      "removeRow": "Entfernen",
+      "submit": "Alle absenden",
+      "success": "{count, plural, one {# Fahrrad eingereicht} other {# Fahrräder eingereicht}} zur Prüfung!",
+      "maxReached": "Maximal 50 Fahrräder pro Stapel"
+    },
+    "accessories": {
+      "title": "Zubehör",
+      "subtitle": "Helme, Kindersitze und Schlösser, die Mieter zur Buchung hinzufügen können.",
+      "addAccessory": "Zubehör hinzufügen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "deleteConfirm": "Dieses Zubehör löschen? Dies kann nicht rückgängig gemacht werden.",
+      "noAccessories": "Sie haben noch kein Zubehör hinzugefügt.",
+      "type": "Typ",
+      "name": "Name",
+      "quantityTotal": "Menge",
+      "pricePerDay": "Preis pro Tag (€)",
+      "save": "Speichern",
+      "added": "Zubehör hinzugefügt",
+      "updated": "Zubehör aktualisiert",
+      "deleted": "Zubehör gelöscht",
+      "types": {
+        "HELMET": "Helm",
+        "CHILD_SEAT": "Kindersitz",
+        "LOCK": "Schloss"
+      }
+    },
+    "calendar": {
+      "title": "Mietkalender",
+      "prevMonth": "Vorheriger Monat",
+      "nextMonth": "Nächster Monat",
+      "noBookings": "Keine Buchungen an diesem Tag.",
+      "bookingsOnDay": "Buchungen am {date}"
     }
   },
   "reviews": {
@@ -358,7 +426,13 @@
       "loadError": "Benutzer konnten nicht geladen werden — bitte versuchen Sie es erneut.",
       "userBanned": "Benutzer gesperrt",
       "userUnbanned": "Benutzer entsperrt",
-      "userDeleted": "Benutzer gelöscht"
+      "userDeleted": "Benutzer gelöscht",
+      "verifyBusiness": "Unternehmen verifizieren",
+      "unverifyBusiness": "Verifizierung entfernen",
+      "businessVerified": "Unternehmen verifiziert",
+      "businessUnverified": "Verifizierung entfernt",
+      "businessVerifiedBadge": "Verifiziert",
+      "businessPendingBadge": "Verifizierung ausstehend"
     },
     "bikes": {
       "title": "Fahrrad-Moderation",

@@ -8,12 +8,21 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import toast from "react-hot-toast";
 import { Camera } from "lucide-react";
-import { usersApi } from "@/lib/api";
+import Link from "next/link";
+import { useLocale } from "next-intl";
+import { usersApi, businessApi } from "@/lib/api";
 import { useAuthStore } from "@/store/auth.store";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Avatar } from "@/components/ui/Avatar";
-import type { UpdateProfileRequest, ChangePasswordRequest } from "@/types";
+import { cn } from "@/lib/utils";
+import type { UpdateProfileRequest, ChangePasswordRequest, UpgradeToBusinessRequest } from "@/types";
+
+function makeBusinessSchema(t: (key: string) => string) {
+  return z.object({
+    businessName: z.string().min(2, t("dashboard.profile.validation.minTwoChars")).max(150),
+  });
+}
 
 // Validation messages are resolved at submit-time via the translation
 // function passed into makeProfileSchema()/makePasswordSchema(), so the
@@ -51,8 +60,28 @@ function makePasswordSchema(t: (key: string) => string) {
 export default function ProfilePage() {
   const t = useTranslations("dashboard.profile");
   const tRoot = useTranslations();
+  const locale = useLocale();
   const { user, setUser } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Business upgrade form
+  const {
+    register: regBiz,
+    handleSubmit: handleBiz,
+    formState: { errors: bizErrors, isSubmitting: upgradingBiz },
+  } = useForm({
+    resolver: zodResolver(makeBusinessSchema(tRoot)),
+    defaultValues: { businessName: "" },
+  });
+
+  const { mutateAsync: upgradeToBusiness } = useMutation({
+    mutationFn: (data: UpgradeToBusinessRequest) => businessApi.upgrade(data),
+    onSuccess: (res) => {
+      setUser(res.data.data);
+      toast.success(t("business.upgraded"));
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   // Profile form
   const {
@@ -232,6 +261,54 @@ export default function ProfilePage() {
             {t("changePassword")}
           </Button>
         </form>
+      </div>
+
+      {/* Business account */}
+      <div className="card p-6 space-y-5">
+        <h2 className="font-semibold text-slate-900">{t("business.title")}</h2>
+
+        {user.role === "BUSINESS" ? (
+          <div className="space-y-4">
+            <span
+              className={cn(
+                "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium",
+                user.businessVerified
+                  ? "bg-emerald-50 text-emerald-700"
+                  : "bg-amber-50 text-amber-700"
+              )}
+            >
+              {user.businessVerified
+                ? t("business.currentBadgeVerified")
+                : t("business.currentBadgePending")}
+            </span>
+            {!user.businessVerified && (
+              <p className="text-sm text-slate-500">{t("business.pendingNotice")}</p>
+            )}
+            <Link href={`/${locale}/dashboard/business`}>
+              <Button type="button">{t("business.goToDashboard")}</Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <p className="text-sm text-slate-500">{t("business.pitch")}</p>
+            <form
+              onSubmit={handleBiz(async (data) => {
+                await upgradeToBusiness(data as UpgradeToBusinessRequest);
+              })}
+              className="space-y-4"
+            >
+              <Input
+                label={t("business.businessName")}
+                placeholder={t("business.businessNamePlaceholder")}
+                error={bizErrors.businessName?.message}
+                {...regBiz("businessName")}
+              />
+              <Button type="submit" loading={upgradingBiz}>
+                {t("business.upgradeButton")}
+              </Button>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );

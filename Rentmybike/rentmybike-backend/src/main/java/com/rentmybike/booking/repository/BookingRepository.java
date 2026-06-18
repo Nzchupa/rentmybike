@@ -323,4 +323,64 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
               AND b.deletedAt IS NULL
             """)
     BigDecimal sumTotalPriceOfCompleted();
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Business dashboard (Stage 3 "Business accounts") / Business-Dashboard
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Total non-deleted bookings received by a business (as bike owner).
+     * Gesamtanzahl nicht gelöschter Buchungen, die ein Unternehmen (als
+     * Fahrrad-Eigentümer) erhalten hat.
+     */
+    long countByOwnerIdAndDeletedAtIsNull(@Param("ownerId") UUID ownerId);
+
+    /**
+     * Total revenue earned by a business — sum of totalPrice for all
+     * COMPLETED bookings where the business is the bike owner.
+     * Gesamtumsatz eines Unternehmens — Summe von totalPrice aller
+     * COMPLETED-Buchungen, bei denen das Unternehmen der Fahrrad-Eigentümer ist.
+     *
+     * <p>COALESCE returns 0.00 when no completed bookings exist yet.
+     * <p>COALESCE gibt 0.00 zurück, wenn noch keine abgeschlossenen Buchungen existieren.
+     */
+    @Query("""
+            SELECT COALESCE(SUM(b.totalPrice), 0)
+            FROM Booking b
+            WHERE b.owner.id = :ownerId
+              AND b.status = com.rentmybike.booking.entity.BookingStatus.COMPLETED
+              AND b.deletedAt IS NULL
+            """)
+    BigDecimal sumTotalPriceOfCompletedByOwnerId(@Param("ownerId") UUID ownerId);
+
+    /**
+     * Bookings for a business's bikes whose date range overlaps [from, to] —
+     * used to render the business rental calendar.
+     * Buchungen für die Fahrräder eines Unternehmens, deren Datumsbereich sich
+     * mit [from, to] überschneidet — wird zum Rendern des
+     * Business-Mietkalenders verwendet.
+     *
+     * <p>Overlap condition mirrors {@link #existsDateConflict} — same Allen's
+     * interval algebra, just without the status restriction (calendar shows
+     * all non-cancelled bookings, not just pending/accepted).
+     * <p>Überschneidungsbedingung entspricht {@link #existsDateConflict} —
+     * gleiche Intervallalgebra, nur ohne Statusbeschränkung (Kalender zeigt
+     * alle nicht stornierten Buchungen, nicht nur ausstehende/akzeptierte).
+     */
+    @Query("""
+            SELECT b FROM Booking b
+            JOIN FETCH b.bike bike
+            JOIN FETCH b.renter
+            WHERE b.owner.id = :ownerId
+              AND b.deletedAt IS NULL
+              AND b.status != com.rentmybike.booking.entity.BookingStatus.CANCELLED
+              AND b.startDate <= :to
+              AND b.endDate   >= :from
+            ORDER BY b.startDate ASC
+            """)
+    List<Booking> findByOwnerIdAndDateRange(
+            @Param("ownerId") UUID ownerId,
+            @Param("from")    LocalDate from,
+            @Param("to")      LocalDate to
+    );
 }

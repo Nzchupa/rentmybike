@@ -331,6 +331,12 @@ import type {
   BookingPhotoResponse,
   BookingPhotoPhase,
   ChatMessageResponse,
+  UpgradeToBusinessRequest,
+  BusinessDashboardSummaryResponse,
+  BulkCreateBikeRequest,
+  AccessoryResponse,
+  CreateAccessoryRequest,
+  UpdateAccessoryRequest,
 } from "@/types";
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
@@ -579,6 +585,13 @@ export const adminApi = {
 
   deleteUser: (id: string) =>
     api.delete<ApiResponse<null>>(`/api/v1/admin/users/${id}`),
+
+  // Stage 3 "Business accounts" — admin-granted verification badge.
+  verifyBusiness: (id: string) =>
+    api.patch<ApiResponse<AdminUserResponse>>(`/api/v1/admin/business/${id}/verify`),
+
+  unverifyBusiness: (id: string) =>
+    api.patch<ApiResponse<AdminUserResponse>>(`/api/v1/admin/business/${id}/unverify`),
 };
 
 // ── Notifications ─────────────────────────────────────────────────────────────
@@ -617,4 +630,45 @@ export const favoritesApi = {
     api.get<ApiResponse<PageResponse<BikeResponse>>>("/api/v1/favorites", {
       params: { page, size },
     }),
+};
+
+// ── Business (Stage 3 "Business accounts") ──────────────────────────────────
+
+export const businessApi = {
+  upgrade: (data: UpgradeToBusinessRequest) =>
+    api.post<ApiResponse<UserProfileResponse>>("/api/v1/business/upgrade", data),
+
+  getDashboardSummary: () =>
+    api.get<ApiResponse<BusinessDashboardSummaryResponse>>(
+      "/api/v1/business/dashboard/summary"
+    ),
+
+  getBookingCalendar: (from: string, to: string) =>
+    api.get<ApiResponse<BookingResponse[]>>("/api/v1/business/bookings/calendar", {
+      params: { from, to },
+    }),
+
+  bulkCreateBikes: (data: BulkCreateBikeRequest) =>
+    api.post<ApiResponse<BikeResponse[]>>("/api/v1/bikes/bulk", data),
+};
+
+// ── Accessories (Stage 3 "Business accounts") ───────────────────────────────
+
+export const accessoriesApi = {
+  // Public — used on a bike's detail/booking page to offer add-ons.
+  // Öffentlich — wird auf der Detail-/Buchungsseite eines Fahrrads genutzt.
+  getByOwner: (ownerId: string) =>
+    api.get<ApiResponse<AccessoryResponse[]>>(`/api/v1/accessories/owner/${ownerId}`),
+
+  getMine: () =>
+    api.get<ApiResponse<AccessoryResponse[]>>("/api/v1/accessories/my"),
+
+  create: (data: CreateAccessoryRequest) =>
+    api.post<ApiResponse<AccessoryResponse>>("/api/v1/accessories", data),
+
+  update: (id: string, data: UpdateAccessoryRequest) =>
+    api.put<ApiResponse<AccessoryResponse>>(`/api/v1/accessories/${id}`, data),
+
+  delete: (id: string) =>
+    api.delete<ApiResponse<null>>(`/api/v1/accessories/${id}`),
 };

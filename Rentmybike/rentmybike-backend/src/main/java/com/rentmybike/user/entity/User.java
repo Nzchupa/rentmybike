@@ -143,6 +143,32 @@ public class User extends BaseEntity implements UserDetails {
     private int tokenVersion = 0;
 
     // ──────────────────────────────────────────────────────────────────────────
+    // Business account fields / Geschäftskonto-Felder
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Display name of the business (bike shop / rental company), set when the
+     * user upgrades from {@code USER} to {@code BUSINESS}. Null for non-business
+     * accounts.
+     * Anzeigename des Unternehmens (Fahrradladen / Vermietfirma), gesetzt beim
+     * Upgrade von {@code USER} auf {@code BUSINESS}. Null für Nicht-Geschäftskonten.
+     */
+    @Column(length = 150)
+    private String businessName;
+
+    /**
+     * Whether an admin has manually verified this business account (a simple
+     * trust badge — no document upload/review flow in this MVP). Meaningless
+     * for non-{@code BUSINESS} roles.
+     * Ob ein Admin dieses Geschäftskonto manuell verifiziert hat (ein einfaches
+     * Vertrauenssiegel — kein Dokumenten-Upload/Prüfungsablauf in diesem MVP).
+     * Bedeutungslos für Nicht-{@code BUSINESS}-Rollen.
+     */
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean businessVerified = false;
+
+    // ──────────────────────────────────────────────────────────────────────────
     // Convenience methods / Hilfsmethoden
     // ──────────────────────────────────────────────────────────────────────────
 
