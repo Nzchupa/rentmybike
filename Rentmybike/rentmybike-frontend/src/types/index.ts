@@ -97,6 +97,9 @@ export interface AuthResponse {
   avatarUrl: string | null;
   emailVerified: boolean;
   createdAt: string;
+  banned: boolean;
+  businessName: string | null;
+  businessVerified: boolean;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

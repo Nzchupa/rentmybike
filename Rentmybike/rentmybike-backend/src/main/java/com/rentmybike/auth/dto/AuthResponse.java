@@ -85,4 +85,22 @@ public class AuthResponse {
      * Zeitpunkt der Kontoerstellung.
      */
     private LocalDateTime createdAt;
+
+    /**
+     * Whether the account is banned.
+     * Ob das Konto gesperrt ist.
+     */
+    private boolean banned;
+
+    /**
+     * Business display name, set when role is BUSINESS (Stage 3 "Business accounts").
+     * Geschäftsname, gesetzt wenn Rolle BUSINESS ist (Stage 3 "Business-Konten").
+     */
+    private String businessName;
+
+    /**
+     * Whether the business account has been admin-verified.
+     * Ob das Geschäftskonto admin-verifiziert wurde.
+     */
+    private boolean businessVerified;
 }

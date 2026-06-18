@@ -467,6 +467,9 @@ public class AuthService {
                 .avatarUrl(user.getAvatarUrl())
                 .emailVerified(user.isEmailVerified())
                 .createdAt(user.getCreatedAt())
+                .banned(user.isBanned())
+                .businessName(user.getBusinessName())
+                .businessVerified(user.isBusinessVerified())
                 .build();
     }
 }
