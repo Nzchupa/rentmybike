@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import toast from "react-hot-toast";
-import { Plus, Pencil, Trash2, HardHat, Baby, Lock } from "lucide-react";
+import { Plus, Pencil, Trash2, HardHat, Baby, Lock, type LucideIcon } from "lucide-react";
 import { accessoriesApi } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -16,7 +16,7 @@ import type { AccessoryResponse, AccessoryType, CreateAccessoryRequest } from "@
 
 const TYPES: AccessoryType[] = ["HELMET", "CHILD_SEAT", "LOCK"];
 
-const TYPE_ICONS: Record<AccessoryType, React.ComponentType<{ size?: number; className?: string }>> = {
+const TYPE_ICONS: Record<AccessoryType, LucideIcon> = {
   HELMET: HardHat,
   CHILD_SEAT: Baby,
   LOCK: Lock,
