@@ -112,7 +112,10 @@ export function NotificationBell() {
               list.map((n) => (
                 <Link
                   key={n.id}
-                  href={`/${locale}/dashboard/bookings/owner`}
+                  // viewAsOwner is null for non-booking notifications, in which case
+                  // owner is a harmless default; for NEW_CHAT_MESSAGE it can be either
+                  // side of the booking, so this can no longer be hardcoded to "owner".
+                  href={`/${locale}/dashboard/bookings/${n.viewAsOwner === false ? "renter" : "owner"}`}
                   onClick={() => {
                     if (!n.read) markOneAsRead(n.id);
                     setOpen(false);

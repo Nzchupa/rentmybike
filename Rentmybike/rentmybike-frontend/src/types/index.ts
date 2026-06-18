@@ -339,7 +339,7 @@ export interface AdminUserResponse {
 // Notifications / Benachrichtigungen
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type NotificationType = "NEW_BOOKING_REQUEST";
+export type NotificationType = "NEW_BOOKING_REQUEST" | "NEW_CHAT_MESSAGE";
 
 export interface NotificationResponse {
   id: string;
@@ -351,6 +351,10 @@ export interface NotificationResponse {
   bookingId: string | null;
   bikeId: string | null;
   bikeTitle: string | null;
+  // Which bookings list ("as owner" vs "as renter") this notification's
+  // booking should deep-link to, null if not booking-related. NEW_BOOKING_REQUEST
+  // always targets the owner, but NEW_CHAT_MESSAGE can go to either side.
+  viewAsOwner: boolean | null;
 }
 
 export interface UnreadCountResponse {

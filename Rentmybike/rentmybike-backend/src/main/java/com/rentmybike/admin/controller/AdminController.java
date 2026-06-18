@@ -8,7 +8,6 @@ import com.rentmybike.common.response.PageResponse;
 import com.rentmybike.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -71,7 +70,21 @@ public class AdminController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
 
-        PageRequest pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        // findAllForAdmin's @Query already has an explicit ORDER BY u.createdAt DESC.
+        // Passing a Pageable with its own Sort here made Spring Data JPA append a
+        // second ORDER BY clause to the generated SQL ("... ORDER BY ... ORDER BY ..."),
+        // which Postgres rejects as a syntax error — surfaced to the user as a generic
+        // 500 "unexpected error" on the admin users page. Sort is already handled by
+        // the query itself, so the Pageable here must stay unsorted.
+        //
+        // findAllForAdmins @Query hat bereits ein explizites ORDER BY u.createdAt DESC.
+        // Ein Pageable mit eigenem Sort führte dazu, dass Spring Data JPA eine zweite
+        // ORDER BY-Klausel an das generierte SQL anhängte ("... ORDER BY ... ORDER BY
+        // ..."), was Postgres als Syntaxfehler ablehnt — dem Benutzer als generischer
+        // 500er "unerwarteter Fehler" auf der Admin-Benutzerseite angezeigt. Die
+        // Sortierung wird bereits von der Query selbst übernommen, daher muss das
+        // Pageable hier unsortiert bleiben.
+        PageRequest pageable = PageRequest.of(page, size);
         return ResponseEntity.ok(ApiResponse.success(adminService.listUsers(search, pageable)));
     }
 

@@ -115,6 +115,47 @@ public class NotificationService {
         }
     }
 
+    /**
+     * Creates an in-app notification for the other participant in a booking's
+     * chat thread when one side sends a new message.
+     * Erstellt eine In-App-Benachrichtigung für die andere Teilnehmerin/den
+     * anderen Teilnehmer im Chat-Thread einer Buchung, wenn eine Seite eine
+     * neue Nachricht sendet.
+     *
+     * <p>Called from {@code ChatService.sendMessage} right after the message
+     * is persisted and broadcast over STOMP. In-app only (no email) — chat is
+     * already real-time for anyone with the thread open, and an email per
+     * message would be spammy; the bell badge/feed is what surfaces messages
+     * to a participant who isn't currently looking at the chat.
+     * <p>Wird von {@code ChatService.sendMessage} direkt nach dem Persistieren
+     * und Broadcasten der Nachricht über STOMP aufgerufen. Nur In-App (keine
+     * E-Mail) — der Chat ist für jeden mit offenem Thread bereits in
+     * Echtzeit, und eine E-Mail pro Nachricht wäre Spam; das Glocken-Badge/
+     * der Feed macht Nachrichten für eine Teilnehmerin/einen Teilnehmer
+     * sichtbar, die/der den Chat aktuell nicht offen hat.
+     *
+     * @param booking     the booking whose chat thread received a message / die Buchung, deren Chat-Thread eine Nachricht erhielt
+     * @param recipient   the other participant (not the sender) / die/der andere Teilnehmer(in) (nicht der/die Sender(in))
+     * @param senderName  the sender's full name, for the notification text / vollständiger Name des Senders/der Senderin, für den Benachrichtigungstext
+     * @param content     the message text (truncated for the preview) / der Nachrichtentext (für die Vorschau gekürzt)
+     */
+    public void notifyNewChatMessage(Booking booking, User recipient, String senderName, String content) {
+        String bikeTitle = booking.getBike().getTitle();
+        String preview = content.length() > 120 ? content.substring(0, 120) + "…" : content;
+
+        String title = "New message about \"" + bikeTitle + "\" / Neue Nachricht zu \"" + bikeTitle + "\"";
+        String message = senderName + ": " + preview;
+
+        Notification notification = Notification.builder()
+                .user(recipient)
+                .booking(booking)
+                .type(NotificationType.NEW_CHAT_MESSAGE)
+                .title(title)
+                .message(message)
+                .build();
+        notificationRepository.save(notification);
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // Read / Lesen
     // ──────────────────────────────────────────────────────────────────────────
@@ -173,6 +214,16 @@ public class NotificationService {
 
     private NotificationResponse toResponse(Notification n) {
         Booking booking = n.getBooking();
+        // viewAsOwner tells the frontend which bookings list ("as owner" vs "as
+        // renter") to deep-link to. NEW_BOOKING_REQUEST's recipient is always the
+        // owner, but NEW_CHAT_MESSAGE's recipient can be either side of the
+        // booking, so this is derived per-notification rather than per-type.
+        // viewAsOwner sagt dem Frontend, zu welcher Buchungsliste ("als
+        // Eigentümer" vs. "als Mieter") verlinkt werden soll. Der Empfänger von
+        // NEW_BOOKING_REQUEST ist immer der Eigentümer, aber der Empfänger von
+        // NEW_CHAT_MESSAGE kann beide Seiten der Buchung sein, daher wird dies
+        // pro Benachrichtigung statt pro Typ abgeleitet.
+        Boolean viewAsOwner = booking != null ? booking.getOwner().getId().equals(n.getUser().getId()) : null;
         return NotificationResponse.builder()
                 .id(n.getId())
                 .type(n.getType())
@@ -183,6 +234,7 @@ public class NotificationService {
                 .bookingId(booking != null ? booking.getId() : null)
                 .bikeId(booking != null ? booking.getBike().getId() : null)
                 .bikeTitle(booking != null ? booking.getBike().getTitle() : null)
+                .viewAsOwner(viewAsOwner)
                 .build();
     }
 }

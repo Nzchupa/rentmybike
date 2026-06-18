@@ -376,8 +376,9 @@ export const usersApi = {
   uploadAvatar: (file: File) => {
     const form = new FormData();
     form.append("file", file);
+    // See uploadPhoto below for why Content-Type must stay unset for FormData uploads.
     return api.put<ApiResponse<UserProfileResponse>>("/api/v1/users/me/avatar", form, {
-      headers: { "Content-Type": "multipart/form-data" },
+      headers: { "Content-Type": undefined },
     });
   },
 
@@ -435,10 +436,26 @@ export const bikesApi = {
   uploadPhoto: (bikeId: string, file: File) => {
     const form = new FormData();
     form.append("file", file);
+    // Don't set Content-Type explicitly: the axios instance defaults to
+    // "application/json", but a hardcoded "multipart/form-data" (without a
+    // boundary) here stomped the browser's own header instead of adding to
+    // it, so the backend received a multipart body with no boundary
+    // delimiter and failed to parse it — surfaced to the user as a generic
+    // upload error. Leaving the header unset lets the browser generate
+    // "multipart/form-data; boundary=..." itself from the FormData body.
+    //
+    // Content-Type hier nicht explizit setzen: Die Axios-Instanz verwendet
+    // standardmäßig "application/json", aber ein hartkodiertes
+    // "multipart/form-data" (ohne boundary) hat hier den vom Browser
+    // gesetzten Header überschrieben statt ihn zu ergänzen, sodass das
+    // Backend einen multipart-Body ohne boundary-Trennzeichen erhielt und
+    // ihn nicht parsen konnte — dem Benutzer als allgemeiner Upload-Fehler
+    // angezeigt. Bleibt der Header unset, erzeugt der Browser
+    // "multipart/form-data; boundary=..." selbst aus dem FormData-Body.
     return api.post<ApiResponse<BikeResponse>>(
       `/api/v1/bikes/${bikeId}/photos`,
       form,
-      { headers: { "Content-Type": "multipart/form-data" } }
+      { headers: { "Content-Type": undefined } }
     );
   },
 
@@ -510,10 +527,11 @@ export const bookingPhotosApi = {
     const form = new FormData();
     form.append("file", file);
     form.append("phase", phase);
+    // See bikesApi.uploadPhoto above for why Content-Type must stay unset for FormData uploads.
     return api.post<ApiResponse<BookingPhotoResponse>>(
       `/api/v1/bookings/${bookingId}/photos`,
       form,
-      { headers: { "Content-Type": "multipart/form-data" } }
+      { headers: { "Content-Type": undefined } }
     );
   },
 

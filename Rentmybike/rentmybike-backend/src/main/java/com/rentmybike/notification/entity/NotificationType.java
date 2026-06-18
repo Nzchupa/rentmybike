@@ -6,17 +6,23 @@ package com.rentmybike.notification.entity;
  * Kategorie einer In-App-Benachrichtigung — bestimmt Icon/Text im Frontend
  * und welches Ereignis sie ausgelöst hat.
  *
- * <p>Only {@code NEW_BOOKING_REQUEST} is produced today (Bug 5: owners weren't
- * told when a renter requested their bike). The enum is kept open-ended so
- * later notification types (booking accepted/rejected, new review, etc.) can
- * be added without a schema change — {@code type} is stored as VARCHAR.
- * <p>Heute wird nur {@code NEW_BOOKING_REQUEST} erzeugt (Bug 5: Eigentümer
- * wurden nicht informiert, wenn ein Mieter ihr Fahrrad anfragte). Das Enum ist
- * bewusst offen gehalten, damit spätere Benachrichtigungstypen (Buchung
- * akzeptiert/abgelehnt, neue Bewertung, etc.) ohne Schemaänderung hinzugefügt
- * werden können — {@code type} wird als VARCHAR gespeichert.
+ * <p>{@code NEW_BOOKING_REQUEST} (Bug 5: owners weren't told when a renter
+ * requested their bike) and {@code NEW_CHAT_MESSAGE} (renter/owner weren't
+ * told when the other side sent a chat message) are produced today. The enum
+ * is kept open-ended so later notification types (booking accepted/rejected,
+ * new review, etc.) can be added without a schema change — {@code type} is
+ * stored as VARCHAR.
+ * <p>{@code NEW_BOOKING_REQUEST} (Bug 5: Eigentümer wurden nicht informiert,
+ * wenn ein Mieter ihr Fahrrad anfragte) und {@code NEW_CHAT_MESSAGE} (Mieter/
+ * Eigentümer wurden nicht informiert, wenn die Gegenseite eine Chatnachricht
+ * sendete) werden heute erzeugt. Das Enum ist bewusst offen gehalten, damit
+ * spätere Benachrichtigungstypen (Buchung akzeptiert/abgelehnt, neue
+ * Bewertung, etc.) ohne Schemaänderung hinzugefügt werden können — {@code
+ * type} wird als VARCHAR gespeichert.
  */
 public enum NotificationType {
     /** A renter submitted a new booking request for one of the owner's bikes. */
-    NEW_BOOKING_REQUEST
+    NEW_BOOKING_REQUEST,
+    /** The other participant in a booking's chat thread sent a new message. */
+    NEW_CHAT_MESSAGE
 }

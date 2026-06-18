@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -63,7 +62,22 @@ public class BikeController {
 
         // Cap page size to prevent abuse / Seitengröße begrenzen zur Missbrauchsverhinderung
         size = Math.min(size, 50);
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        // searchPublic's @Query already has an explicit "ORDER BY b.createdAt DESC".
+        // Passing a Pageable with its own Sort here made Spring Data JPA append a
+        // second ORDER BY clause to the generated SQL, which Postgres rejects as a
+        // syntax error — every search (with or without filters) failed with a 500,
+        // which the bikes search page silently swallowed and rendered as "no bikes
+        // found" instead of surfacing the real error. Keep this Pageable unsorted;
+        // the query supplies the order.
+        //
+        // searchPublics @Query hat bereits ein explizites "ORDER BY b.createdAt
+        // DESC". Ein Pageable mit eigenem Sort führte dazu, dass Spring Data JPA
+        // eine zweite ORDER BY-Klausel an das generierte SQL anhängte, was Postgres
+        // als Syntaxfehler ablehnt — jede Suche (mit oder ohne Filter) schlug mit
+        // 500 fehl, was die Fahrrad-Suchseite stillschweigend verschluckte und als
+        // "keine Fahrräder gefunden" anzeigte statt den eigentlichen Fehler. Dieses
+        // Pageable bleibt unsortiert; die Query liefert die Sortierung.
+        Pageable pageable = PageRequest.of(page, size);
 
         PageResponse<BikeResponse> result = bikeService.searchBikes(city, category, minPrice, maxPrice, pageable);
         return ResponseEntity.ok(ApiResponse.success(result));
@@ -136,8 +150,9 @@ public class BikeController {
             @RequestParam(defaultValue = "0")  int page,
             @RequestParam(defaultValue = "20") int size) {
 
-        Pageable pageable = PageRequest.of(page, Math.min(size, 50),
-                Sort.by("createdAt").descending());
+        // findByOwnerIdAndDeletedAtIsNull's @Query already orders by createdAt DESC —
+        // see the comment on searchBikes() above for why Sort must not be passed here too.
+        Pageable pageable = PageRequest.of(page, Math.min(size, 50));
 
         PageResponse<BikeResponse> result = bikeService.getMyBikes(currentUser.getId(), pageable);
         return ResponseEntity.ok(ApiResponse.success(result));
@@ -245,8 +260,9 @@ public class BikeController {
             @RequestParam(defaultValue = "0")  int page,
             @RequestParam(defaultValue = "20") int size) {
 
-        Pageable pageable = PageRequest.of(page, Math.min(size, 100),
-                Sort.by("createdAt").ascending());
+        // findAllForAdmin's @Query already orders by createdAt ASC — see the comment
+        // on searchBikes() above for why Sort must not be passed here too.
+        Pageable pageable = PageRequest.of(page, Math.min(size, 100));
 
         PageResponse<BikeResponse> result = bikeService.adminListBikes(status, pageable);
         return ResponseEntity.ok(ApiResponse.success(result));

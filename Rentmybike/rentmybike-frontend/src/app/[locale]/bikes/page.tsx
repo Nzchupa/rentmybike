@@ -27,7 +27,16 @@ export default function BikesPage() {
   });
   const [page, setPage] = useState(0);
 
-  const { data, isLoading, isFetching } = useQuery({
+  // isError was previously never read here, so a failed search request (e.g. a
+  // transient 500) rendered identically to "no bikes match these filters" — the
+  // empty-state message — instead of surfacing the real problem. This mirrors
+  // the same fix already applied to the admin users page.
+  // isError wurde hier vorher nie ausgelesen, daher sah eine fehlgeschlagene
+  // Suchanfrage (z. B. ein vorübergehender 500er) exakt so aus wie "keine
+  // Fahrräder passen zu diesen Filtern" — die Leerzustand-Meldung — statt das
+  // eigentliche Problem offenzulegen. Entspricht der bereits auf der
+  // Admin-Benutzerseite angewendeten Korrektur.
+  const { data, isLoading, isFetching, isError, error } = useQuery({
     queryKey: ["bikes", filters, page],
     queryFn: () =>
       bikesApi.search({
@@ -61,6 +70,12 @@ export default function BikesPage() {
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="card h-60 animate-pulse bg-slate-100" />
             ))}
+          </div>
+        ) : isError ? (
+          <div className="text-center py-20 text-red-600">
+            <p className="text-lg">
+              {error instanceof Error ? error.message : tc("noResults")}
+            </p>
           </div>
         ) : bikes.length === 0 ? (
           <div className="text-center py-20 text-slate-500">

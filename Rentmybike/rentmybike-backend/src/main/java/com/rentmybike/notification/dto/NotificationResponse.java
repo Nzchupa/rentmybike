@@ -31,4 +31,19 @@ public class NotificationResponse {
     private UUID bookingId;
     private UUID bikeId;
     private String bikeTitle;
+
+    /**
+     * Whether the recipient should be deep-linked to the "as owner" or
+     * "as renter" bookings list to view this notification's booking — null
+     * if not booking-related. Needed because, unlike {@code NEW_BOOKING_REQUEST}
+     * (recipient is always the owner), {@code NEW_CHAT_MESSAGE} can be sent to
+     * either side of a booking, so the frontend can no longer hardcode one link.
+     * Ob der Empfänger zur "als Eigentümer"- oder "als Mieter"-Buchungsliste
+     * verlinkt werden soll, um die Buchung dieser Benachrichtigung anzusehen —
+     * null, falls nicht buchungsbezogen. Nötig, weil im Gegensatz zu
+     * {@code NEW_BOOKING_REQUEST} (Empfänger ist immer der Eigentümer)
+     * {@code NEW_CHAT_MESSAGE} an beide Seiten einer Buchung gesendet werden
+     * kann, sodass das Frontend nicht mehr einen einzigen Link fest verdrahten kann.
+     */
+    private Boolean viewAsOwner;
 }

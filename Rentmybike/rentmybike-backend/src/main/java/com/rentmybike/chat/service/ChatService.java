@@ -7,6 +7,8 @@ import com.rentmybike.chat.entity.ChatMessage;
 import com.rentmybike.chat.repository.ChatMessageRepository;
 import com.rentmybike.common.exception.AccessDeniedException;
 import com.rentmybike.common.exception.ResourceNotFoundException;
+import com.rentmybike.notification.service.NotificationService;
+import com.rentmybike.user.entity.User;
 import com.rentmybike.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,12 +45,18 @@ public class ChatService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final NotificationService notificationService;
 
     /**
-     * Persists a chat message and broadcasts it to everyone subscribed to
-     * this booking's chat topic.
-     * Persistiert eine Chatnachricht und sendet sie an alle Abonnenten des
-     * Chat-Themas dieser Buchung.
+     * Persists a chat message, broadcasts it to everyone subscribed to this
+     * booking's chat topic, and creates an in-app notification for the other
+     * participant ("the user asked: when messages appear in the chat, we
+     * should get a notification on the site").
+     * Persistiert eine Chatnachricht, sendet sie an alle Abonnenten des
+     * Chat-Themas dieser Buchung und erstellt eine In-App-Benachrichtigung
+     * für die andere Teilnehmerin/den anderen Teilnehmer ("wenn im Chat
+     * Nachrichten erscheinen, sollen wir eine Benachrichtigung auf der
+     * Website erhalten").
      */
     public ChatMessageResponse sendMessage(UUID bookingId, UUID senderId, String content) {
         Booking booking = bookingRepository.findById(bookingId)
@@ -69,6 +77,16 @@ public class ChatService {
 
         ChatMessageResponse response = toResponse(message);
         messagingTemplate.convertAndSend("/topic/booking/" + bookingId, response);
+
+        // The recipient is whichever participant did NOT send this message —
+        // sender is the renter ⇒ notify the owner, and vice versa.
+        // Der Empfänger ist der Teilnehmer, der diese Nachricht NICHT gesendet
+        // hat — Sender ist der Mieter ⇒ Eigentümer benachrichtigen, und umgekehrt.
+        User recipient = booking.getRenter().getId().equals(senderId)
+                ? booking.getOwner()
+                : booking.getRenter();
+        notificationService.notifyNewChatMessage(booking, recipient, response.getSenderName(), content);
+
         return response;
     }
 

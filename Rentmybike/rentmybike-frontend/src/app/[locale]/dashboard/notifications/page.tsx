@@ -74,7 +74,9 @@ export default function NotificationsPage() {
           {notifications.map((n) => (
             <Link
               key={n.id}
-              href={`/${locale}/dashboard/bookings/owner`}
+              // See NotificationBell.tsx for why this can't be hardcoded to "owner" —
+              // NEW_CHAT_MESSAGE notifications can be addressed to either side of a booking.
+              href={`/${locale}/dashboard/bookings/${n.viewAsOwner === false ? "renter" : "owner"}`}
               onClick={() => {
                 if (!n.read) markOneAsRead(n.id);
               }}
