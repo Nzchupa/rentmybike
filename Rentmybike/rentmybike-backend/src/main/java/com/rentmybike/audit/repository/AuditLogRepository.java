@@ -33,14 +33,23 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, UUID> {
      * @param targetType exact match, null = no filter / exakte Übereinstimmung, null = kein Filter
      * @param search     free-text across actorName/details, null = no filter /
      *                   Freitext über actorName/details, null = kein Filter
+     *
+     * <p>{@code CAST(:search AS string)} is required — see the detailed
+     * explanation on {@code UserRepository.findAllForAdmin}. Without it, a
+     * null search bound only inside CONCAT/LIKE got sent as bytea and the
+     * query 500'd.
+     * <p>{@code CAST(:search AS string)} ist erforderlich — siehe die
+     * ausführliche Erklärung bei {@code UserRepository.findAllForAdmin}. Ohne
+     * ihn wurde ein null-Suchparameter, der nur innerhalb von CONCAT/LIKE
+     * gebunden war, als bytea gesendet, und die Abfrage schlug mit 500 fehl.
      */
     @Query("""
             SELECT a FROM AuditLog a
             WHERE (:action IS NULL OR a.action = :action)
               AND (:targetType IS NULL OR a.targetType = :targetType)
               AND (:search IS NULL
-                   OR LOWER(a.actorName) LIKE LOWER(CONCAT('%', :search, '%'))
-                   OR LOWER(a.details)   LIKE LOWER(CONCAT('%', :search, '%')))
+                   OR LOWER(a.actorName) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+                   OR LOWER(a.details)   LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')))
             ORDER BY a.createdAt DESC
             """)
     Page<AuditLog> findAllForAdmin(

@@ -22,6 +22,16 @@ public interface ReportRepository extends JpaRepository<Report, UUID> {
      * Admin-Listen-/Filterabfrage — null-koaleszierende Filter, gleiches
      * Muster wie AuditLogRepository.findAllForAdmin. Die Suche durchsucht
      * den Namen des Meldenden sowie die Freitext-Details/Auflösungsnotiz.
+     *
+     * <p>{@code CAST(:search AS string)} is required — see the detailed
+     * explanation on {@code UserRepository.findAllForAdmin}. Without it, a
+     * null search bound only inside CONCAT/LIKE got sent as bytea and every
+     * admin/reports request 500'd.
+     * <p>{@code CAST(:search AS string)} ist erforderlich — siehe die
+     * ausführliche Erklärung bei {@code UserRepository.findAllForAdmin}. Ohne
+     * ihn wurde ein null-Suchparameter, der nur innerhalb von CONCAT/LIKE
+     * gebunden war, als bytea gesendet, und jede admin/reports-Anfrage schlug
+     * mit 500 fehl.
      */
     @Query("""
             SELECT r FROM Report r
@@ -29,9 +39,9 @@ public interface ReportRepository extends JpaRepository<Report, UUID> {
               AND (:status IS NULL OR r.status = :status)
               AND (:targetType IS NULL OR r.targetType = :targetType)
               AND (:search IS NULL
-                   OR LOWER(r.reporterName) LIKE LOWER(CONCAT('%', :search, '%'))
-                   OR LOWER(r.details)      LIKE LOWER(CONCAT('%', :search, '%'))
-                   OR LOWER(r.resolutionNote) LIKE LOWER(CONCAT('%', :search, '%')))
+                   OR LOWER(r.reporterName) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+                   OR LOWER(r.details)      LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+                   OR LOWER(r.resolutionNote) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')))
             ORDER BY r.createdAt DESC
             """)
     Page<Report> findAllForAdmin(

@@ -53,15 +53,29 @@ public interface UserRepository extends JpaRepository<User, UUID> {
      * <p>Search is case-insensitive LIKE across email, firstName, lastName.
      * <p>Suche ist Groß-/Kleinschreibungsunabhängig LIKE über email, firstName, lastName.
      *
+     * <p>The explicit {@code CAST(:search AS string)} matters: when {@code search}
+     * is null (no filter applied) and it only ever appears inside {@code CONCAT}/
+     * {@code LIKE}, Postgres has no other clue about its type and the driver was
+     * sending it as {@code bytea} — every admin/users request 500'd with
+     * "function lower(bytea) does not exist". Forcing the cast pins the bind
+     * parameter to text regardless of whether a value is present.
+     * <p>Der explizite {@code CAST(:search AS string)} ist wichtig: Wenn
+     * {@code search} null ist (kein Filter aktiv) und nur innerhalb von
+     * {@code CONCAT}/{@code LIKE} auftaucht, hat Postgres keinen anderen Hinweis
+     * auf den Typ, und der Treiber sendete ihn als {@code bytea} — jede
+     * admin/users-Anfrage schlug mit 500 fehl ("function lower(bytea) does not
+     * exist"). Der erzwungene Cast legt den Bind-Parameter unabhängig davon, ob
+     * ein Wert vorhanden ist, auf Text fest.
+     *
      * @param search null means no filter / null bedeutet kein Filter
      */
     @Query("""
             SELECT u FROM User u
             WHERE u.deletedAt IS NULL
               AND (:search IS NULL
-                   OR LOWER(u.email)     LIKE LOWER(CONCAT('%', :search, '%'))
-                   OR LOWER(u.firstName) LIKE LOWER(CONCAT('%', :search, '%'))
-                   OR LOWER(u.lastName)  LIKE LOWER(CONCAT('%', :search, '%')))
+                   OR LOWER(u.email)     LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+                   OR LOWER(u.firstName) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+                   OR LOWER(u.lastName)  LIKE LOWER(CONCAT('%', CAST(:search AS string), '%')))
             ORDER BY u.createdAt DESC
             """)
     Page<User> findAllForAdmin(@Param("search") String search, Pageable pageable);
