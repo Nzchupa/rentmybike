@@ -83,10 +83,14 @@
   },
   "home": {
     "hero": {
+      "badge": "Peer-to-Peer-Fahrradverleih",
       "title": "Fahrrad mieten, Stadt entdecken",
       "subtitle": "Der Peer-to-Peer-Marktplatz für Fahrradverleih von Privatpersonen. Günstig, flexibel, umweltfreundlich.",
       "cta": "Fahrräder durchsuchen",
-      "ctaOwner": "Fahrrad inserieren"
+      "ctaOwner": "Fahrrad inserieren",
+      "trustPeerToPeer": "100% Peer-to-Peer",
+      "trustReviews": "Verifizierte Bewertungen",
+      "trustBikeTypes": "Alle Fahrradtypen"
     },
     "features": {
       "title": "Warum RentMyBike?",
@@ -165,6 +169,8 @@
       "email": "E-Mail-Adresse",
       "password": "Passwort",
       "confirmPassword": "Passwort bestätigen",
+      "passwordHint": "Mind. 8 Zeichen",
+      "confirmPasswordPlaceholder": "Passwort wiederholen",
       "submit": "Konto erstellen",
       "haveAccount": "Bereits ein Konto?",
       "signIn": "Anmelden",
@@ -290,6 +296,9 @@
     "cancelConfirm": "Möchten Sie diese Buchung wirklich stornieren?",
     "acceptConfirm": "Diese Buchungsanfrage akzeptieren?",
     "rejectConfirm": "Diese Buchungsanfrage ablehnen?",
+    "acceptedToast": "Buchung akzeptiert!",
+    "rejectedToast": "Buchung abgelehnt.",
+    "cancelledToast": "Buchung storniert.",
     "photos": {
       "title": "Zustandsfotos",
       "before": "Vor der Abholung",
@@ -389,6 +398,9 @@
       "profileSaved": "Profil gespeichert",
       "passwordChanged": "Passwort geändert",
       "avatarUpdated": "Avatar aktualisiert",
+      "emailVerifiedBadge": "E-Mail verifiziert",
+      "emailUnverifiedBadge": "E-Mail nicht verifiziert",
+      "memberSince": "Mitglied seit {date}",
       "validation": {
         "minTwoChars": "Min. 2 Zeichen",
         "required": "Erforderlich"

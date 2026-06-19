@@ -1,12 +1,14 @@
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { MapPin } from "lucide-react";
 import { StarRating } from "@/components/ui/StarRating";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, cn } from "@/lib/utils";
 import { reviewsApi } from "@/lib/api";
 import { FavoriteButton } from "@/components/bikes/FavoriteButton";
+import { BikeImageFallback } from "@/components/bikes/BikeImageFallback";
 import type { BikeResponse } from "@/types";
 
 interface BikeCardProps {
@@ -37,28 +39,38 @@ export function BikeCard({ bike }: BikeCardProps) {
     staleTime: 5 * 60 * 1000,
   });
 
+  // Track image load state so we can show a skeleton while the photo loads
+  // instead of a flash of empty grey, and fall back cleanly on a load error
+  // (e.g. broken/expired upload URL) rather than leaving a dead <img>.
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageErrored, setImageErrored] = useState(false);
+  const hasPhoto = Boolean(bike.primaryPhotoUrl) && !imageErrored;
+
   return (
     <Link href={`/${locale}/bikes/${bike.id}`} className="group block">
       <div className="card overflow-hidden transition-shadow hover:shadow-md">
-        {/* Photo */}
+        {/* Photo — fixed aspect ratio (h-48) kept consistent across every card */}
         <div className="relative h-48 bg-slate-100 overflow-hidden">
-          {bike.primaryPhotoUrl ? (
-            <Image
-              src={bike.primaryPhotoUrl}
-              alt={bike.title}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-            />
+          {hasPhoto ? (
+            <>
+              {!imageLoaded && (
+                <div className="absolute inset-0 animate-pulse bg-slate-200" />
+              )}
+              <Image
+                src={bike.primaryPhotoUrl!}
+                alt={bike.title}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                className={cn(
+                  "object-cover transition-all duration-300 group-hover:scale-105",
+                  imageLoaded ? "opacity-100" : "opacity-0"
+                )}
+                onLoad={() => setImageLoaded(true)}
+                onError={() => setImageErrored(true)}
+              />
+            </>
           ) : (
-            <div className="flex h-full items-center justify-center text-slate-300">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <circle cx="5.5" cy="17.5" r="3.5"/>
-                <circle cx="18.5" cy="17.5" r="3.5"/>
-                <path d="M5.5 17.5L8 10l4 4 2-6h2.5"/>
-                <path d="M15 10h3l1 2"/>
-              </svg>
-            </div>
+            <BikeImageFallback />
           )}
 
           {/* Category badge */}

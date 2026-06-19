@@ -29,6 +29,7 @@ interface BookingCardProps {
  */
 export function BookingCard({ booking, view, onReview }: BookingCardProps) {
   const t = useTranslations("booking");
+  const tReviews = useTranslations("reviews");
   const locale = useLocale();
   const queryClient = useQueryClient();
   const [showPhotos, setShowPhotos] = useState(false);
@@ -59,19 +60,19 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
 
   const { mutate: accept, isPending: accepting } = useMutation({
     mutationFn: () => bookingsApi.accept(booking.id),
-    onSuccess: () => { toast.success("Booking accepted!"); invalidate(); },
+    onSuccess: () => { toast.success(t("acceptedToast")); invalidate(); },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const { mutate: reject, isPending: rejecting } = useMutation({
     mutationFn: () => bookingsApi.reject(booking.id),
-    onSuccess: () => { toast.success("Booking rejected."); invalidate(); },
+    onSuccess: () => { toast.success(t("rejectedToast")); invalidate(); },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const { mutate: cancel, isPending: cancelling } = useMutation({
     mutationFn: () => bookingsApi.cancel(booking.id),
-    onSuccess: () => { toast.success("Booking cancelled."); invalidate(); },
+    onSuccess: () => { toast.success(t("cancelledToast")); invalidate(); },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -177,7 +178,7 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
                   variant="outline"
                   onClick={() => onReview(booking)}
                 >
-                  Review
+                  {tReviews("writeReview")}
                 </Button>
               )}
             </div>

@@ -1,10 +1,11 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { Heart } from "lucide-react";
 import { favoritesApi } from "@/lib/api";
 import { BikeCard } from "@/components/bikes/BikeCard";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 /**
  * My Favorites dashboard page — bikes the current user has bookmarked.
@@ -12,6 +13,8 @@ import { BikeCard } from "@/components/bikes/BikeCard";
  */
 export default function MyFavoritesPage() {
   const t = useTranslations("dashboard.favorites");
+  const tDash = useTranslations("dashboard");
+  const locale = useLocale();
 
   const { data, isLoading } = useQuery({
     queryKey: ["my-favorites"],
@@ -32,10 +35,11 @@ export default function MyFavoritesPage() {
           ))}
         </div>
       ) : bikes.length === 0 ? (
-        <div className="card p-12 text-center text-slate-500">
-          <Heart size={32} className="mx-auto mb-3 text-slate-300" />
-          <p>{t("empty")}</p>
-        </div>
+        <EmptyState
+          icon={Heart}
+          message={t("empty")}
+          action={{ label: tDash("browseBikes"), href: `/${locale}/bikes` }}
+        />
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {bikes.map((bike) => (

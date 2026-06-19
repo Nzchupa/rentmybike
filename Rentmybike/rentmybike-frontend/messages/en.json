@@ -83,10 +83,14 @@
   },
   "home": {
     "hero": {
+      "badge": "Peer-to-peer bike rental",
       "title": "Rent a Bike, Explore Your City",
       "subtitle": "The peer-to-peer marketplace to rent bikes from locals. Affordable, flexible, eco-friendly.",
       "cta": "Browse Bikes",
-      "ctaOwner": "List Your Bike"
+      "ctaOwner": "List Your Bike",
+      "trustPeerToPeer": "100% peer-to-peer",
+      "trustReviews": "Verified reviews",
+      "trustBikeTypes": "All bike types"
     },
     "features": {
       "title": "Why RentMyBike?",
@@ -165,6 +169,8 @@
       "email": "Email address",
       "password": "Password",
       "confirmPassword": "Confirm password",
+      "passwordHint": "Min. 8 characters",
+      "confirmPasswordPlaceholder": "Repeat password",
       "submit": "Create account",
       "haveAccount": "Already have an account?",
       "signIn": "Log in",
@@ -290,6 +296,9 @@
     "cancelConfirm": "Are you sure you want to cancel this booking?",
     "acceptConfirm": "Accept this booking request?",
     "rejectConfirm": "Reject this booking request?",
+    "acceptedToast": "Booking accepted!",
+    "rejectedToast": "Booking rejected.",
+    "cancelledToast": "Booking cancelled.",
     "photos": {
       "title": "Condition photos",
       "before": "Before pickup",
@@ -389,6 +398,9 @@
       "profileSaved": "Profile saved",
       "passwordChanged": "Password changed",
       "avatarUpdated": "Avatar updated",
+      "emailVerifiedBadge": "Email verified",
+      "emailUnverifiedBadge": "Email not verified",
+      "memberSince": "Member since {date}",
       "validation": {
         "minTwoChars": "Min. 2 characters",
         "required": "Required"

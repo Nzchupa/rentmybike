@@ -4,11 +4,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Pencil, Trash2, Camera } from "lucide-react";
+import { Plus, Pencil, Trash2, Camera, Bike as BikeIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import { bikesApi } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { ApprovalStatusBadge } from "@/components/ui/Badge";
+import { BikeImageFallback } from "@/components/bikes/BikeImageFallback";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { formatPrice } from "@/lib/utils";
 
 /**
@@ -57,12 +59,11 @@ export default function MyBikesPage() {
           ))}
         </div>
       ) : bikes.length === 0 ? (
-        <div className="card p-12 text-center text-slate-500">
-          <p className="mb-4">{t("noBikes")}</p>
-          <Button asChild>
-            <Link href={`/${locale}/dashboard/bikes/new`}>{t("addBike")}</Link>
-          </Button>
-        </div>
+        <EmptyState
+          icon={BikeIcon}
+          message={t("noBikes")}
+          action={{ label: t("addBike"), href: `/${locale}/dashboard/bikes/new` }}
+        />
       ) : (
         <div className="space-y-3">
           {bikes.map((bike) => (
@@ -73,7 +74,7 @@ export default function MyBikesPage() {
                 className="flex items-center gap-4 flex-1 min-w-0 hover:opacity-80"
               >
                 <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-slate-100 shrink-0">
-                  {bike.primaryPhotoUrl && (
+                  {bike.primaryPhotoUrl ? (
                     <Image
                       src={bike.primaryPhotoUrl}
                       alt={bike.title}
@@ -81,6 +82,8 @@ export default function MyBikesPage() {
                       className="object-cover"
                       sizes="64px"
                     />
+                  ) : (
+                    <BikeImageFallback iconSize={24} />
                   )}
                 </div>
 

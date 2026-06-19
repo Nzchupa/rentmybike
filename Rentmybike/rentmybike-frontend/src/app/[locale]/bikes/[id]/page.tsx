@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { MapPin, ChevronLeft, Star } from "lucide-react";
+import { MapPin, ChevronLeft } from "lucide-react";
 import { bikesApi, reviewsApi } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
@@ -16,6 +16,7 @@ import { useState } from "react";
 import type { BikePhotoResponse } from "@/types";
 import { BookingForm } from "@/components/booking/BookingForm";
 import { FavoriteButton } from "@/components/bikes/FavoriteButton";
+import { BikeImageFallback } from "@/components/bikes/BikeImageFallback";
 
 interface BikeDetailPageProps {
   // Next.js 14 passes route params as a plain (already-resolved) object —
@@ -108,9 +109,7 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
                 priority
               />
             ) : (
-              <div className="flex h-full items-center justify-center text-slate-300">
-                <Star size={64} />
-              </div>
+              <BikeImageFallback iconSize={64} />
             )}
             <div className="absolute top-3 right-3">
               <ApprovalStatusBadge status={bike.approvalStatus} />

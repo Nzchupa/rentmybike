@@ -1,9 +1,11 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
+import { CalendarSearch } from "lucide-react";
 import { bookingsApi } from "@/lib/api";
 import { BookingCard } from "@/components/booking/BookingCard";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 /**
  * "As Renter" bookings — all bookings made by the current user.
@@ -12,6 +14,8 @@ import { BookingCard } from "@/components/booking/BookingCard";
 export default function RenterBookingsPage() {
   const t = useTranslations("dashboard.tabs");
   const tb = useTranslations("dashboard.bookings");
+  const tDash = useTranslations("dashboard");
+  const locale = useLocale();
 
   const { data, isLoading } = useQuery({
     queryKey: ["renter-bookings"],
@@ -32,9 +36,11 @@ export default function RenterBookingsPage() {
           ))}
         </div>
       ) : bookings.length === 0 ? (
-        <div className="card p-12 text-center text-slate-500">
-          <p>{tb("noRenterBookings")}</p>
-        </div>
+        <EmptyState
+          icon={CalendarSearch}
+          message={tb("noRenterBookings")}
+          action={{ label: tDash("browseBikes"), href: `/${locale}/bikes` }}
+        />
       ) : (
         <div className="space-y-3">
           {bookings.map((b) => (

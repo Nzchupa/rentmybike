@@ -107,7 +107,7 @@ export default function RegisterPage() {
               label={t("password")}
               type="password"
               autoComplete="new-password"
-              placeholder="Min. 8 characters"
+              placeholder={t("passwordHint")}
               error={errors.password?.message}
               {...register("password")}
             />
@@ -115,7 +115,7 @@ export default function RegisterPage() {
               label={t("confirmPassword")}
               type="password"
               autoComplete="new-password"
-              placeholder="Repeat password"
+              placeholder={t("confirmPasswordPlaceholder")}
               error={errors.confirmPassword?.message}
               {...register("confirmPassword")}
             />

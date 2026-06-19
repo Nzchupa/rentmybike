@@ -3,8 +3,10 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import Link from "next/link";
+import { Bell, AlertCircle } from "lucide-react";
 import { notificationsApi } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { cn, formatDate } from "@/lib/utils";
 
 /**
@@ -62,13 +64,13 @@ export default function NotificationsPage() {
           ))}
         </div>
       ) : isError ? (
-        <div className="card p-12 text-center text-red-600">
-          <p>{error instanceof Error ? error.message : t("loadError")}</p>
-        </div>
+        <EmptyState
+          icon={AlertCircle}
+          message={error instanceof Error ? error.message : t("loadError")}
+          variant="error"
+        />
       ) : notifications.length === 0 ? (
-        <div className="card p-12 text-center text-slate-500">
-          <p>{t("empty")}</p>
-        </div>
+        <EmptyState icon={Bell} message={t("empty")} />
       ) : (
         <div className="card divide-y divide-slate-100 overflow-hidden">
           {notifications.map((n) => (

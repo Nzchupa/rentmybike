@@ -15,7 +15,8 @@ import { useAuthStore } from "@/store/auth.store";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Avatar } from "@/components/ui/Avatar";
-import { cn } from "@/lib/utils";
+import { VerificationBadge } from "@/components/ui/VerificationBadge";
+import { cn, formatDate } from "@/lib/utils";
 import type { UpdateProfileRequest, ChangePasswordRequest, UpgradeToBusinessRequest } from "@/types";
 
 function makeBusinessSchema(t: (key: string) => string) {
@@ -188,6 +189,16 @@ export default function ProfilePage() {
         <div>
           <p className="font-semibold text-slate-900">{user.fullName}</p>
           <p className="text-sm text-slate-500">{user.email}</p>
+          <div className="flex flex-wrap items-center gap-2 mt-2">
+            <VerificationBadge
+              verified={user.emailVerified}
+              verifiedLabel={t("emailVerifiedBadge")}
+              unverifiedLabel={t("emailUnverifiedBadge")}
+            />
+            <span className="text-xs text-slate-400">
+              {t("memberSince", { date: formatDate(user.createdAt, locale) })}
+            </span>
+          </div>
         </div>
       </div>
 

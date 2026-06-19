@@ -53,7 +53,7 @@ function HeroSection() {
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
         <div className="inline-flex items-center gap-2 rounded-full bg-brand-100 px-4 py-1.5 text-sm font-medium text-brand-700 mb-8">
           <Bike size={16} />
-          Peer-to-peer bike rental
+          {t("badge")}
         </div>
 
         <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
@@ -76,15 +76,15 @@ function HeroSection() {
         <div className="mt-16 flex flex-wrap items-center justify-center gap-8 text-sm text-slate-500">
           <div className="flex items-center gap-2">
             <Users size={16} className="text-brand-500" />
-            <span>100% peer-to-peer</span>
+            <span>{t("trustPeerToPeer")}</span>
           </div>
           <div className="flex items-center gap-2">
             <Star size={16} className="text-amber-500" />
-            <span>Verified reviews</span>
+            <span>{t("trustReviews")}</span>
           </div>
           <div className="flex items-center gap-2">
             <Bike size={16} className="text-brand-500" />
-            <span>All bike types</span>
+            <span>{t("trustBikeTypes")}</span>
           </div>
         </div>
       </div>

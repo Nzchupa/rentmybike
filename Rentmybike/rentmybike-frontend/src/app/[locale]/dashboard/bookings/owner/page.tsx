@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
+import { CalendarCheck, AlertCircle } from "lucide-react";
 import { bookingsApi } from "@/lib/api";
 import { BookingCard } from "@/components/booking/BookingCard";
 import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { BookingStatus } from "@/types";
 
 const STATUS_FILTERS: (BookingStatus | "ALL")[] = [
@@ -70,13 +72,13 @@ export default function OwnerBookingsPage() {
           ))}
         </div>
       ) : isError ? (
-        <div className="card p-12 text-center text-red-600">
-          <p>{error instanceof Error ? error.message : tBookings("loadError")}</p>
-        </div>
+        <EmptyState
+          icon={AlertCircle}
+          message={error instanceof Error ? error.message : tBookings("loadError")}
+          variant="error"
+        />
       ) : bookings.length === 0 ? (
-        <div className="card p-12 text-center text-slate-500">
-          <p>{tBookings("noOwnerBookings")}</p>
-        </div>
+        <EmptyState icon={CalendarCheck} message={tBookings("noOwnerBookings")} />
       ) : (
         <div className="space-y-3">
           {bookings.map((b) => (
