@@ -50,6 +50,8 @@ function AccessoryForm({
   const {
     register,
     handleSubmit,
+    setValue,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<AccessoryFormValues>({
     resolver: zodResolver(makeAccessorySchema(tRoot)),
@@ -62,6 +64,16 @@ function AccessoryForm({
     },
   });
 
+  // Pre-seed the name field with the category label when the owner switches
+  // type and hasn't typed a custom name yet — saves re-typing "Helmet" /
+  // "Child seat" / "Lock" for the common case (spec item #12), while still
+  // letting owners override it for e.g. a specific brand/model name.
+  // Füllt das Namensfeld beim Kategoriewechsel mit der Kategoriebezeichnung
+  // vor, solange der Eigentümer noch keinen eigenen Namen eingegeben hat —
+  // erspart das erneute Eintippen für den Standardfall.
+  const typeRegister = register("type");
+  const nameRegister = register("name");
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
@@ -69,7 +81,16 @@ function AccessoryForm({
           <label className="label">{t("type")}</label>
           <select
             className="w-full h-10 px-3 rounded-xl border border-slate-300 bg-white text-sm outline-none focus:ring-2 focus:ring-brand-500"
-            {...register("type")}
+            {...typeRegister}
+            onChange={(e) => {
+              typeRegister.onChange(e);
+              const newType = e.target.value as AccessoryType;
+              const currentName = getValues("name").trim();
+              const isUntouchedDefault = TYPES.some((ty) => t(`types.${ty}`) === currentName);
+              if (currentName === "" || isUntouchedDefault) {
+                setValue("name", t(`types.${newType}`));
+              }
+            }}
           >
             {TYPES.map((type) => (
               <option key={type} value={type}>{t(`types.${type}`)}</option>
@@ -79,7 +100,7 @@ function AccessoryForm({
         <Input
           label={t("name")}
           error={errors.name?.message}
-          {...register("name")}
+          {...nameRegister}
         />
       </div>
       <div className="grid grid-cols-2 gap-4">

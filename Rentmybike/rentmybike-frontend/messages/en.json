@@ -28,13 +28,17 @@
     "login": "Log in",
     "register": "Sign up",
     "logout": "Log out",
-    "myProfile": "My Profile"
+    "myProfile": "My Profile",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "footer": {
     "tagline": "Peer-to-peer bike rental marketplace.",
     "quickLinks": "Quick links",
     "home": "Home",
     "bikes": "Browse bikes",
+    "howItWorks": "How it works",
+    "faq": "FAQ",
     "company": "Company",
     "about": "About",
     "contact": "Contact",
@@ -79,6 +83,58 @@
       "section3Body": "A booking request is not confirmed until the owner accepts it. Either party can use the in-app chat to coordinate pickup, return, and any issues.",
       "section4Title": "Changes",
       "section4Body": "These terms may be updated as the project evolves."
+    },
+    "howItWorks": {
+      "title": "How RentMyBike works",
+      "subtitle": "A peer-to-peer marketplace connecting bike owners with people who want to rent — here's the full flow for both sides.",
+      "forRentersTitle": "Renting a bike",
+      "forRentersSubtitle": "Three steps from search to ride.",
+      "renterStep1Title": "Find a bike",
+      "renterStep1Desc": "Search by city and dates to see what's available near you, with real photos and prices set by the owner.",
+      "renterStep2Title": "Send a request",
+      "renterStep2Desc": "Pick your dates, add an optional message, and send a booking request to the owner.",
+      "renterStep3Title": "Meet up and ride",
+      "renterStep3Desc": "Once the owner accepts, coordinate pickup in the in-app chat, then get the bike and go explore.",
+      "forRentersCta": "Browse bikes",
+      "forOwnersTitle": "Listing your bike",
+      "forOwnersSubtitle": "Turn a bike you're not using every day into income.",
+      "ownerStep1Title": "List your bike",
+      "ownerStep1Desc": "Add photos, a description, and your price per day. New listings go through a quick review before going live.",
+      "ownerStep2Title": "Accept requests",
+      "ownerStep2Desc": "Renters send booking requests for the dates they want — you choose which to accept.",
+      "ownerStep3Title": "Get paid and get reviewed",
+      "ownerStep3Desc": "After the rental, you and the renter review each other, building trust for future bookings.",
+      "forOwnersCta": "List your bike",
+      "safetyTitle": "Built-in trust and safety",
+      "safetySubtitle": "Every booking is backed by features designed to protect both sides.",
+      "safetyPhotosTitle": "Before & after photos",
+      "safetyPhotosDesc": "Owners and renters can document the bike's condition at handover and return.",
+      "safetyReviewsTitle": "Real reviews",
+      "safetyReviewsDesc": "Renters and owners rate each other after every completed booking — visible on profiles.",
+      "safetyChatTitle": "Direct communication",
+      "safetyChatDesc": "Coordinate pickup details and ask questions through the in-app chat, no phone number needed.",
+      "faqPrompt": "Still have questions?",
+      "faqCta": "Read the FAQ"
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "subtitle": "Common questions from renters and bike owners.",
+      "bookingQ": "How does booking a bike work?",
+      "bookingA": "Search for a bike by city and dates, then send a booking request to the owner with your chosen dates. The booking is only confirmed once the owner accepts it — you'll see the status update and can chat with the owner in the meantime.",
+      "paymentQ": "How and when do I pay?",
+      "paymentA": "RentMyBike is a peer-to-peer marketplace as a student project — payment is currently arranged directly between renter and owner, outside the app, once a booking is accepted.",
+      "damageQ": "What happens if the bike is damaged during the rental?",
+      "damageA": "Owners and renters can upload before/after condition photos for each booking to document the bike's state at handover and return, which helps resolve any disagreement about damage.",
+      "cancelQ": "Can I cancel a booking?",
+      "cancelA": "Yes — cancellable bookings show a Cancel button on your bookings page. Once cancelled, the dates become available again for other renters.",
+      "verificationQ": "What does \"Email verified\" mean?",
+      "verificationA": "It means the account holder confirmed their email address via the link sent at registration. We're working on adding further verification (like phone and identity) in future updates.",
+      "accessoriesQ": "Can I rent accessories like a helmet or child seat?",
+      "accessoriesA": "Business owners can offer accessories — helmets, child seats, and locks — alongside their bikes. Availability depends on what the specific owner has listed.",
+      "businessQ": "I run a bike rental business — what's different for me?",
+      "businessA": "Upgrading to a Business account gives you a dedicated dashboard with bulk bike listing, a rental calendar across all your bikes, accessory management, and booking statistics.",
+      "supportQ": "I have another question — who do I contact?",
+      "supportA": "Reach out through the Contact page — this project is currently maintained by a single developer and questions are answered by email."
     }
   },
   "home": {
@@ -281,6 +337,10 @@
       "CANCELLED": "Cancelled",
       "COMPLETED": "Completed"
     },
+    "priceBreakdown": {
+      "bikeRental": "Bike rental ({days, plural, one {# day} other {# days}})",
+      "total": "Total"
+    },
     "errors": {
       "dateConflict": "These dates are already booked",
       "selfBooking": "You cannot book your own bike",
@@ -330,7 +390,9 @@
       "favorites": "Favorites",
       "notifications": "Notifications",
       "profile": "Profile",
-      "business": "Business"
+      "business": "Business",
+      "more": "More",
+      "closeMore": "Close menu"
     },
     "favorites": {
       "title": "My Favorites",

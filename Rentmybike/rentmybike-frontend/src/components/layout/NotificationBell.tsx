@@ -7,6 +7,7 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Bell } from "lucide-react";
 import { notificationsApi } from "@/lib/api";
 import { cn, formatDate } from "@/lib/utils";
+import { NotificationIcon } from "@/components/notifications/NotificationIcon";
 
 /**
  * Bell icon with unread-notification badge, shown in the navbar for
@@ -125,9 +126,14 @@ export function NotificationBell() {
                     !n.read && "bg-brand-50/50"
                   )}
                 >
-                  <p className="text-sm font-medium text-slate-900">{n.title}</p>
-                  <p className="text-xs text-slate-600 mt-0.5 line-clamp-2">{n.message}</p>
-                  <p className="text-[11px] text-slate-400 mt-1">{formatDate(n.createdAt, locale)}</p>
+                  <div className="flex items-start gap-3">
+                    <NotificationIcon type={n.type} className="w-7 h-7" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-slate-900">{n.title}</p>
+                      <p className="text-xs text-slate-600 mt-0.5 line-clamp-2">{n.message}</p>
+                      <p className="text-[11px] text-slate-400 mt-1">{formatDate(n.createdAt, locale)}</p>
+                    </div>
+                  </div>
                 </Link>
               ))
             )}

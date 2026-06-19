@@ -21,7 +21,23 @@ import { enUS, de } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { businessApi } from "@/lib/api";
 import { cn, formatPrice } from "@/lib/utils";
-import type { BookingResponse } from "@/types";
+import { BookingStatusBadge } from "@/components/ui/Badge";
+import type { BookingResponse, BookingStatus } from "@/types";
+
+// Same status → color mapping as the shared Badge component, just as solid
+// dots instead of pill backgrounds, so the calendar grid stays legible at
+// a glance (spec item #5 — color-coded booking status visualization).
+// Gleiche Status-Farbzuordnung wie die Badge-Komponente, hier als Punkte
+// statt Pillen, damit das Kalenderraster auf einen Blick lesbar bleibt.
+const statusDotClass: Record<BookingStatus, string> = {
+  PENDING: "bg-yellow-500",
+  ACCEPTED: "bg-blue-500",
+  REJECTED: "bg-red-500",
+  CANCELLED: "bg-slate-400",
+  COMPLETED: "bg-green-500",
+};
+
+const LEGEND_STATUSES: BookingStatus[] = ["PENDING", "ACCEPTED", "COMPLETED", "CANCELLED", "REJECTED"];
 
 /**
  * Rental calendar — simple month grid showing booking counts per day,
@@ -30,6 +46,7 @@ import type { BookingResponse } from "@/types";
  */
 export default function RentalCalendarPage() {
   const t = useTranslations("business.calendar");
+  const tStatus = useTranslations("booking.status");
   const locale = useLocale();
   const dfnsLocale = locale === "de" ? de : enUS;
 
@@ -99,7 +116,8 @@ export default function RentalCalendarPage() {
         </div>
         <div className="grid grid-cols-7 gap-1">
           {days.map((day) => {
-            const count = bookingsOnDay(day).length;
+            const dayBookings = bookingsOnDay(day);
+            const statusesPresent = Array.from(new Set(dayBookings.map((b) => b.status)));
             const inMonth = isSameMonth(day, monthCursor);
             const selected = selectedDay && isSameDay(day, selectedDay);
             return (
@@ -115,15 +133,29 @@ export default function RentalCalendarPage() {
                 )}
               >
                 <span className="text-xs font-medium">{format(day, "d")}</span>
-                {count > 0 && (
-                  <span className="text-[11px] font-semibold px-1.5 py-0.5 rounded-full bg-brand-100 text-brand-700">
-                    {count}
+                {statusesPresent.length > 0 && (
+                  <span className="flex flex-wrap items-center gap-0.5">
+                    {statusesPresent.slice(0, 4).map((status) => (
+                      <span
+                        key={status}
+                        className={cn("w-1.5 h-1.5 rounded-full", statusDotClass[status])}
+                      />
+                    ))}
                   </span>
                 )}
               </button>
             );
           })}
         </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500">
+        {LEGEND_STATUSES.map((status) => (
+          <span key={status} className="flex items-center gap-1.5">
+            <span className={cn("w-1.5 h-1.5 rounded-full", statusDotClass[status])} />
+            {tStatus(status)}
+          </span>
+        ))}
       </div>
 
       {selectedDay && (
@@ -138,7 +170,10 @@ export default function RentalCalendarPage() {
               {selectedBookings.map((b) => (
                 <div key={b.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 p-3">
                   <div>
-                    <p className="font-medium text-slate-900 text-sm">{b.bikeTitle}</p>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <p className="font-medium text-slate-900 text-sm">{b.bikeTitle}</p>
+                      <BookingStatusBadge status={b.status} />
+                    </div>
                     <p className="text-xs text-slate-500">
                       {b.renterName} · {format(parseISO(b.startDate), "MMM d")} – {format(parseISO(b.endDate), "MMM d")}
                     </p>

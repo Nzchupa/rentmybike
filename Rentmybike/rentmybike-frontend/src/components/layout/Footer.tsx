@@ -37,6 +37,16 @@ export function Footer() {
                   {t("bikes")}
                 </Link>
               </li>
+              <li>
+                <Link href={`/${locale}/how-it-works`} className="hover:text-slate-900 transition-colors">
+                  {t("howItWorks")}
+                </Link>
+              </li>
+              <li>
+                <Link href={`/${locale}/faq`} className="hover:text-slate-900 transition-colors">
+                  {t("faq")}
+                </Link>
+              </li>
             </ul>
           </div>
 

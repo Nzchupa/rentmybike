@@ -13,7 +13,7 @@ import { BookingStatusBadge } from "@/components/ui/Badge";
 import { Avatar } from "@/components/ui/Avatar";
 import { BookingPhotosPanel } from "@/components/booking/BookingPhotosPanel";
 import { ChatPanel } from "@/components/booking/ChatPanel";
-import { formatPrice, formatDate } from "@/lib/utils";
+import { cn, formatPrice, formatDate } from "@/lib/utils";
 import type { BookingResponse } from "@/types";
 
 interface BookingCardProps {
@@ -52,6 +52,14 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
   // schließt aber, sobald die Buchung erledigt ist (abgelehnt/storniert), da
   // es nichts mehr zu koordinieren gibt.
   const chatEnabled = booking.status !== "REJECTED" && booking.status !== "CANCELLED";
+
+  // Price breakdown (spec item #9) — only worth itemizing once there's
+  // something to itemize beyond the bike rental itself.
+  // Preisaufschlüsselung — wird nur aufgeschlüsselt, wenn es neben der
+  // reinen Fahrradmiete noch etwas zu zeigen gibt.
+  const accessoriesTotal = booking.accessories.reduce((sum, a) => sum + a.lineTotal, 0);
+  const bikeSubtotal = booking.totalPrice - accessoriesTotal;
+  const hasBreakdown = booking.accessories.length > 0;
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["owner-bookings"] });
@@ -103,7 +111,7 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
             >
               {booking.bikeTitle}
             </Link>
-            <BookingStatusBadge status={booking.status} />
+            <BookingStatusBadge status={booking.status} size="md" />
           </div>
 
           <div className="flex items-center gap-1 text-sm text-slate-500 mt-0.5">
@@ -128,13 +136,36 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
             </div>
           )}
 
+          {hasBreakdown && (
+            <div className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-sm space-y-1">
+              <div className="flex items-center justify-between text-slate-600">
+                <span>{t("priceBreakdown.bikeRental", { days: booking.rentalDays })}</span>
+                <span>{formatPrice(bikeSubtotal, locale)}</span>
+              </div>
+              {booking.accessories.map((a) => (
+                <div key={a.accessoryId} className="flex items-center justify-between text-slate-600">
+                  <span>
+                    {a.name} {a.quantity > 1 && `× ${a.quantity}`}
+                  </span>
+                  <span>{formatPrice(a.lineTotal, locale)}</span>
+                </div>
+              ))}
+              <div className="flex items-center justify-between font-semibold text-slate-900 pt-1 border-t border-slate-200">
+                <span>{t("priceBreakdown.total")}</span>
+                <span>{formatPrice(booking.totalPrice, locale)}</span>
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center justify-between mt-3">
-            <span className="font-semibold text-slate-900">
-              {formatPrice(booking.totalPrice, locale)}
-            </span>
+            {!hasBreakdown && (
+              <span className="font-semibold text-slate-900">
+                {formatPrice(booking.totalPrice, locale)}
+              </span>
+            )}
 
             {/* Actions */}
-            <div className="flex gap-2">
+            <div className={cn("flex gap-2", hasBreakdown && "ml-auto")}>
               {view === "owner" && booking.status === "PENDING" && (
                 <>
                   <Button

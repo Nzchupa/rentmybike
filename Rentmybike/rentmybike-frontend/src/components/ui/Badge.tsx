@@ -5,10 +5,12 @@ import { cn } from "@/lib/utils";
 import type { BookingStatus, ApprovalStatus } from "@/types";
 
 type BadgeVariant = "green" | "yellow" | "red" | "blue" | "gray";
+type BadgeSize = "sm" | "md";
 
 interface BadgeProps {
   children: React.ReactNode;
   variant?: BadgeVariant;
+  size?: BadgeSize;
   className?: string;
 }
 
@@ -20,12 +22,24 @@ const variantClasses: Record<BadgeVariant, string> = {
   gray:   "bg-slate-100 text-slate-700",
 };
 
-export function Badge({ children, variant = "gray", className }: BadgeProps) {
+// "md" gives booking status badges more visual weight on dashboard cards,
+// where the status is often the most important thing on the card (spec
+// item #9). "sm" stays the default for inline/dense contexts.
+// "md" verleiht Buchungsstatus-Badges auf Dashboard-Karten mehr visuelles
+// Gewicht, da der Status dort oft das Wichtigste ist. "sm" bleibt der
+// Standard für kompakte Kontexte.
+const sizeClasses: Record<BadgeSize, string> = {
+  sm: "px-2.5 py-0.5 text-xs",
+  md: "px-3 py-1 text-sm",
+};
+
+export function Badge({ children, variant = "gray", size = "sm", className }: BadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+        "inline-flex items-center rounded-full font-medium",
         variantClasses[variant],
+        sizeClasses[size],
         className
       )}
     >
@@ -44,12 +58,12 @@ const bookingStatusVariant: Record<BookingStatus, BadgeVariant> = {
   COMPLETED: "green",
 };
 
-export function BookingStatusBadge({ status }: { status: BookingStatus }) {
+export function BookingStatusBadge({ status, size }: { status: BookingStatus; size?: BadgeSize }) {
   // Previously rendered the raw enum value (e.g. "PENDING") regardless of
   // locale. Vorher wurde der rohe Enum-Wert (z. B. "PENDING") unabhängig
   // von der Sprache angezeigt.
   const t = useTranslations("booking.status");
-  return <Badge variant={bookingStatusVariant[status]}>{t(status)}</Badge>;
+  return <Badge variant={bookingStatusVariant[status]} size={size}>{t(status)}</Badge>;
 }
 
 const approvalStatusVariant: Record<ApprovalStatus, BadgeVariant> = {

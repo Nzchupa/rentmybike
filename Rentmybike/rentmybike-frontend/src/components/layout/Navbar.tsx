@@ -123,13 +123,24 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile hamburger */}
-          <button
-            className="md:hidden p-2 text-slate-600 hover:text-slate-900"
-            onClick={() => setMobileOpen(!mobileOpen)}
-          >
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+          {/* Mobile-only icons + hamburger. The notification bell previously
+              only rendered inside the "hidden md:flex" auth block, so
+              authenticated users on mobile had no way to see notifications
+              from the public navbar at all. */}
+          {/* Mobile-Icons + Hamburger. Die Benachrichtigungsglocke wurde
+              bisher nur im "hidden md:flex"-Block gerendert — angemeldete
+              Nutzer hatten auf Mobilgeräten daher gar keinen Zugriff auf
+              Benachrichtigungen über die Navbar. */}
+          <div className="flex md:hidden items-center gap-1">
+            {authenticated && <NotificationBell />}
+            <button
+              className="p-2 text-slate-600 hover:text-slate-900"
+              aria-label={mobileOpen ? t("closeMenu") : t("openMenu")}
+              onClick={() => setMobileOpen(!mobileOpen)}
+            >
+              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -146,6 +157,27 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
+          {authenticated && user && (
+            <Link
+              href={localePath("/dashboard/profile")}
+              className="flex items-center gap-3 py-2"
+              onClick={() => setMobileOpen(false)}
+            >
+              <Avatar name={user.fullName} avatarUrl={user.avatarUrl} size="sm" />
+              <span className="text-sm font-medium text-slate-700">{user.fullName}</span>
+            </Link>
+          )}
+
+          <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+            <Link
+              href={localeSwitchHref}
+              className="text-xs font-medium text-slate-500 hover:text-slate-900 border border-slate-200 rounded-lg px-2 py-1"
+              onClick={() => setMobileOpen(false)}
+            >
+              {locale === "en" ? "DE" : "EN"}
+            </Link>
+          </div>
+
           <div className="pt-2 flex flex-col gap-2">
             {authenticated ? (
               <Button variant="outline" size="sm" onClick={logout} className="w-full">

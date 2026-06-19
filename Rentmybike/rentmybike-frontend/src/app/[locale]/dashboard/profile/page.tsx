@@ -16,7 +16,8 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Avatar } from "@/components/ui/Avatar";
 import { VerificationBadge } from "@/components/ui/VerificationBadge";
-import { cn, formatDate } from "@/lib/utils";
+import { BusinessVerificationCard } from "@/components/dashboard/BusinessVerificationCard";
+import { formatDate } from "@/lib/utils";
 import type { UpdateProfileRequest, ChangePasswordRequest, UpgradeToBusinessRequest } from "@/types";
 
 function makeBusinessSchema(t: (key: string) => string) {
@@ -279,26 +280,14 @@ export default function ProfilePage() {
         <h2 className="font-semibold text-slate-900">{t("business.title")}</h2>
 
         {user.role === "BUSINESS" ? (
-          <div className="space-y-4">
-            <span
-              className={cn(
-                "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium",
-                user.businessVerified
-                  ? "bg-emerald-50 text-emerald-700"
-                  : "bg-amber-50 text-amber-700"
-              )}
-            >
-              {user.businessVerified
-                ? t("business.currentBadgeVerified")
-                : t("business.currentBadgePending")}
-            </span>
-            {!user.businessVerified && (
-              <p className="text-sm text-slate-500">{t("business.pendingNotice")}</p>
-            )}
-            <Link href={`/${locale}/dashboard/business`}>
-              <Button type="button">{t("business.goToDashboard")}</Button>
-            </Link>
-          </div>
+          <BusinessVerificationCard
+            verified={user.businessVerified}
+            locale={locale}
+            verifiedLabel={t("business.currentBadgeVerified")}
+            pendingLabel={t("business.currentBadgePending")}
+            pendingNotice={t("business.pendingNotice")}
+            goToDashboardLabel={t("business.goToDashboard")}
+          />
         ) : (
           <div className="space-y-4">
             <p className="text-sm text-slate-500">{t("business.pitch")}</p>

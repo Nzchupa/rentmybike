@@ -28,13 +28,17 @@
     "login": "Anmelden",
     "register": "Registrieren",
     "logout": "Abmelden",
-    "myProfile": "Mein Profil"
+    "myProfile": "Mein Profil",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen"
   },
   "footer": {
     "tagline": "Peer-to-Peer-Marktplatz für Fahrradverleih.",
     "quickLinks": "Schnellzugriff",
     "home": "Startseite",
     "bikes": "Fahrräder durchsuchen",
+    "howItWorks": "So funktioniert's",
+    "faq": "FAQ",
     "company": "Unternehmen",
     "about": "Über uns",
     "contact": "Kontakt",
@@ -79,6 +83,58 @@
       "section3Body": "Eine Buchungsanfrage ist erst bestätigt, wenn der Eigentümer sie annimmt. Beide Seiten können den In-App-Chat nutzen, um Abholung, Rückgabe und etwaige Probleme zu klären.",
       "section4Title": "Änderungen",
       "section4Body": "Diese Bedingungen können sich im Laufe des Projekts ändern."
+    },
+    "howItWorks": {
+      "title": "So funktioniert RentMyBike",
+      "subtitle": "Ein Peer-to-Peer-Marktplatz, der Fahrradbesitzer mit Mietinteressenten verbindet — hier ist der vollständige Ablauf für beide Seiten.",
+      "forRentersTitle": "Ein Fahrrad mieten",
+      "forRentersSubtitle": "Drei Schritte von der Suche bis zur Fahrt.",
+      "renterStep1Title": "Fahrrad finden",
+      "renterStep1Desc": "Suche nach Stadt und Datum, um verfügbare Räder in deiner Nähe zu sehen, mit echten Fotos und vom Eigentümer festgelegten Preisen.",
+      "renterStep2Title": "Anfrage senden",
+      "renterStep2Desc": "Wähle deine Daten, füge optional eine Nachricht hinzu und sende eine Buchungsanfrage an den Eigentümer.",
+      "renterStep3Title": "Treffen und losfahren",
+      "renterStep3Desc": "Sobald der Eigentümer zustimmt, koordiniere die Abholung im In-App-Chat, hol dir das Fahrrad und los geht's.",
+      "forRentersCta": "Fahrräder durchsuchen",
+      "forOwnersTitle": "Dein Fahrrad anbieten",
+      "forOwnersSubtitle": "Verdiene mit einem Fahrrad, das du nicht jeden Tag nutzt.",
+      "ownerStep1Title": "Fahrrad einstellen",
+      "ownerStep1Desc": "Füge Fotos, eine Beschreibung und deinen Tagespreis hinzu. Neue Anzeigen werden vor der Veröffentlichung kurz geprüft.",
+      "ownerStep2Title": "Anfragen annehmen",
+      "ownerStep2Desc": "Mieter senden Buchungsanfragen für ihre gewünschten Daten — du entscheidest, welche du annimmst.",
+      "ownerStep3Title": "Bezahlt werden und bewertet werden",
+      "ownerStep3Desc": "Nach der Vermietung bewerten sich Mieter und Eigentümer gegenseitig — das schafft Vertrauen für zukünftige Buchungen.",
+      "forOwnersCta": "Fahrrad einstellen",
+      "safetyTitle": "Integriertes Vertrauen und Sicherheit",
+      "safetySubtitle": "Jede Buchung wird durch Funktionen unterstützt, die beide Seiten schützen sollen.",
+      "safetyPhotosTitle": "Fotos vorher & nachher",
+      "safetyPhotosDesc": "Eigentümer und Mieter können den Zustand des Fahrrads bei Übergabe und Rückgabe dokumentieren.",
+      "safetyReviewsTitle": "Echte Bewertungen",
+      "safetyReviewsDesc": "Mieter und Eigentümer bewerten sich nach jeder abgeschlossenen Buchung gegenseitig — sichtbar im Profil.",
+      "safetyChatTitle": "Direkte Kommunikation",
+      "safetyChatDesc": "Koordiniere Abholdetails und stelle Fragen über den In-App-Chat — keine Telefonnummer nötig.",
+      "faqPrompt": "Noch Fragen?",
+      "faqCta": "FAQ lesen"
+    },
+    "faq": {
+      "title": "Häufig gestellte Fragen",
+      "subtitle": "Häufige Fragen von Mietern und Fahrradbesitzern.",
+      "bookingQ": "Wie funktioniert die Buchung eines Fahrrads?",
+      "bookingA": "Suche nach Stadt und Datum und sende dann eine Buchungsanfrage mit deinen gewünschten Daten an den Eigentümer. Die Buchung ist erst bestätigt, wenn der Eigentümer sie annimmt — du siehst den Status und kannst in der Zwischenzeit mit dem Eigentümer chatten.",
+      "paymentQ": "Wie und wann bezahle ich?",
+      "paymentA": "RentMyBike ist als Studierendenprojekt ein Peer-to-Peer-Marktplatz — die Bezahlung wird derzeit direkt zwischen Mieter und Eigentümer außerhalb der App vereinbart, sobald eine Buchung angenommen wurde.",
+      "damageQ": "Was passiert, wenn das Fahrrad während der Mietzeit beschädigt wird?",
+      "damageA": "Eigentümer und Mieter können für jede Buchung Vorher-/Nachher-Fotos hochladen, um den Zustand des Fahrrads bei Übergabe und Rückgabe zu dokumentieren — das hilft, Unstimmigkeiten über Schäden zu klären.",
+      "cancelQ": "Kann ich eine Buchung stornieren?",
+      "cancelA": "Ja — stornierbare Buchungen zeigen auf deiner Buchungsseite eine Schaltfläche zum Stornieren. Nach der Stornierung sind die Daten wieder für andere Mieter verfügbar.",
+      "verificationQ": "Was bedeutet \"E-Mail verifiziert\"?",
+      "verificationA": "Es bedeutet, dass der Kontoinhaber seine E-Mail-Adresse über den bei der Registrierung gesendeten Link bestätigt hat. Wir arbeiten daran, in zukünftigen Updates weitere Verifizierungen (wie Telefon und Identität) hinzuzufügen.",
+      "accessoriesQ": "Kann ich Zubehör wie einen Helm oder Kindersitz mieten?",
+      "accessoriesA": "Geschäftskonten können Zubehör — Helme, Kindersitze und Schlösser — zusätzlich zu ihren Fahrrädern anbieten. Die Verfügbarkeit hängt davon ab, was der jeweilige Eigentümer eingestellt hat.",
+      "businessQ": "Ich betreibe ein Fahrradvermietungsgeschäft — was ist für mich anders?",
+      "businessA": "Ein Upgrade auf ein Geschäftskonto gibt dir ein eigenes Dashboard mit Massen-Einstellung von Fahrrädern, einem Vermietungskalender für alle deine Fahrräder, Zubehörverwaltung und Buchungsstatistiken.",
+      "supportQ": "Ich habe eine andere Frage — wen kontaktiere ich?",
+      "supportA": "Wende dich über die Kontaktseite an uns — dieses Projekt wird derzeit von einem einzelnen Entwickler betreut, Fragen werden per E-Mail beantwortet."
     }
   },
   "home": {
@@ -281,6 +337,10 @@
       "CANCELLED": "Storniert",
       "COMPLETED": "Abgeschlossen"
     },
+    "priceBreakdown": {
+      "bikeRental": "Fahrradmiete ({days, plural, one {# Tag} other {# Tage}})",
+      "total": "Gesamt"
+    },
     "errors": {
       "dateConflict": "Diese Termine sind bereits gebucht",
       "selfBooking": "Sie können Ihr eigenes Fahrrad nicht buchen",
@@ -330,7 +390,9 @@
       "favorites": "Favoriten",
       "notifications": "Benachrichtigungen",
       "profile": "Profil",
-      "business": "Business"
+      "business": "Business",
+      "more": "Mehr",
+      "closeMore": "Menü schließen"
     },
     "favorites": {
       "title": "Meine Favoriten",
