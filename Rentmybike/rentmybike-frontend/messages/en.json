@@ -454,6 +454,16 @@
       "hints": {
         "pending": "Your bike will be reviewed by our team before going live (usually within 24h).",
         "resetToApproval": "Editing content will send the bike back for review."
+      },
+      "photos": "Photos",
+      "photosHint": "Optional — you can also add photos later from the bike's page.",
+      "dropzone": {
+        "cta": "Drag photos here or click to browse",
+        "browse": "Browse files",
+        "remove": "Remove photo",
+        "tooMany": "You can add up to {max} photos.",
+        "invalidType": "Only JPEG, PNG, or WebP images are allowed.",
+        "tooLarge": "File must be smaller than {max}MB."
       }
     },
     "profile": {

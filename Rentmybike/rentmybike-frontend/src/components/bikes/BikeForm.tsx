@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,6 +8,7 @@ import { z } from "zod";
 import { Info } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { PhotoDropzone } from "@/components/bikes/PhotoDropzone";
 import type { BikeResponse, BikeCategory } from "@/types";
 
 const CATEGORIES: BikeCategory[] = [
@@ -37,7 +39,14 @@ export type BikeFormValues = z.infer<ReturnType<typeof makeBikeSchema>>;
 interface BikeFormProps {
   defaultValues?: Partial<BikeFormValues>;
   existingBike?: BikeResponse;
-  onSubmit: (values: BikeFormValues) => Promise<void>;
+  // `photos` is only populated when creating a new bike (see PhotoDropzone
+  // below) — editing reuses the existing dedicated photo management page,
+  // so the second argument is simply unused there.
+  // `photos` wird nur beim Erstellen eines neuen Fahrrads befüllt (siehe
+  // PhotoDropzone unten) — die Bearbeitung nutzt weiterhin die bestehende,
+  // dedizierte Fotoverwaltungsseite, daher bleibt das zweite Argument dort
+  // ungenutzt.
+  onSubmit: (values: BikeFormValues, photos: File[]) => Promise<void>;
   isEditing?: boolean;
 }
 
@@ -49,6 +58,7 @@ export function BikeForm({ defaultValues, existingBike, onSubmit, isEditing }: B
   const t = useTranslations("dashboard.bikeForm");
   const tc = useTranslations("bikes.categories");
   const bikeSchema = makeBikeSchema(t);
+  const [photos, setPhotos] = useState<File[]>([]);
 
   const {
     register,
@@ -63,7 +73,10 @@ export function BikeForm({ defaultValues, existingBike, onSubmit, isEditing }: B
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+    <form
+      onSubmit={handleSubmit((values) => onSubmit(values, photos))}
+      className="space-y-5"
+    >
       <Input
         label={t("title")}
         placeholder={t("titlePlaceholder")}
@@ -140,6 +153,14 @@ export function BikeForm({ defaultValues, existingBike, onSubmit, isEditing }: B
           <label htmlFor="available" className="text-sm font-medium text-slate-700">
             {t("available")}
           </label>
+        </div>
+      )}
+
+      {!isEditing && (
+        <div>
+          <label className="label">{t("photos")}</label>
+          <PhotoDropzone files={photos} onChange={setPhotos} disabled={isSubmitting} />
+          <p className="mt-1.5 text-xs text-slate-500">{t("photosHint")}</p>
         </div>
       )}
 

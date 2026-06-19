@@ -19,27 +19,51 @@ export default function NewBikePage() {
 
   const { mutateAsync: createBike } = useMutation({
     mutationFn: bikesApi.create,
-    onSuccess: (res) => {
-      queryClient.invalidateQueries({ queryKey: ["my-bikes"] });
-      toast.success(t("bikeListed"));
-      // Send the owner straight to the photo-upload page instead of the
-      // plain list — a bike with zero photos is much less likely to get
-      // booked, and without this most owners wouldn't realize photos are
-      // a separate step.
-      // Eigentümer direkt zur Foto-Upload-Seite schicken statt zur reinen
-      // Liste — ein Fahrrad ohne Fotos wird viel seltener gebucht, und ohne
-      // dies würden die meisten Eigentümer nicht merken, dass Fotos ein
-      // separater Schritt sind.
-      router.push(`/${locale}/dashboard/bikes/${res.data.data.id}/photos`);
-    },
     onError: (e: Error) => toast.error(e.message),
   });
 
-  async function onSubmit(values: BikeFormValues) {
-    await createBike({
+  // Photos picked in the form's PhotoDropzone can't be uploaded until the
+  // bike exists (the upload endpoint needs a bike ID), so they're held
+  // client-side and sent here, right after creation succeeds, one request
+  // per file. A failure on one photo doesn't block the others or the
+  // overall flow — the owner still lands on the photos page afterwards and
+  // can retry anything that didn't make it.
+  //
+  // In der PhotoDropzone des Formulars ausgewählte Fotos können erst
+  // hochgeladen werden, wenn das Fahrrad existiert (der Upload-Endpunkt
+  // benötigt eine Fahrrad-ID), daher werden sie clientseitig gehalten und
+  // hier, direkt nach erfolgreicher Erstellung, mit je einer Anfrage pro
+  // Datei gesendet. Ein Fehlschlag bei einem Foto blockiert weder die
+  // anderen noch den Gesamtablauf — der Eigentümer landet danach trotzdem
+  // auf der Fotoseite und kann alles wiederholen, was nicht angekommen ist.
+  async function onSubmit(values: BikeFormValues, photos: File[]) {
+    const res = await createBike({
       ...values,
       address: values.address ?? undefined,
     });
+    const bikeId = res.data.data.id;
+    queryClient.invalidateQueries({ queryKey: ["my-bikes"] });
+
+    for (const file of photos) {
+      try {
+        await bikesApi.uploadPhoto(bikeId, file);
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Photo upload failed");
+      }
+    }
+    if (photos.length > 0) {
+      queryClient.invalidateQueries({ queryKey: ["bike", bikeId] });
+    }
+
+    toast.success(t("bikeListed"));
+    // Send the owner to the photo-upload page rather than the plain list —
+    // even with photos already attached, this is where they can review,
+    // reorder, or fix anything that failed above.
+    // Eigentümer zur Foto-Upload-Seite schicken statt zur reinen Liste —
+    // selbst mit bereits angehängten Fotos ist dies die Stelle, an der sie
+    // alles überprüfen, neu anordnen oder oben Fehlgeschlagenes
+    // korrigieren können.
+    router.push(`/${locale}/dashboard/bikes/${bikeId}/photos`);
   }
 
   return (

@@ -454,6 +454,16 @@
       "hints": {
         "pending": "Ihr Fahrrad wird von unserem Team geprüft, bevor es live geht (normalerweise innerhalb von 24 Stunden).",
         "resetToApproval": "Inhaltsänderungen senden das Fahrrad erneut zur Prüfung."
+      },
+      "photos": "Fotos",
+      "photosHint": "Optional — Sie können Fotos auch später über die Fahrradseite hinzufügen.",
+      "dropzone": {
+        "cta": "Fotos hierher ziehen oder klicken, um Dateien auszuwählen",
+        "browse": "Dateien auswählen",
+        "remove": "Foto entfernen",
+        "tooMany": "Sie können bis zu {max} Fotos hinzufügen.",
+        "invalidType": "Nur JPEG-, PNG- oder WebP-Bilder sind erlaubt.",
+        "tooLarge": "Datei muss kleiner als {max}MB sein."
       }
     },
     "profile": {
