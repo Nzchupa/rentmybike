@@ -2,6 +2,8 @@ package com.rentmybike.booking.repository;
 
 import com.rentmybike.booking.entity.Booking;
 import com.rentmybike.booking.entity.BookingStatus;
+import com.rentmybike.common.projection.DailyAmountProjection;
+import com.rentmybike.common.projection.DailyCountProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -271,6 +273,35 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
     List<Booking> findByBikeIdOrderByStartDateDesc(@Param("bikeId") UUID bikeId);
 
     /**
+     * Non-deleted booking count for a specific bike, optionally filtered by
+     * status — building block for the per-bike stats panel (owner/admin).
+     * Anzahl nicht gelöschter Buchungen für ein bestimmtes Fahrrad, optional
+     * nach Status gefiltert — Baustein für das Pro-Fahrrad-Statistikpanel
+     * (Eigentümer/Admin).
+     */
+    long countByBikeIdAndDeletedAtIsNull(UUID bikeId);
+
+    /** Same as above, filtered to a specific status / Wie oben, gefiltert nach einem bestimmten Status */
+    long countByBikeIdAndStatusAndDeletedAtIsNull(UUID bikeId, BookingStatus status);
+
+    /**
+     * Gross revenue (sum of totalPrice) from COMPLETED bookings for a
+     * specific bike — the per-bike counterpart to {@link
+     * #sumTotalPriceOfCompleted}.
+     * Bruttoumsatz (Summe von totalPrice) aus COMPLETED-Buchungen für ein
+     * bestimmtes Fahrrad — das Pro-Fahrrad-Gegenstück zu {@link
+     * #sumTotalPriceOfCompleted}.
+     */
+    @Query("""
+            SELECT COALESCE(SUM(b.totalPrice), 0)
+            FROM Booking b
+            WHERE b.bike.id = :bikeId
+              AND b.status = com.rentmybike.booking.entity.BookingStatus.COMPLETED
+              AND b.deletedAt IS NULL
+            """)
+    BigDecimal sumTotalPriceOfCompletedByBikeId(@Param("bikeId") UUID bikeId);
+
+    /**
      * Active (PENDING/ACCEPTED) bookings for a bike, used to expose occupied
      * date ranges on the public bike detail page so renters can see — and the
      * client-side calendar can disable — dates that are already taken.
@@ -310,6 +341,16 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
     long countByStatusAndDeletedAtIsNull(BookingStatus status);
 
     /**
+     * Count of non-deleted bookings made by a user as renter — used by
+     * AdminService to populate the per-user "bookingCount" figure in the
+     * admin user list.
+     * Anzahl nicht gelöschter Buchungen eines Benutzers als Mieter — wird von
+     * AdminService verwendet, um die Kennzahl "bookingCount" pro Benutzer in
+     * der Admin-Benutzerliste zu befüllen.
+     */
+    long countByRenterIdAndDeletedAtIsNull(@Param("renterId") UUID renterId);
+
+    /**
      * Gross transaction volume — sum of totalPrice for all COMPLETED bookings.
      * Brutto-Transaktionsvolumen — Summe von totalPrice aller COMPLETED-Buchungen.
      *
@@ -323,6 +364,55 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
               AND b.deletedAt IS NULL
             """)
     BigDecimal sumTotalPriceOfCompleted();
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Admin analytics time-series / Admin-Analyse-Zeitreihe
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Daily new-booking counts since {@code from}, one row per day that had
+     * at least one new booking (any status — this tracks demand/activity,
+     * not just successful rentals). Native query, mirrors {@code
+     * UserRepository.countDailySignupsSince}.
+     * Tägliche Anzahl neuer Buchungen seit {@code from}, eine Zeile pro Tag
+     * mit mindestens einer neuen Buchung (jeder Status — dies erfasst
+     * Nachfrage/Aktivität, nicht nur erfolgreiche Vermietungen). Native
+     * Abfrage, entspricht {@code UserRepository.countDailySignupsSince}.
+     */
+    @Query(value = """
+            SELECT DATE_TRUNC('day', created_at)::date AS day, COUNT(*) AS count
+            FROM bookings
+            WHERE created_at >= :from
+              AND deleted_at IS NULL
+            GROUP BY day
+            ORDER BY day
+            """, nativeQuery = true)
+    List<DailyCountProjection> countDailyBookingsSince(@Param("from") LocalDateTime from);
+
+    /**
+     * Daily revenue (sum of totalPrice for COMPLETED bookings) since {@code
+     * from}, one row per day that had at least one completed booking.
+     * Revenue is attributed to the day the booking was created, not
+     * completed — completion date isn't tracked separately, and creation
+     * date is what the rest of the admin dashboard's time-series already
+     * buckets by.
+     * Täglicher Umsatz (Summe von totalPrice für COMPLETED-Buchungen) seit
+     * {@code from}, eine Zeile pro Tag mit mindestens einer abgeschlossenen
+     * Buchung. Der Umsatz wird dem Erstellungstag der Buchung zugeordnet,
+     * nicht dem Abschlussdatum — ein separates Abschlussdatum wird nicht
+     * erfasst, und das Erstellungsdatum ist das, wonach die restliche
+     * Zeitreihe des Admin-Dashboards bereits gruppiert.
+     */
+    @Query(value = """
+            SELECT DATE_TRUNC('day', created_at)::date AS day, SUM(total_price) AS amount
+            FROM bookings
+            WHERE created_at >= :from
+              AND deleted_at IS NULL
+              AND status = 'COMPLETED'
+            GROUP BY day
+            ORDER BY day
+            """, nativeQuery = true)
+    List<DailyAmountProjection> sumDailyRevenueSince(@Param("from") LocalDateTime from);
 
     // ──────────────────────────────────────────────────────────────────────────
     // Business dashboard (Stage 3 "Business accounts") / Business-Dashboard
@@ -354,6 +444,62 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
     BigDecimal sumTotalPriceOfCompletedByOwnerId(@Param("ownerId") UUID ownerId);
 
     /**
+     * Daily booking counts for one business's bikes since {@code from} —
+     * the owner-scoped counterpart to {@link #countDailyBookingsSince}, used
+     * by the business analytics chart instead of the admin one.
+     * Tägliche Buchungszählungen für die Fahrräder eines Unternehmens seit
+     * {@code from} — das eigentümerbezogene Gegenstück zu {@link
+     * #countDailyBookingsSince}, von der Business-Analytics-Grafik anstelle
+     * der Admin-Grafik verwendet.
+     */
+    @Query(value = """
+            SELECT DATE_TRUNC('day', created_at)::date AS day, COUNT(*) AS count
+            FROM bookings
+            WHERE owner_id = :ownerId
+              AND created_at >= :from
+              AND deleted_at IS NULL
+            GROUP BY day
+            ORDER BY day
+            """, nativeQuery = true)
+    List<DailyCountProjection> countDailyBookingsByOwnerSince(@Param("ownerId") UUID ownerId, @Param("from") LocalDateTime from);
+
+    /**
+     * Daily COMPLETED-booking revenue for one business's bikes since
+     * {@code from} — owner-scoped counterpart to {@link #sumDailyRevenueSince}.
+     * Tägliche COMPLETED-Buchungsumsätze für die Fahrräder eines Unternehmens
+     * seit {@code from} — eigentümerbezogenes Gegenstück zu {@link #sumDailyRevenueSince}.
+     */
+    @Query(value = """
+            SELECT DATE_TRUNC('day', created_at)::date AS day, SUM(total_price) AS amount
+            FROM bookings
+            WHERE owner_id = :ownerId
+              AND created_at >= :from
+              AND deleted_at IS NULL
+              AND status = 'COMPLETED'
+            GROUP BY day
+            ORDER BY day
+            """, nativeQuery = true)
+    List<DailyAmountProjection> sumDailyRevenueByOwnerSince(@Param("ownerId") UUID ownerId, @Param("from") LocalDateTime from);
+
+    /**
+     * Average rental length (in days, inclusive of both endpoints) across a
+     * business's COMPLETED bookings — backs the "avg. booking duration"
+     * analytics metric. 0.0 when there are no completed bookings yet.
+     * Durchschnittliche Mietdauer (in Tagen, beide Endpunkte inklusive) über
+     * die COMPLETED-Buchungen eines Unternehmens — Grundlage für die
+     * Analytics-Kennzahl "durchschnittliche Buchungsdauer". 0.0, wenn noch
+     * keine abgeschlossenen Buchungen existieren.
+     */
+    @Query(value = """
+            SELECT COALESCE(AVG((end_date - start_date) + 1), 0)
+            FROM bookings
+            WHERE owner_id = :ownerId
+              AND deleted_at IS NULL
+              AND status = 'COMPLETED'
+            """, nativeQuery = true)
+    double avgCompletedRentalDaysByOwnerId(@Param("ownerId") UUID ownerId);
+
+    /**
      * Bookings for a business's bikes whose date range overlaps [from, to] —
      * used to render the business rental calendar.
      * Buchungen für die Fahrräder eines Unternehmens, deren Datumsbereich sich
@@ -382,5 +528,37 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             @Param("ownerId") UUID ownerId,
             @Param("from")    LocalDate from,
             @Param("to")      LocalDate to
+    );
+
+    /**
+     * Upcoming ACCEPTED bookings for an owner's bikes, soonest start date
+     * first — backs the business overview's "upcoming bookings" panel. Pass
+     * a {@link Pageable} (e.g. {@code PageRequest.of(0, 5)}, unsorted) to
+     * cap the result size; this query already has its own explicit
+     * {@code ORDER BY}, so the Pageable must not carry a Sort — see the
+     * Pageable/Sort pitfall documented on {@link #findByOwnerIdAndStatus}
+     * above.
+     * Anstehende ACCEPTED-Buchungen für die Fahrräder eines Eigentümers,
+     * frühestes Startdatum zuerst — Grundlage für das
+     * "anstehende Buchungen"-Panel der Business-Übersicht. Ein
+     * {@link Pageable} übergeben (z. B. {@code PageRequest.of(0, 5)},
+     * unsortiert), um die Ergebnisgröße zu begrenzen; diese Abfrage hat
+     * bereits ein eigenes explizites {@code ORDER BY}, daher darf das
+     * Pageable keinen Sort tragen.
+     */
+    @Query("""
+            SELECT b FROM Booking b
+            JOIN FETCH b.bike bike
+            JOIN FETCH b.renter
+            WHERE b.owner.id = :ownerId
+              AND b.deletedAt IS NULL
+              AND b.status = com.rentmybike.booking.entity.BookingStatus.ACCEPTED
+              AND b.startDate >= :from
+            ORDER BY b.startDate ASC
+            """)
+    List<Booking> findUpcomingByOwnerId(
+            @Param("ownerId") UUID ownerId,
+            @Param("from")    LocalDate from,
+            Pageable pageable
     );
 }

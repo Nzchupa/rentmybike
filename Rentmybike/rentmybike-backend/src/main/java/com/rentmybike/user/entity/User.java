@@ -129,6 +129,18 @@ public class User extends BaseEntity implements UserDetails {
     private LocalDateTime bannedAt;
 
     /**
+     * Timestamp when the user was suspended by an admin (null = not suspended).
+     * Distinct from {@code bannedAt} — suspension is intended as a lighter,
+     * typically temporary restriction, but it enforces the same login block.
+     * Zeitpunkt, wann der Benutzer von einem Admin suspendiert wurde (null =
+     * nicht suspendiert). Unterscheidet sich von {@code bannedAt} — Suspendierung
+     * ist als leichtere, typischerweise temporäre Einschränkung gedacht, erzwingt
+     * aber dieselbe Anmeldesperre.
+     */
+    @Column
+    private LocalDateTime suspendedAt;
+
+    /**
      * Incremented on logout (and should be on password change) to invalidate
      * every access/refresh token issued before that point — tokens embed the
      * version they were issued with, and a mismatch is treated as revoked.
@@ -188,6 +200,14 @@ public class User extends BaseEntity implements UserDetails {
         return bannedAt != null;
     }
 
+    /**
+     * Checks whether the user is currently suspended.
+     * Prüft, ob der Benutzer aktuell suspendiert ist.
+     */
+    public boolean isSuspended() {
+        return suspendedAt != null;
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // UserDetails implementation (Spring Security)
     // UserDetails-Implementierung (Spring Security)
@@ -219,12 +239,15 @@ public class User extends BaseEntity implements UserDetails {
     }
 
     /**
-     * Account is locked if the user is banned.
-     * Konto ist gesperrt, wenn der Benutzer gebannt wurde.
+     * Account is locked if the user is banned or suspended — both block login
+     * the same way via this single Spring Security enforcement point.
+     * Konto ist gesperrt, wenn der Benutzer gebannt oder suspendiert wurde —
+     * beide blockieren die Anmeldung auf die gleiche Weise über diesen
+     * einzigen Spring-Security-Durchsetzungspunkt.
      */
     @Override
     public boolean isAccountNonLocked() {
-        return !isBanned();
+        return !isBanned() && !isSuspended();
     }
 
     /**

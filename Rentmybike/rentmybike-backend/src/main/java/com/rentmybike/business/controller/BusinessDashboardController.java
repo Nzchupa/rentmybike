@@ -2,7 +2,9 @@ package com.rentmybike.business.controller;
 
 import com.rentmybike.booking.dto.BookingResponse;
 import com.rentmybike.booking.service.BookingService;
+import com.rentmybike.business.dto.BusinessAnalyticsResponse;
 import com.rentmybike.business.dto.BusinessDashboardSummaryResponse;
+import com.rentmybike.business.dto.BusinessOverviewExtrasResponse;
 import com.rentmybike.business.service.BusinessDashboardService;
 import com.rentmybike.common.response.ApiResponse;
 import com.rentmybike.user.entity.User;
@@ -52,6 +54,47 @@ public class BusinessDashboardController {
         BusinessDashboardSummaryResponse summary =
                 businessDashboardService.getDashboardSummary(currentUser.getId());
         return ResponseEntity.ok(ApiResponse.success(summary));
+    }
+
+    /**
+     * Richer analytics — daily booking/revenue chart, popular bikes, average
+     * rental duration, and views-to-bookings conversion rate.
+     * Umfangreichere Analytik — tägliches Buchungs-/Umsatzdiagramm, beliebte
+     * Fahrräder, durchschnittliche Mietdauer und Konversionsrate von
+     * Aufrufen zu Buchungen.
+     *
+     * <p>GET /api/v1/business/dashboard/analytics?days=30
+     *
+     * @param days trailing window in days, clamped to [1, 365], defaults to 30 / zurückliegendes Fenster in Tagen, begrenzt auf [1, 365], Standard 30
+     */
+    @GetMapping("/dashboard/analytics")
+    public ResponseEntity<ApiResponse<BusinessAnalyticsResponse>> getAnalytics(
+            @AuthenticationPrincipal User currentUser,
+            @RequestParam(defaultValue = "30") int days) {
+
+        int clamped = Math.max(1, Math.min(days, 365));
+        BusinessAnalyticsResponse analytics =
+                businessDashboardService.getAnalytics(currentUser.getId(), clamped);
+        return ResponseEntity.ok(ApiResponse.success(analytics));
+    }
+
+    /**
+     * Supplementary "at a glance" lists for the overview page: bookings
+     * awaiting accept/reject, the soonest upcoming confirmed bookings, and
+     * the most recently received reviews.
+     * Ergänzende "auf einen Blick"-Listen für die Übersichtsseite: Buchungen,
+     * die auf Annahme/Ablehnung warten, die nächsten anstehenden
+     * bestätigten Buchungen und die zuletzt erhaltenen Bewertungen.
+     *
+     * <p>GET /api/v1/business/dashboard/overview-extras
+     */
+    @GetMapping("/dashboard/overview-extras")
+    public ResponseEntity<ApiResponse<BusinessOverviewExtrasResponse>> getOverviewExtras(
+            @AuthenticationPrincipal User currentUser) {
+
+        BusinessOverviewExtrasResponse extras =
+                businessDashboardService.getOverviewExtras(currentUser.getId());
+        return ResponseEntity.ok(ApiResponse.success(extras));
     }
 
     /**

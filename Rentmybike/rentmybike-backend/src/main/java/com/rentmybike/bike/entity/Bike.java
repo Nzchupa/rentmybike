@@ -125,6 +125,16 @@ public class Bike extends BaseEntity {
     @Column(name = "rejection_reason", columnDefinition = "TEXT")
     private String rejectionReason;
 
+    /**
+     * Number of times this bike's public detail page has been viewed.
+     * Not deduplicated per visitor — see V17 migration comment for why.
+     * Anzahl der Aufrufe der öffentlichen Detailseite dieses Fahrrads. Nicht
+     * pro Besucher dedupliziert — siehe Kommentar in der V17-Migration.
+     */
+    @Column(name = "view_count", nullable = false)
+    @Builder.Default
+    private long viewCount = 0;
+
     // ──────────────────────────────────────────────────────────────────────────
     // Photos / Fotos
     // ──────────────────────────────────────────────────────────────────────────

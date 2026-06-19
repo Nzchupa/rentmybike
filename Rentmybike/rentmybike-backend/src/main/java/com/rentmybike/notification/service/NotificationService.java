@@ -1,6 +1,7 @@
 package com.rentmybike.notification.service;
 
 import com.rentmybike.auth.service.EmailService;
+import com.rentmybike.bike.entity.Bike;
 import com.rentmybike.booking.entity.Booking;
 import com.rentmybike.common.exception.AccessDeniedException;
 import com.rentmybike.common.exception.ResourceNotFoundException;
@@ -9,7 +10,10 @@ import com.rentmybike.notification.dto.NotificationResponse;
 import com.rentmybike.notification.entity.Notification;
 import com.rentmybike.notification.entity.NotificationType;
 import com.rentmybike.notification.repository.NotificationRepository;
+import com.rentmybike.report.entity.Report;
 import com.rentmybike.user.entity.User;
+import com.rentmybike.user.entity.UserRole;
+import com.rentmybike.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -52,6 +57,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final EmailService emailService;
+    private final UserRepository userRepository;
 
     // ──────────────────────────────────────────────────────────────────────────
     // Create (triggered by BookingService) / Erstellen (ausgelöst von BookingService)
@@ -154,6 +160,77 @@ public class NotificationService {
                 .message(message)
                 .build();
         notificationRepository.save(notification);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Admin notification center / Admin-Benachrichtigungszentrum
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Fans out an in-app notification to every admin when a new bike listing
+     * is created and needs approval. In-app only — admins already poll the
+     * moderation queue, and an email per submission would be noisy; this
+     * powers the admin notification center / bell badge instead.
+     * Verteilt eine In-App-Benachrichtigung an jeden Admin, wenn ein neues
+     * Fahrrad-Inserat erstellt wurde und auf Genehmigung wartet. Nur In-App —
+     * Admins fragen die Moderationswarteschlange bereits ab, und eine E-Mail
+     * pro Einreichung wäre störend; dies versorgt stattdessen das
+     * Admin-Benachrichtigungszentrum / Glocken-Badge.
+     *
+     * @param bike the newly-created, PENDING bike / das neu erstellte, PENDING-Fahrrad
+     */
+    public void notifyAdminsOfNewPendingBike(Bike bike) {
+        String title = "New bike pending approval / Neues Fahrrad wartet auf Genehmigung";
+        String message = "\"" + bike.getTitle() + "\" by " + bike.getOwner().getFullName()
+                + " is awaiting review / \"" + bike.getTitle() + "\" von " + bike.getOwner().getFullName()
+                + " wartet auf Prüfung.";
+
+        fanOutToAdmins(NotificationType.ADMIN_NEW_PENDING_BIKE, title, message);
+    }
+
+    /**
+     * Fans out an in-app notification to every admin when a new report is
+     * filed against a bike, user, or review, so it surfaces in the admin
+     * notification center alongside the moderation queue.
+     * Verteilt eine In-App-Benachrichtigung an jeden Admin, wenn eine neue
+     * Meldung gegen ein Fahrrad, einen Benutzer oder eine Bewertung
+     * eingereicht wird, damit sie im Admin-Benachrichtigungszentrum neben der
+     * Moderationswarteschlange erscheint.
+     *
+     * @param report the newly-filed report / die neu eingereichte Meldung
+     */
+    public void notifyAdminsOfNewReport(Report report) {
+        String title = "New report filed / Neue Meldung eingereicht";
+        String message = report.getReporterName() + " reported a " + report.getTargetType().name().toLowerCase()
+                + " for " + report.getReason().name().toLowerCase().replace('_', ' ')
+                + " / " + report.getReporterName() + " hat ein(e) " + report.getTargetType().name().toLowerCase()
+                + " wegen " + report.getReason().name().toLowerCase().replace('_', ' ') + " gemeldet.";
+
+        fanOutToAdmins(NotificationType.ADMIN_NEW_REPORT, title, message);
+    }
+
+    /**
+     * Writes one {@link Notification} row per active admin. Deliberately
+     * not booking-linked (admin notifications aren't tied to a single
+     * booking) — context lives in the title/message text instead.
+     * Schreibt eine {@link Notification}-Zeile pro aktivem Admin. Bewusst
+     * nicht mit einer Buchung verknüpft (Admin-Benachrichtigungen sind nicht
+     * an eine einzelne Buchung gebunden) — der Kontext steckt stattdessen im
+     * Titel-/Nachrichtentext.
+     */
+    private void fanOutToAdmins(NotificationType type, String title, String message) {
+        List<User> admins = userRepository.findAllByRoleAndDeletedAtIsNull(UserRole.ADMIN);
+        for (User admin : admins) {
+            Notification notification = Notification.builder()
+                    .user(admin)
+                    .type(type)
+                    .title(title)
+                    .message(message)
+                    .build();
+            notificationRepository.save(notification);
+        }
+        log.debug("Fanned out {} notification to {} admin(s) / {}-Benachrichtigung an {} Admin(s) verteilt",
+                type, admins.size(), type, admins.size());
     }
 
     // ──────────────────────────────────────────────────────────────────────────

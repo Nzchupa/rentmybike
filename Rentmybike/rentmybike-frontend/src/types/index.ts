@@ -115,7 +115,7 @@ export type BikeCategory =
   | "CARGO"
   | "KIDS";
 
-export type ApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
+export type ApprovalStatus = "PENDING" | "APPROVED" | "REJECTED" | "CHANGES_REQUESTED";
 
 export interface BikePhotoResponse {
   id: string;
@@ -142,6 +142,8 @@ export interface BikeResponse {
   rejectionReason: string | null;
   primaryPhotoUrl: string | null;
   photos: BikePhotoResponse[];
+  /** Public detail-page view count / Anzahl öffentlicher Detailseiten-Aufrufe */
+  viewCount: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -327,19 +329,31 @@ export interface AdminUserResponse {
   emailVerified: boolean;
   banned: boolean;
   bannedAt: string | null;
+  suspendedAt: string | null;
   /** Business display name — null unless role is BUSINESS / Geschäftsname — null außer bei Rolle BUSINESS */
   businessName: string | null;
   /** Whether an admin verified this business / Ob ein Admin dieses Unternehmen verifiziert hat */
   businessVerified: boolean;
   createdAt: string;
   deletedAt: string | null;
+  bikeCount: number;
+  bookingCount: number;
+  /** Best-available "last activity" proxy — see backend AdminUserResponse for caveat. */
+  lastActivityAt: string | null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Notifications / Benachrichtigungen
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type NotificationType = "NEW_BOOKING_REQUEST" | "NEW_CHAT_MESSAGE";
+export type NotificationType =
+  | "NEW_BOOKING_REQUEST"
+  | "NEW_CHAT_MESSAGE"
+  // Admin-only fan-out types (see NotificationService.notifyAdminsOfNewPendingBike /
+  // notifyAdminsOfNewReport on the backend) — every admin gets one row per event.
+  // Nur für Admins — Fan-out-Typen, jeder Admin erhält eine Zeile pro Ereignis.
+  | "ADMIN_NEW_PENDING_BIKE"
+  | "ADMIN_NEW_REPORT";
 
 export interface NotificationResponse {
   id: string;
@@ -370,6 +384,84 @@ export interface FavoriteStatusResponse {
   favoriteCount: number;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Audit log / Audit-Log
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type AuditAction =
+  | "USER_REGISTERED"
+  | "USER_BANNED"
+  | "USER_UNBANNED"
+  | "USER_SUSPENDED"
+  | "USER_UNSUSPENDED"
+  | "USER_DELETED"
+  | "USER_PROMOTED_TO_BUSINESS"
+  | "USER_PROMOTED_TO_ADMIN"
+  | "USER_VERIFIED_EMAIL"
+  | "BIKE_APPROVED"
+  | "BIKE_REJECTED"
+  | "BIKE_CHANGES_REQUESTED"
+  | "BUSINESS_VERIFIED"
+  | "BUSINESS_UNVERIFIED"
+  | "BOOKING_CANCELLED";
+
+export interface AuditLogResponse {
+  id: string;
+  /** Null for system events / Null bei Systemereignissen */
+  actorId: string | null;
+  /** Denormalized snapshot of the actor's name at event time / Momentaufnahme des Akteursnamens */
+  actorName: string | null;
+  action: AuditAction;
+  /** e.g. "USER" / "BIKE" / "BOOKING" */
+  targetType: string;
+  targetId: string | null;
+  details: string | null;
+  createdAt: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Reports / Meldungen — content moderation reports filed by users
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type ReportTargetType = "BIKE" | "USER" | "REVIEW";
+
+export type ReportReason =
+  | "SPAM"
+  | "INAPPROPRIATE_CONTENT"
+  | "FRAUD_OR_SCAM"
+  | "HARASSMENT"
+  | "FAKE_LISTING"
+  | "SAFETY_CONCERN"
+  | "OTHER";
+
+export type ReportStatus = "PENDING" | "UNDER_REVIEW" | "RESOLVED" | "DISMISSED";
+
+export interface ReportResponse {
+  id: string;
+  reporterId: string;
+  reporterName: string;
+  targetType: ReportTargetType;
+  targetId: string;
+  /** Resolved bike title / username / review snippet, for display / Aufgelöster Anzeigename des Ziels */
+  targetLabel: string | null;
+  reason: ReportReason;
+  details: string | null;
+  status: ReportStatus;
+  resolutionNote: string | null;
+  resolvedBy: string | null;
+  resolvedByName: string | null;
+  resolvedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateReportRequest {
+  targetType: ReportTargetType;
+  targetId: string;
+  reason: ReportReason;
+  details?: string;
+}
+
 export interface AdminStatsResponse {
   totalUsers: number;
   bannedUsers: number;
@@ -387,6 +479,20 @@ export interface AdminStatsResponse {
   totalRevenue: number;
 }
 
+/** One day's platform-activity counters, zero-filled for empty days. / Ein Tag an Plattform-Aktivitätszählern, bei Inaktivität nullaufgefüllt. */
+export interface AdminTimeSeriesPoint {
+  date: string;
+  newUsers: number;
+  newBikes: number;
+  newBookings: number;
+  revenue: number;
+}
+
+export interface AdminAnalyticsResponse {
+  rangeDays: number;
+  series: AdminTimeSeriesPoint[];
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Business dashboard (Stage 3 "Business accounts") / Business-Dashboard
 // ─────────────────────────────────────────────────────────────────────────────
@@ -396,4 +502,39 @@ export interface BusinessDashboardSummaryResponse {
   activeBikes: number;
   totalBookings: number;
   averageRating: number;
+}
+
+/** GET /api/v1/business/dashboard/overview-extras — see BusinessOverviewExtrasResponse on the backend. */
+export interface BusinessOverviewExtrasResponse {
+  pendingActionBookings: BookingResponse[];
+  upcomingBookings: BookingResponse[];
+  recentReviews: ReviewResponse[];
+}
+
+/** One day's booking/revenue counters for a business's analytics chart, zero-filled. / Ein Tag an Buchungs-/Umsatzzählern, nullaufgefüllt. */
+export interface BusinessTimeSeriesPoint {
+  date: string;
+  newBookings: number;
+  revenue: number;
+}
+
+/** One row in the "popular bikes" panel — see PopularBikeResponse on the backend. */
+export interface PopularBikeResponse {
+  bikeId: string;
+  title: string;
+  viewCount: number;
+  bookingCount: number;
+  revenue: number;
+}
+
+/** GET /api/v1/business/dashboard/analytics — see BusinessAnalyticsResponse on the backend. This
+ * richer layer (daily chart, popular bikes, average rental duration, view-to-booking conversion
+ * rate) existed fully on the backend but was never called from the frontend until now — exactly
+ * the same "wired up but never used" gap closed elsewhere this session. */
+export interface BusinessAnalyticsResponse {
+  rangeDays: number;
+  series: BusinessTimeSeriesPoint[];
+  popularBikes: PopularBikeResponse[];
+  averageBookingDurationDays: number;
+  conversionRate: number;
 }

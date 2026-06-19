@@ -124,7 +124,7 @@ function AccessoryForm({
         <Button type="submit" loading={isSubmitting}>{submitLabel}</Button>
         {onCancel && (
           <Button type="button" variant="ghost" onClick={onCancel}>
-            Cancel
+            {tRoot("common.cancel")}
           </Button>
         )}
       </div>
@@ -248,7 +248,7 @@ export default function AccessoriesPage() {
                   <div>
                     <p className="font-medium text-slate-900">{accessory.name}</p>
                     <p className="text-sm text-slate-500">
-                      {t(`types.${accessory.type}`)} · {accessory.quantityTotal} × {formatPrice(accessory.pricePerDay)}/day
+                      {t(`types.${accessory.type}`)} · {t("unitsLabel", { count: accessory.quantityTotal })} · {formatPrice(accessory.pricePerDay)}{t("perDay")}
                     </p>
                   </div>
                 </div>

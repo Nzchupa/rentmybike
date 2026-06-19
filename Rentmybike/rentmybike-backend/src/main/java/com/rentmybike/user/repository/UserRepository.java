@@ -1,5 +1,6 @@
 package com.rentmybike.user.repository;
 
+import com.rentmybike.common.projection.DailyCountProjection;
 import com.rentmybike.user.entity.User;
 import com.rentmybike.user.entity.UserRole;
 import org.springframework.data.domain.Page;
@@ -9,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -71,4 +74,37 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     /** Total users with a specific role / Gesamtanzahl Benutzer mit einer bestimmten Rolle */
     long countByRoleAndDeletedAtIsNull(UserRole role);
+
+    /**
+     * All active users with a given role — used to fan out admin-facing
+     * notifications (e.g. new pending bike, new report) to every admin.
+     * Alle aktiven Benutzer mit einer bestimmten Rolle — wird verwendet, um
+     * an Admins gerichtete Benachrichtigungen (z. B. neues ausstehendes
+     * Fahrrad, neue Meldung) an jeden Admin zu verteilen.
+     */
+    java.util.List<User> findAllByRoleAndDeletedAtIsNull(UserRole role);
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Admin analytics time-series / Admin-Analyse-Zeitreihe
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Daily new-signup counts since {@code from}, one row per day that had
+     * at least one signup. Native query — {@code DATE_TRUNC} has no JPQL
+     * equivalent. Gaps (days with zero signups) are filled in by {@code
+     * AdminService.getAnalytics}, not here.
+     * Tägliche Neuanmeldungs-Zählungen seit {@code from}, eine Zeile pro Tag
+     * mit mindestens einer Anmeldung. Native Abfrage — {@code DATE_TRUNC}
+     * hat keine JPQL-Entsprechung. Lücken (Tage ohne Anmeldungen) werden von
+     * {@code AdminService.getAnalytics} aufgefüllt, nicht hier.
+     */
+    @Query(value = """
+            SELECT DATE_TRUNC('day', created_at)::date AS day, COUNT(*) AS count
+            FROM users
+            WHERE created_at >= :from
+              AND deleted_at IS NULL
+            GROUP BY day
+            ORDER BY day
+            """, nativeQuery = true)
+    List<DailyCountProjection> countDailySignupsSince(@Param("from") LocalDateTime from);
 }

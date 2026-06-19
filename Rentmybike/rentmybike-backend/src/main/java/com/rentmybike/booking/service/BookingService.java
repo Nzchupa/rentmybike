@@ -2,6 +2,8 @@ package com.rentmybike.booking.service;
 
 import com.rentmybike.accessory.entity.Accessory;
 import com.rentmybike.accessory.repository.AccessoryRepository;
+import com.rentmybike.audit.entity.AuditAction;
+import com.rentmybike.audit.service.AuditLogService;
 import com.rentmybike.bike.entity.Bike;
 import com.rentmybike.bike.entity.BikePhoto;
 import com.rentmybike.bike.repository.BikeRepository;
@@ -24,6 +26,7 @@ import com.rentmybike.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +67,7 @@ public class BookingService {
     private final NotificationService notificationService;
     private final AccessoryRepository accessoryRepository;
     private final BookingAccessoryRepository bookingAccessoryRepository;
+    private final AuditLogService auditLogService;
 
     // ──────────────────────────────────────────────────────────────────────────
     // CREATE / ERSTELLEN
@@ -321,6 +325,22 @@ public class BookingService {
         return bookings.stream().map(this::toBookingResponse).toList();
     }
 
+    /**
+     * The owner's next few upcoming ACCEPTED bookings, soonest first — backs
+     * the business overview's "upcoming bookings" panel.
+     * Die nächsten anstehenden ACCEPTED-Buchungen des Eigentümers, früheste
+     * zuerst — Grundlage für das "anstehende Buchungen"-Panel der
+     * Business-Übersicht.
+     */
+    @Transactional(readOnly = true)
+    public List<BookingResponse> getOwnerUpcomingBookings(UUID ownerId, int limit) {
+        // findUpcomingByOwnerId already has its own ORDER BY startDate ASC —
+        // unsorted Pageable, see the Pageable/Sort pitfall noted elsewhere in
+        // this class.
+        List<Booking> bookings = bookingRepository.findUpcomingByOwnerId(ownerId, LocalDate.now(), PageRequest.of(0, limit));
+        return bookings.stream().map(this::toBookingResponse).toList();
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // OWNER ACTIONS / EIGENTÜMER-AKTIONEN
     // ──────────────────────────────────────────────────────────────────────────
@@ -415,6 +435,10 @@ public class BookingService {
         bookingRepository.save(booking);
 
         log.info("Booking CANCELLED by renter: {} / Buchung STORNIERT vom Mieter: {}", bookingId, bookingId);
+
+        auditLogService.record(renterId, booking.getRenter().getFullName(), AuditAction.BOOKING_CANCELLED,
+                "BOOKING", bookingId, null);
+
         return toBookingResponse(booking);
     }
 

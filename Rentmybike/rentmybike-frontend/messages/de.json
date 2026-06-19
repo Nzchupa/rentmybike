@@ -9,6 +9,8 @@
     "confirm": "Bestätigen",
     "back": "Zurück",
     "submit": "Absenden",
+    "previous": "Vorherige",
+    "next": "Weiter",
     "search": "Suchen",
     "filter": "Filtern",
     "clearFilters": "Filter zurücksetzen",
@@ -309,7 +311,8 @@
     "approvalStatus": {
       "PENDING": "Ausstehende Prüfung",
       "APPROVED": "Genehmigt",
-      "REJECTED": "Abgelehnt"
+      "REJECTED": "Abgelehnt",
+      "CHANGES_REQUESTED": "Änderungen angefordert"
     }
   },
   "booking": {
@@ -327,7 +330,11 @@
       "loginRequired": "Bitte anmelden zum Buchen",
       "selectDate": "Datum wählen",
       "done": "Fertig",
-      "requestSent": "Buchungsanfrage gesendet!"
+      "requestSent": "Buchungsanfrage gesendet!",
+      "accessoriesTitle": "Zubehör",
+      "accessoriesNone": "Dieser Anbieter hat kein Zubehör verfügbar.",
+      "accessoriesSubtotal": "Zubehör",
+      "accessoryUnavailable": "Für diesen Zeitraum ausgebucht"
     },
     "status": {
       "ALL": "Alle",
@@ -341,6 +348,8 @@
       "bikeRental": "Fahrradmiete ({days, plural, one {# Tag} other {# Tage}})",
       "total": "Gesamt"
     },
+    "renterLabel": "Mieter:",
+    "ownerLabel": "Eigentümer:",
     "errors": {
       "dateConflict": "Diese Termine sind bereits gebucht",
       "selfBooking": "Sie können Ihr eigenes Fahrrad nicht buchen",
@@ -409,7 +418,12 @@
       "addPhoto": "Foto hinzufügen",
       "maxPhotos": "Maximal 5 Fotos pro Fahrrad",
       "bikeDeleted": "Fahrrad gelöscht",
-      "bikeNotFound": "Fahrrad nicht gefunden."
+      "bikeNotFound": "Fahrrad nicht gefunden.",
+      "perDay": " / Tag",
+      "viewsLabel": "{count, plural, one {# Aufruf} other {# Aufrufe}}",
+      "available": "Verfügbar",
+      "unavailable": "Nicht verfügbar",
+      "availabilityUpdated": "Verfügbarkeit aktualisiert"
     },
     "bikeForm": {
       "createTitle": "Neues Fahrrad inserieren",
@@ -500,7 +514,31 @@
       "bikes": "Fahrräder verwalten",
       "bulkAdd": "Fahrräder im Stapel hinzufügen",
       "accessories": "Zubehör",
-      "calendar": "Mietkalender"
+      "calendar": "Mietkalender",
+      "analytics": "Analytik"
+    },
+    "analytics": {
+      "title": "Analytik",
+      "backToOverview": "Zurück zur Übersicht",
+      "rangeDays": "{count, plural, one {# Tag} other {# Tage}}",
+      "chartBookings": "Neue Buchungen",
+      "chartRevenue": "Umsatz",
+      "averageDuration": "Durchschnittliche Mietdauer",
+      "daysValue": "{count, plural, one {# Tag} other {# Tage}}",
+      "conversionRate": "Ansicht-zu-Buchung-Konversion",
+      "popularBikes": "Beliebte Fahrräder",
+      "revenue": "Umsatz",
+      "noPopularBikes": "Noch nicht genug Daten."
+    },
+    "overview": {
+      "needsAttention": "Erfordert Ihre Aufmerksamkeit",
+      "noPendingActions": "Keine Buchungen warten auf Sie.",
+      "upcoming": "Anstehende Buchungen",
+      "noUpcoming": "Keine anstehenden Buchungen.",
+      "recentReviews": "Neueste Bewertungen",
+      "noRecentReviews": "Noch keine Bewertungen.",
+      "viewAllBookings": "Alle Buchungen ansehen",
+      "nights": "{count, plural, one {# Nacht} other {# Nächte}}"
     },
     "bulkAdd": {
       "title": "Fahrräder im Stapel hinzufügen",
@@ -527,6 +565,8 @@
       "added": "Zubehör hinzugefügt",
       "updated": "Zubehör aktualisiert",
       "deleted": "Zubehör gelöscht",
+      "perDay": "/Tag",
+      "unitsLabel": "{count, plural, one {# Stück} other {# Stück}}",
       "types": {
         "HELMET": "Helm",
         "CHILD_SEAT": "Kindersitz",
@@ -548,6 +588,7 @@
     "comment": "Ihre Bewertung",
     "commentPlaceholder": "Teilen Sie Ihre Erfahrung...",
     "submitReview": "Bewertung absenden",
+    "reviewSubmitted": "Bewertung gesendet — vielen Dank!",
     "renterToOwner": "Bewertung für Eigentümer",
     "ownerToRenter": "Bewertung für Mieter",
     "averageRating": "{rating} von 5",
@@ -558,7 +599,12 @@
     "nav": {
       "stats": "Statistiken",
       "users": "Benutzer",
-      "bikes": "Fahrräder"
+      "bikes": "Fahrräder",
+      "moderation": "Moderation",
+      "businessVerification": "Geschäftsverifizierung",
+      "reports": "Meldungen",
+      "auditLog": "Audit-Protokoll",
+      "notifications": "Benachrichtigungen"
     },
     "stats": {
       "title": "Plattformstatistiken",
@@ -578,7 +624,13 @@
       "sectionBookings": "Buchungen",
       "lockedAccounts": "Gesperrte Konten",
       "awaitingModeration": "Wartet auf Moderation",
-      "liveOnPlatform": "Live auf der Plattform"
+      "liveOnPlatform": "Live auf der Plattform",
+      "rangeDays": "{count, plural, one {# Tag} other {# Tage}}",
+      "sectionActivity": "Aktivität",
+      "chartNewUsers": "Neue Anmeldungen",
+      "chartNewBikes": "Neue Fahrrad-Inserate",
+      "chartNewBookings": "Neue Buchungen",
+      "chartRevenue": "Umsatz"
     },
     "users": {
       "title": "Benutzerverwaltung",
@@ -605,7 +657,24 @@
       "businessVerified": "Unternehmen verifiziert",
       "businessUnverified": "Verifizierung entfernt",
       "businessVerifiedBadge": "Verifiziert",
-      "businessPendingBadge": "Verifizierung ausstehend"
+      "businessPendingBadge": "Verifizierung ausstehend",
+      "suspended": "Pausiert",
+      "suspend": "Pausieren",
+      "unsuspend": "Reaktivieren",
+      "suspendConfirm": "Diesen Nutzer pausieren? Er wird vorübergehend gesperrt.",
+      "userSuspended": "Nutzer pausiert",
+      "userUnsuspended": "Nutzer reaktiviert",
+      "promoteToBusiness": "Zu Business befördern",
+      "promoteToBusinessConfirm": "Diesen Nutzer zu einem Business-Konto befördern?",
+      "userPromotedBusiness": "Nutzer zu Business befördert",
+      "promoteToAdmin": "Zu Admin befördern",
+      "promoteToAdminConfirm": "Diesen Nutzer zum Admin befördern? Dies gewährt vollen administrativen Zugriff.",
+      "userPromotedAdmin": "Nutzer zu Admin befördert",
+      "activity": "Aktivität",
+      "bikesCount": "{count, plural, one {# Fahrrad} other {# Fahrräder}}",
+      "bookingsCount": "{count, plural, one {# Buchung} other {# Buchungen}}",
+      "previous": "Zurück",
+      "next": "Weiter"
     },
     "bikes": {
       "title": "Fahrrad-Moderation",
@@ -617,7 +686,8 @@
         "all": "Alle",
         "pending": "Ausstehend",
         "approved": "Genehmigt",
-        "rejected": "Abgelehnt"
+        "rejected": "Abgelehnt",
+        "changesRequested": "Änderungen angefordert"
       },
       "noBikesFound": "Keine Fahrräder gefunden.",
       "noPhoto": "Kein Foto",
@@ -625,7 +695,112 @@
       "perDay": "/Tag",
       "confirmReject": "Ablehnung bestätigen",
       "bikeApproved": "Fahrrad genehmigt",
-      "bikeRejected": "Fahrrad abgelehnt"
+      "bikeRejected": "Fahrrad abgelehnt",
+      "requestChanges": "Änderungen anfordern",
+      "requestChangesReasonPlaceholder": "Erklären Sie, was geändert werden muss (min. 10 Zeichen)...",
+      "confirmRequestChanges": "Anfrage bestätigen",
+      "changesRequested": "Änderungen angefordert",
+      "reasonLabel": "Grund",
+      "viewsLabel": "{count, plural, one {# Aufruf} other {# Aufrufe}}"
+    },
+    "moderation": {
+      "title": "Moderations-Center",
+      "pendingBikeApprovals": "Ausstehende Fahrrad-Genehmigungen",
+      "openReports": "Offene Meldungen",
+      "noOpenReports": "Keine offenen Meldungen — alles erledigt.",
+      "unknownTarget": "(Inhalt nicht mehr verfügbar)",
+      "reportedBy": "Gemeldet von {name}",
+      "markUnderReview": "Als in Prüfung markieren",
+      "markedUnderReview": "Meldung als in Prüfung markiert",
+      "resolve": "Lösen",
+      "dismiss": "Verwerfen",
+      "warn": "Benutzer verwarnen",
+      "ban": "Benutzer sperren",
+      "confirmResolve": "Lösung bestätigen",
+      "confirmDismiss": "Verwerfen bestätigen",
+      "confirmWarn": "Verwarnung bestätigen",
+      "confirmBan": "Sperrung bestätigen",
+      "resolutionNotePlaceholder": "Optionale Notiz zu dieser Entscheidung...",
+      "reportResolved": "Meldung gelöst",
+      "reportDismissed": "Meldung verworfen",
+      "userWarned": "Benutzer verwarnt und Meldung gelöst",
+      "userBanned": "Benutzer gesperrt und Meldung gelöst",
+      "status": {
+        "PENDING": "Ausstehend",
+        "UNDER_REVIEW": "In Prüfung",
+        "RESOLVED": "Gelöst",
+        "DISMISSED": "Verworfen"
+      },
+      "reasons": {
+        "SPAM": "Spam",
+        "INAPPROPRIATE_CONTENT": "Unangemessener Inhalt",
+        "FRAUD_OR_SCAM": "Betrug",
+        "HARASSMENT": "Belästigung",
+        "FAKE_LISTING": "Gefälschtes Inserat",
+        "SAFETY_CONCERN": "Sicherheitsbedenken",
+        "OTHER": "Sonstiges"
+      }
+    },
+    "businessVerification": {
+      "title": "Geschäftsverifizierung-Center",
+      "subtitle": "Geschäftskonten prüfen und das Verifizierungs-Abzeichen vergeben oder entziehen.",
+      "statPending": "Ausstehende Verifizierung",
+      "statVerified": "Verifizierte Unternehmen",
+      "searchPlaceholder": "Suche nach Firmenname, Inhaber oder E-Mail...",
+      "tab": {
+        "PENDING": "Ausstehend",
+        "VERIFIED": "Verifiziert",
+        "ALL": "Alle"
+      },
+      "noResults": "Keine Geschäftskonten entsprechen dieser Ansicht.",
+      "loadError": "Geschäftskonten konnten nicht geladen werden — bitte versuchen Sie es erneut.",
+      "joinedLabel": "Beigetreten am {date}"
+    },
+    "reports": {
+      "title": "Meldungen",
+      "searchPlaceholder": "Suche nach Ziel, Melder oder Details...",
+      "allStatuses": "Alle Status",
+      "allTargets": "Alle Zieltypen",
+      "noReportsFound": "Keine Meldungen gefunden.",
+      "loadError": "Meldungen konnten nicht geladen werden.",
+      "resolvedBy": "Bearbeitet von {name}"
+    },
+    "auditLog": {
+      "title": "Audit-Protokoll",
+      "searchPlaceholder": "Suche nach Akteur, Ziel oder Details...",
+      "allActions": "Alle Aktionen",
+      "allTargets": "Alle Zieltypen",
+      "time": "Zeit",
+      "actor": "Akteur",
+      "action": "Aktion",
+      "target": "Ziel",
+      "details": "Details",
+      "systemActor": "System",
+      "noEntriesFound": "Keine Audit-Protokoll-Einträge gefunden.",
+      "loadError": "Das Audit-Protokoll konnte nicht geladen werden.",
+      "previous": "Vorherige",
+      "next": "Weiter",
+      "actions": {
+        "USER_REGISTERED": "Benutzer registriert",
+        "USER_BANNED": "Benutzer gesperrt",
+        "USER_UNBANNED": "Sperrung aufgehoben",
+        "USER_SUSPENDED": "Benutzer pausiert",
+        "USER_UNSUSPENDED": "Pausierung aufgehoben",
+        "USER_DELETED": "Benutzer gelöscht",
+        "USER_PROMOTED_TO_BUSINESS": "Zu Business befördert",
+        "USER_PROMOTED_TO_ADMIN": "Zu Admin befördert",
+        "USER_VERIFIED_EMAIL": "E-Mail verifiziert",
+        "BIKE_APPROVED": "Fahrrad genehmigt",
+        "BIKE_REJECTED": "Fahrrad abgelehnt",
+        "BIKE_CHANGES_REQUESTED": "Änderungen am Fahrrad angefordert",
+        "BUSINESS_VERIFIED": "Business verifiziert",
+        "BUSINESS_UNVERIFIED": "Business-Verifizierung aufgehoben",
+        "BOOKING_CANCELLED": "Buchung storniert"
+      }
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "empty": "Noch keine Benachrichtigungen."
     }
   },
   "notifications": {

@@ -9,6 +9,8 @@
     "confirm": "Confirm",
     "back": "Back",
     "submit": "Submit",
+    "previous": "Previous",
+    "next": "Next",
     "search": "Search",
     "filter": "Filter",
     "clearFilters": "Clear filters",
@@ -309,7 +311,8 @@
     "approvalStatus": {
       "PENDING": "Pending review",
       "APPROVED": "Approved",
-      "REJECTED": "Rejected"
+      "REJECTED": "Rejected",
+      "CHANGES_REQUESTED": "Changes requested"
     }
   },
   "booking": {
@@ -327,7 +330,11 @@
       "loginRequired": "Please log in to book",
       "selectDate": "Select date",
       "done": "Done",
-      "requestSent": "Booking request sent!"
+      "requestSent": "Booking request sent!",
+      "accessoriesTitle": "Add-ons",
+      "accessoriesNone": "This owner has no add-ons available.",
+      "accessoriesSubtotal": "Add-ons",
+      "accessoryUnavailable": "Sold out for these dates"
     },
     "status": {
       "ALL": "All",
@@ -341,6 +348,8 @@
       "bikeRental": "Bike rental ({days, plural, one {# day} other {# days}})",
       "total": "Total"
     },
+    "renterLabel": "Renter:",
+    "ownerLabel": "Owner:",
     "errors": {
       "dateConflict": "These dates are already booked",
       "selfBooking": "You cannot book your own bike",
@@ -409,7 +418,12 @@
       "addPhoto": "Add photo",
       "maxPhotos": "Maximum 5 photos per bike",
       "bikeDeleted": "Bike deleted",
-      "bikeNotFound": "Bike not found."
+      "bikeNotFound": "Bike not found.",
+      "perDay": " / day",
+      "viewsLabel": "{count, plural, one {# view} other {# views}}",
+      "available": "Available",
+      "unavailable": "Unavailable",
+      "availabilityUpdated": "Availability updated"
     },
     "bikeForm": {
       "createTitle": "List a new bike",
@@ -500,7 +514,31 @@
       "bikes": "Manage bikes",
       "bulkAdd": "Bulk-add bikes",
       "accessories": "Accessories",
-      "calendar": "Rental calendar"
+      "calendar": "Rental calendar",
+      "analytics": "Analytics"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "backToOverview": "Back to overview",
+      "rangeDays": "{count, plural, one {# day} other {# days}}",
+      "chartBookings": "New bookings",
+      "chartRevenue": "Revenue",
+      "averageDuration": "Average rental duration",
+      "daysValue": "{count, plural, one {# day} other {# days}}",
+      "conversionRate": "View-to-booking conversion",
+      "popularBikes": "Popular bikes",
+      "revenue": "revenue",
+      "noPopularBikes": "Not enough data yet."
+    },
+    "overview": {
+      "needsAttention": "Needs your attention",
+      "noPendingActions": "No bookings waiting on you.",
+      "upcoming": "Upcoming bookings",
+      "noUpcoming": "No upcoming bookings.",
+      "recentReviews": "Recent reviews",
+      "noRecentReviews": "No reviews yet.",
+      "viewAllBookings": "View all bookings",
+      "nights": "{count, plural, one {# night} other {# nights}}"
     },
     "bulkAdd": {
       "title": "Bulk-add bikes",
@@ -527,6 +565,8 @@
       "added": "Accessory added",
       "updated": "Accessory updated",
       "deleted": "Accessory deleted",
+      "perDay": "/day",
+      "unitsLabel": "{count, plural, one {# unit} other {# units}}",
       "types": {
         "HELMET": "Helmet",
         "CHILD_SEAT": "Child seat",
@@ -548,6 +588,7 @@
     "comment": "Your review",
     "commentPlaceholder": "Share your experience...",
     "submitReview": "Submit review",
+    "reviewSubmitted": "Review submitted — thank you!",
     "renterToOwner": "Review for owner",
     "ownerToRenter": "Review for renter",
     "averageRating": "{rating} out of 5",
@@ -558,7 +599,12 @@
     "nav": {
       "stats": "Statistics",
       "users": "Users",
-      "bikes": "Bikes"
+      "bikes": "Bikes",
+      "moderation": "Moderation",
+      "businessVerification": "Business Verification",
+      "reports": "Reports",
+      "auditLog": "Audit Log",
+      "notifications": "Notifications"
     },
     "stats": {
       "title": "Platform Statistics",
@@ -578,7 +624,13 @@
       "sectionBookings": "Bookings",
       "lockedAccounts": "Locked accounts",
       "awaitingModeration": "Awaiting moderation",
-      "liveOnPlatform": "Live on platform"
+      "liveOnPlatform": "Live on platform",
+      "rangeDays": "{count, plural, one {# day} other {# days}}",
+      "sectionActivity": "Activity",
+      "chartNewUsers": "New signups",
+      "chartNewBikes": "New bike listings",
+      "chartNewBookings": "New bookings",
+      "chartRevenue": "Revenue"
     },
     "users": {
       "title": "User Management",
@@ -605,7 +657,24 @@
       "businessVerified": "Business verified",
       "businessUnverified": "Business verification removed",
       "businessVerifiedBadge": "Verified",
-      "businessPendingBadge": "Pending verification"
+      "businessPendingBadge": "Pending verification",
+      "suspended": "Suspended",
+      "suspend": "Suspend",
+      "unsuspend": "Unsuspend",
+      "suspendConfirm": "Suspend this user? They will be temporarily locked out.",
+      "userSuspended": "User suspended",
+      "userUnsuspended": "User unsuspended",
+      "promoteToBusiness": "Promote to business",
+      "promoteToBusinessConfirm": "Promote this user to a business account?",
+      "userPromotedBusiness": "User promoted to business",
+      "promoteToAdmin": "Promote to admin",
+      "promoteToAdminConfirm": "Promote this user to admin? This grants full administrative access.",
+      "userPromotedAdmin": "User promoted to admin",
+      "activity": "Activity",
+      "bikesCount": "{count, plural, one {# bike} other {# bikes}}",
+      "bookingsCount": "{count, plural, one {# booking} other {# bookings}}",
+      "previous": "Previous",
+      "next": "Next"
     },
     "bikes": {
       "title": "Bike Moderation",
@@ -617,7 +686,8 @@
         "all": "All",
         "pending": "Pending",
         "approved": "Approved",
-        "rejected": "Rejected"
+        "rejected": "Rejected",
+        "changesRequested": "Changes requested"
       },
       "noBikesFound": "No bikes found.",
       "noPhoto": "No photo",
@@ -625,7 +695,112 @@
       "perDay": "/day",
       "confirmReject": "Confirm reject",
       "bikeApproved": "Bike approved",
-      "bikeRejected": "Bike rejected"
+      "bikeRejected": "Bike rejected",
+      "requestChanges": "Request changes",
+      "requestChangesReasonPlaceholder": "Explain what needs to change (min. 10 characters)...",
+      "confirmRequestChanges": "Confirm request",
+      "changesRequested": "Changes requested",
+      "reasonLabel": "Reason",
+      "viewsLabel": "{count, plural, one {# view} other {# views}}"
+    },
+    "moderation": {
+      "title": "Moderation Center",
+      "pendingBikeApprovals": "Pending bike approvals",
+      "openReports": "Open reports",
+      "noOpenReports": "No open reports — all caught up.",
+      "unknownTarget": "(content no longer available)",
+      "reportedBy": "Reported by {name}",
+      "markUnderReview": "Mark under review",
+      "markedUnderReview": "Report marked under review",
+      "resolve": "Resolve",
+      "dismiss": "Dismiss",
+      "warn": "Warn user",
+      "ban": "Ban user",
+      "confirmResolve": "Confirm resolve",
+      "confirmDismiss": "Confirm dismiss",
+      "confirmWarn": "Confirm warn",
+      "confirmBan": "Confirm ban",
+      "resolutionNotePlaceholder": "Optional note about this decision...",
+      "reportResolved": "Report resolved",
+      "reportDismissed": "Report dismissed",
+      "userWarned": "User warned and report resolved",
+      "userBanned": "User banned and report resolved",
+      "status": {
+        "PENDING": "Pending",
+        "UNDER_REVIEW": "Under review",
+        "RESOLVED": "Resolved",
+        "DISMISSED": "Dismissed"
+      },
+      "reasons": {
+        "SPAM": "Spam",
+        "INAPPROPRIATE_CONTENT": "Inappropriate content",
+        "FRAUD_OR_SCAM": "Fraud or scam",
+        "HARASSMENT": "Harassment",
+        "FAKE_LISTING": "Fake listing",
+        "SAFETY_CONCERN": "Safety concern",
+        "OTHER": "Other"
+      }
+    },
+    "businessVerification": {
+      "title": "Business Verification Center",
+      "subtitle": "Review business accounts and grant or revoke the verified-business badge.",
+      "statPending": "Pending verification",
+      "statVerified": "Verified businesses",
+      "searchPlaceholder": "Search by business name, owner, or email...",
+      "tab": {
+        "PENDING": "Pending",
+        "VERIFIED": "Verified",
+        "ALL": "All"
+      },
+      "noResults": "No business accounts match this view.",
+      "loadError": "Couldn't load business accounts — please try again.",
+      "joinedLabel": "Joined {date}"
+    },
+    "reports": {
+      "title": "Reports",
+      "searchPlaceholder": "Search by target, reporter, or details...",
+      "allStatuses": "All statuses",
+      "allTargets": "All target types",
+      "noReportsFound": "No reports found.",
+      "loadError": "Couldn't load reports — please try again.",
+      "resolvedBy": "Resolved by {name}"
+    },
+    "auditLog": {
+      "title": "Audit Log",
+      "searchPlaceholder": "Search by actor, target, or details...",
+      "allActions": "All actions",
+      "allTargets": "All target types",
+      "time": "Time",
+      "actor": "Actor",
+      "action": "Action",
+      "target": "Target",
+      "details": "Details",
+      "systemActor": "System",
+      "noEntriesFound": "No audit log entries found.",
+      "loadError": "Failed to load the audit log.",
+      "previous": "Previous",
+      "next": "Next",
+      "actions": {
+        "USER_REGISTERED": "User registered",
+        "USER_BANNED": "User banned",
+        "USER_UNBANNED": "User unbanned",
+        "USER_SUSPENDED": "User suspended",
+        "USER_UNSUSPENDED": "User unsuspended",
+        "USER_DELETED": "User deleted",
+        "USER_PROMOTED_TO_BUSINESS": "Promoted to business",
+        "USER_PROMOTED_TO_ADMIN": "Promoted to admin",
+        "USER_VERIFIED_EMAIL": "Email verified",
+        "BIKE_APPROVED": "Bike approved",
+        "BIKE_REJECTED": "Bike rejected",
+        "BIKE_CHANGES_REQUESTED": "Bike changes requested",
+        "BUSINESS_VERIFIED": "Business verified",
+        "BUSINESS_UNVERIFIED": "Business unverified",
+        "BOOKING_CANCELLED": "Booking cancelled"
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "empty": "No notifications yet."
     }
   },
   "notifications": {

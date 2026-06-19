@@ -1,10 +1,14 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { Users, Bike, Calendar, TrendingUp, Clock, CheckCircle } from "lucide-react";
 import { adminApi } from "@/lib/api";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, formatDate } from "@/lib/utils";
+import { TimeSeriesChart } from "@/components/ui/TimeSeriesChart";
+
+const RANGE_OPTIONS = [7, 30, 90] as const;
 
 interface StatCardProps {
   label: string;
@@ -37,6 +41,8 @@ function StatCard({ label, value, icon, sub, highlight }: StatCardProps) {
  */
 export default function AdminStatsPage() {
   const t = useTranslations("admin.stats");
+  const locale = useLocale();
+  const [rangeDays, setRangeDays] = useState<number>(30);
 
   const { data: stats, isLoading } = useQuery({
     queryKey: ["admin-stats"],
@@ -44,6 +50,19 @@ export default function AdminStatsPage() {
     select: (r) => r.data.data,
     refetchInterval: 30_000,   // auto-refresh every 30s
   });
+
+  const { data: analytics, isLoading: analyticsLoading } = useQuery({
+    queryKey: ["admin-analytics", rangeDays],
+    queryFn: () => adminApi.getAnalytics(rangeDays),
+    select: (r) => r.data.data,
+  });
+
+  const series = analytics?.series ?? [];
+  const chartLabels = series.map((p) => formatDate(p.date, locale, "d MMM"));
+  const usersData = series.map((p, i) => ({ label: chartLabels[i], value: p.newUsers }));
+  const bikesData = series.map((p, i) => ({ label: chartLabels[i], value: p.newBikes }));
+  const bookingsData = series.map((p, i) => ({ label: chartLabels[i], value: p.newBookings }));
+  const revenueData = series.map((p, i) => ({ label: chartLabels[i], value: p.revenue }));
 
   if (isLoading || !stats) {
     return (
@@ -57,7 +76,67 @@ export default function AdminStatsPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="section-title">{t("title")}</h1>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <h1 className="section-title">{t("title")}</h1>
+        <div className="flex gap-1">
+          {RANGE_OPTIONS.map((d) => (
+            <button
+              key={d}
+              onClick={() => setRangeDays(d)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                rangeDays === d
+                  ? "bg-slate-900 text-white"
+                  : "text-slate-600 hover:bg-slate-100"
+              }`}
+            >
+              {t("rangeDays", { count: d })}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Activity charts — daily new-user/new-bike/new-booking/revenue
+          time-series, backed by /api/v1/admin/analytics (built in an earlier
+          backend session) but never surfaced on the frontend until now. */}
+      {/* Aktivitätsdiagramme — tägliche Zeitreihen für neue Benutzer/Fahrräder/
+          Buchungen/Umsatz, gestützt auf /api/v1/admin/analytics (in einer
+          früheren Backend-Sitzung erstellt, aber bisher nie im Frontend
+          angezeigt). */}
+      <section>
+        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">
+          {t("sectionActivity")}
+        </h2>
+        {analyticsLoading ? (
+          <div className="grid sm:grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="card h-48 animate-pulse bg-slate-100" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="card p-5">
+              <p className="text-sm font-medium text-slate-500 mb-2">{t("chartNewUsers")}</p>
+              <TimeSeriesChart data={usersData} color="#0ea5e9" />
+            </div>
+            <div className="card p-5">
+              <p className="text-sm font-medium text-slate-500 mb-2">{t("chartNewBikes")}</p>
+              <TimeSeriesChart data={bikesData} color="#8b5cf6" />
+            </div>
+            <div className="card p-5">
+              <p className="text-sm font-medium text-slate-500 mb-2">{t("chartNewBookings")}</p>
+              <TimeSeriesChart data={bookingsData} color="#f59e0b" />
+            </div>
+            <div className="card p-5">
+              <p className="text-sm font-medium text-slate-500 mb-2">{t("chartRevenue")}</p>
+              <TimeSeriesChart
+                data={revenueData}
+                color="#10b981"
+                formatValue={(v) => formatPrice(v, locale)}
+              />
+            </div>
+          </div>
+        )}
+      </section>
 
       {/* Revenue highlight */}
       <StatCard

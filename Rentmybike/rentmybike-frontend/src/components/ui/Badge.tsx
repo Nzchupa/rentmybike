@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import type { BookingStatus, ApprovalStatus } from "@/types";
+import type { BookingStatus, ApprovalStatus, ReportStatus } from "@/types";
 
 type BadgeVariant = "green" | "yellow" | "red" | "blue" | "gray";
 type BadgeSize = "sm" | "md";
@@ -67,9 +67,10 @@ export function BookingStatusBadge({ status, size }: { status: BookingStatus; si
 }
 
 const approvalStatusVariant: Record<ApprovalStatus, BadgeVariant> = {
-  PENDING:  "yellow",
-  APPROVED: "green",
-  REJECTED: "red",
+  PENDING:           "yellow",
+  APPROVED:          "green",
+  REJECTED:          "red",
+  CHANGES_REQUESTED: "blue",
 };
 
 export function ApprovalStatusBadge({ status }: { status: ApprovalStatus }) {
@@ -78,4 +79,16 @@ export function ApprovalStatusBadge({ status }: { status: ApprovalStatus }) {
   // von der Sprache angezeigt.
   const t = useTranslations("bikes.approvalStatus");
   return <Badge variant={approvalStatusVariant[status]}>{t(status)}</Badge>;
+}
+
+const reportStatusVariant: Record<ReportStatus, BadgeVariant> = {
+  PENDING:      "yellow",
+  UNDER_REVIEW: "blue",
+  RESOLVED:     "green",
+  DISMISSED:    "gray",
+};
+
+export function ReportStatusBadge({ status }: { status: ReportStatus }) {
+  const t = useTranslations("admin.moderation.status");
+  return <Badge variant={reportStatusVariant[status]}>{t(status)}</Badge>;
 }

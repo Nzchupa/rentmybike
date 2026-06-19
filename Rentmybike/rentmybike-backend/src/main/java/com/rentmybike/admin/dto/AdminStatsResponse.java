@@ -45,6 +45,9 @@ public class AdminStatsResponse {
     /** Rejected bikes / Abgelehnte Fahrräder */
     private long rejectedBikes;
 
+    /** Sent back to owner for edits, not a full rejection / An Eigentümer zur Bearbeitung zurückgesendet, keine vollständige Ablehnung */
+    private long changesRequestedBikes;
+
     // ──────────────────────────────────────────────────────────────────────────
     // Booking stats / Buchungsstatistiken
     // ──────────────────────────────────────────────────────────────────────────

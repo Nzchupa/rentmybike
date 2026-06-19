@@ -9,7 +9,8 @@ import { format, isBefore, parseISO, startOfToday } from "date-fns";
 import { de, enUS } from "date-fns/locale";
 import toast from "react-hot-toast";
 import "react-day-picker/dist/style.css";
-import { bookingsApi } from "@/lib/api";
+import { Minus, Plus as PlusIcon } from "lucide-react";
+import { bookingsApi, accessoriesApi } from "@/lib/api";
 import { useAuthStore } from "@/store/auth.store";
 import { Button } from "@/components/ui/Button";
 import { formatPrice, calcRentalDays, calcTotalPrice, toIsoDate } from "@/lib/utils";
@@ -29,6 +30,7 @@ interface BookingFormProps {
 export function BookingForm({ bike }: BookingFormProps) {
   const t = useTranslations("booking.form");
   const te = useTranslations("booking.errors");
+  const tAcc = useTranslations("business.accessories");
   const tNav = useTranslations("nav");
   const locale = useLocale();
   const { user } = useAuthStore();
@@ -37,6 +39,21 @@ export function BookingForm({ bike }: BookingFormProps) {
   const [range, setRange] = useState<{ from?: Date; to?: Date }>({});
   const [message, setMessage] = useState("");
   const [showCalendar, setShowCalendar] = useState(false);
+  // accessoryId -> selected quantity / Zubehör-ID -> ausgewählte Menge
+  const [accessoryQty, setAccessoryQty] = useState<Record<string, number>>({});
+
+  // Accessories the bike's owner offers as booking add-ons — public endpoint
+  // (accessoriesApi.getByOwner) already existed on the backend/API client but
+  // was never rendered anywhere, so renters had no way to actually attach a
+  // helmet/child seat/lock to a booking despite the backend fully supporting
+  // it (CreateBookingRequest.accessories).
+  // Zubehör, das der Eigentümer als Buchungs-Add-on anbietet — der öffentliche
+  // Endpunkt existierte bereits, wurde aber nie angezeigt.
+  const { data: accessories = [] } = useQuery({
+    queryKey: ["owner-accessories", bike.ownerId],
+    queryFn: () => accessoriesApi.getByOwner(bike.ownerId),
+    select: (r) => r.data.data ?? [],
+  });
 
   // Occupied date ranges for this bike — used to disable already-booked dates
   // in the calendar and to validate overlap before submitting, instead of
@@ -59,6 +76,7 @@ export function BookingForm({ bike }: BookingFormProps) {
       setRange({});
       setMessage("");
       setShowCalendar(false);
+      setAccessoryQty({});
       // Query key mismatch bug: this used to invalidate ["my-renter-bookings"],
       // but RenterBookingsPage (dashboard/bookings/renter/page.tsx) actually
       // queries under ["renter-bookings"]. Since the keys never matched, the
@@ -101,10 +119,23 @@ export function BookingForm({ bike }: BookingFormProps) {
   const { from: startDate, to: endDate } = range;
   const rentalDays =
     startDate && endDate ? calcRentalDays(toIsoDate(startDate), toIsoDate(endDate)) : 0;
-  const totalPrice =
+  const bikeTotal =
     startDate && endDate
       ? calcTotalPrice(bike.pricePerDay, toIsoDate(startDate), toIsoDate(endDate))
       : 0;
+
+  const selectedAccessories = accessories
+    .map((a) => ({ accessory: a, quantity: accessoryQty[a.id] ?? 0 }))
+    .filter((s) => s.quantity > 0);
+  const accessoriesTotal = selectedAccessories.reduce(
+    (sum, s) => sum + s.accessory.pricePerDay * s.quantity * rentalDays,
+    0
+  );
+  const totalPrice = bikeTotal + accessoriesTotal;
+
+  function setQty(accessoryId: string, quantity: number, max: number) {
+    setAccessoryQty((prev) => ({ ...prev, [accessoryId]: Math.max(0, Math.min(max, quantity)) }));
+  }
 
   // Date ranges already booked (PENDING/ACCEPTED), parsed for the calendar's
   // `disabled` prop and for the overlap check below.
@@ -142,6 +173,9 @@ export function BookingForm({ bike }: BookingFormProps) {
       startDate: toIsoDate(startDate),
       endDate: toIsoDate(endDate),
       message: message.trim() || undefined,
+      accessories: selectedAccessories.length
+        ? selectedAccessories.map((s) => ({ accessoryId: s.accessory.id, quantity: s.quantity }))
+        : undefined,
     });
   }
 
@@ -204,6 +238,50 @@ export function BookingForm({ bike }: BookingFormProps) {
         )}
       </div>
 
+      {/* Accessories add-ons */}
+      {accessories.length > 0 && (
+        <div>
+          <label className="label">{t("accessoriesTitle")}</label>
+          <div className="space-y-2">
+            {accessories.map((accessory) => {
+              const qty = accessoryQty[accessory.id] ?? 0;
+              return (
+                <div
+                  key={accessory.id}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 px-3 py-2.5"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-slate-900 truncate">{accessory.name}</p>
+                    <p className="text-xs text-slate-500">
+                      {formatPrice(accessory.pricePerDay, locale)}{tAcc("perDay")}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setQty(accessory.id, qty - 1, accessory.quantityTotal)}
+                      disabled={qty <= 0}
+                      className="w-7 h-7 rounded-full border border-slate-300 flex items-center justify-center text-slate-600 disabled:opacity-40 hover:border-brand-500"
+                    >
+                      <Minus size={14} />
+                    </button>
+                    <span className="w-5 text-center text-sm font-medium">{qty}</span>
+                    <button
+                      type="button"
+                      onClick={() => setQty(accessory.id, qty + 1, accessory.quantityTotal)}
+                      disabled={qty >= accessory.quantityTotal}
+                      className="w-7 h-7 rounded-full border border-slate-300 flex items-center justify-center text-slate-600 disabled:opacity-40 hover:border-brand-500"
+                    >
+                      <PlusIcon size={14} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Message */}
       <div>
         <label className="label">{t("message")}</label>
@@ -228,6 +306,12 @@ export function BookingForm({ bike }: BookingFormProps) {
             <span className="text-slate-600">× {t("days", { count: rentalDays })}</span>
             <span />
           </div>
+          {selectedAccessories.length > 0 && (
+            <div className="flex justify-between">
+              <span className="text-slate-600">{t("accessoriesSubtotal")}</span>
+              <span>{formatPrice(accessoriesTotal, locale)}</span>
+            </div>
+          )}
           <div className="border-t border-slate-200 pt-2 flex justify-between font-semibold">
             <span>{t("totalPrice")}</span>
             <span className="text-brand-600">{formatPrice(totalPrice, locale)}</span>

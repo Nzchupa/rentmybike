@@ -174,6 +174,21 @@ public class BikeController {
     }
 
     /**
+     * Owner: per-bike stats panel (view count + booking breakdown + revenue).
+     * Eigentümer: Pro-Fahrrad-Statistikpanel (Aufrufzähler + Buchungsaufschlüsselung + Umsatz).
+     *
+     * <p>GET /api/v1/bikes/{id}/stats
+     */
+    @GetMapping("/api/v1/bikes/{id}/stats")
+    public ResponseEntity<ApiResponse<BikeStatsResponse>> getBikeStats(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User currentUser) {
+
+        BikeStatsResponse stats = bikeService.getBikeStats(id, currentUser.getId());
+        return ResponseEntity.ok(ApiResponse.success(stats));
+    }
+
+    /**
      * Update an existing bike listing (owner only).
      * Vorhandenes Fahrrad-Inserat aktualisieren (nur Eigentümer).
      *
@@ -282,6 +297,21 @@ public class BikeController {
     }
 
     /**
+     * Admin: per-bike stats panel — same data as the owner endpoint, no
+     * ownership check.
+     * Admin: Pro-Fahrrad-Statistikpanel — gleiche Daten wie der
+     * Eigentümer-Endpunkt, ohne Eigentümerschaftsprüfung.
+     *
+     * <p>GET /api/v1/admin/bikes/{id}/stats
+     */
+    @GetMapping("/api/v1/admin/bikes/{id}/stats")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<BikeStatsResponse>> adminGetBikeStats(@PathVariable UUID id) {
+        BikeStatsResponse stats = bikeService.adminGetBikeStats(id);
+        return ResponseEntity.ok(ApiResponse.success(stats));
+    }
+
+    /**
      * Admin: approve a bike listing — makes it visible in public search.
      * Admin: Fahrrad-Inserat genehmigen — macht es in öffentlicher Suche sichtbar.
      *
@@ -289,8 +319,10 @@ public class BikeController {
      */
     @PostMapping("/api/v1/admin/bikes/{id}/approve")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<BikeResponse>> approveBike(@PathVariable UUID id) {
-        BikeResponse approved = bikeService.approveBike(id);
+    public ResponseEntity<ApiResponse<BikeResponse>> approveBike(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User currentAdmin) {
+        BikeResponse approved = bikeService.approveBike(id, currentAdmin.getId(), currentAdmin.getFullName());
         return ResponseEntity.ok(ApiResponse.success(approved, "Bike approved / Fahrrad genehmigt"));
     }
 
@@ -304,9 +336,32 @@ public class BikeController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<BikeResponse>> rejectBike(
             @PathVariable UUID id,
-            @Valid @RequestBody RejectBikeRequest request) {
+            @Valid @RequestBody RejectBikeRequest request,
+            @AuthenticationPrincipal User currentAdmin) {
 
-        BikeResponse rejected = bikeService.rejectBike(id, request);
+        BikeResponse rejected = bikeService.rejectBike(id, request, currentAdmin.getId(), currentAdmin.getFullName());
         return ResponseEntity.ok(ApiResponse.success(rejected, "Bike rejected / Fahrrad abgelehnt"));
+    }
+
+    /**
+     * Admin: request specific changes on a bike listing — softer than a full
+     * rejection. The owner sees the feedback and the bike automatically
+     * returns to PENDING the next time they save an edit.
+     * Admin: konkrete Änderungen an einem Fahrrad-Inserat anfordern — milder
+     * als eine vollständige Ablehnung. Der Eigentümer sieht das Feedback und
+     * das Fahrrad kehrt bei der nächsten gespeicherten Bearbeitung
+     * automatisch zu PENDING zurück.
+     *
+     * <p>POST /api/v1/admin/bikes/{id}/request-changes
+     */
+    @PostMapping("/api/v1/admin/bikes/{id}/request-changes")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<BikeResponse>> requestChanges(
+            @PathVariable UUID id,
+            @Valid @RequestBody RejectBikeRequest request,
+            @AuthenticationPrincipal User currentAdmin) {
+
+        BikeResponse updated = bikeService.requestChanges(id, request, currentAdmin.getId(), currentAdmin.getFullName());
+        return ResponseEntity.ok(ApiResponse.success(updated, "Changes requested / Änderungen angefordert"));
     }
 }

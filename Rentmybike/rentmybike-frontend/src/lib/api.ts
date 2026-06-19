@@ -333,10 +333,19 @@ import type {
   ChatMessageResponse,
   UpgradeToBusinessRequest,
   BusinessDashboardSummaryResponse,
+  BusinessOverviewExtrasResponse,
+  BusinessAnalyticsResponse,
   BulkCreateBikeRequest,
   AccessoryResponse,
   CreateAccessoryRequest,
   UpdateAccessoryRequest,
+  AuditLogResponse,
+  AuditAction,
+  AdminAnalyticsResponse,
+  ReportResponse,
+  ReportStatus,
+  ReportTargetType,
+  CreateReportRequest,
 } from "@/types";
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
@@ -475,6 +484,11 @@ export const bikesApi = {
     api.post<ApiResponse<BikeResponse>>(`/api/v1/admin/bikes/${id}/reject`, {
       reason,
     }),
+
+  adminRequestChanges: (id: string, reason: string) =>
+    api.post<ApiResponse<BikeResponse>>(`/api/v1/admin/bikes/${id}/request-changes`, {
+      reason,
+    }),
 };
 
 // ── Bookings ──────────────────────────────────────────────────────────────────
@@ -590,6 +604,13 @@ export const adminApi = {
   getStats: () =>
     api.get<ApiResponse<AdminStatsResponse>>("/api/v1/admin/stats"),
 
+  // Daily activity time-series for the stats dashboard's charts.
+  // Tägliche Aktivitäts-Zeitreihe für die Diagramme des Statistik-Dashboards.
+  getAnalytics: (days = 30) =>
+    api.get<ApiResponse<AdminAnalyticsResponse>>("/api/v1/admin/analytics", {
+      params: { days },
+    }),
+
   listUsers: (search?: string, page = 0, size = 20) =>
     api.get<ApiResponse<PageResponse<AdminUserResponse>>>("/api/v1/admin/users", {
       params: { search, page, size },
@@ -601,6 +622,18 @@ export const adminApi = {
   unbanUser: (id: string) =>
     api.post<ApiResponse<AdminUserResponse>>(`/api/v1/admin/users/${id}/unban`),
 
+  suspendUser: (id: string) =>
+    api.post<ApiResponse<AdminUserResponse>>(`/api/v1/admin/users/${id}/suspend`),
+
+  unsuspendUser: (id: string) =>
+    api.post<ApiResponse<AdminUserResponse>>(`/api/v1/admin/users/${id}/unsuspend`),
+
+  promoteToBusiness: (id: string) =>
+    api.patch<ApiResponse<AdminUserResponse>>(`/api/v1/admin/users/${id}/promote-to-business`),
+
+  promoteToAdmin: (id: string) =>
+    api.patch<ApiResponse<AdminUserResponse>>(`/api/v1/admin/users/${id}/promote-to-admin`),
+
   deleteUser: (id: string) =>
     api.delete<ApiResponse<null>>(`/api/v1/admin/users/${id}`),
 
@@ -610,6 +643,82 @@ export const adminApi = {
 
   unverifyBusiness: (id: string) =>
     api.patch<ApiResponse<AdminUserResponse>>(`/api/v1/admin/business/${id}/unverify`),
+
+  // Audit log — paginated, filterable browse over admin/moderation/account events.
+  // Audit-Log — paginiertes, filterbares Durchsuchen von Admin-/Moderations-/Kontoereignissen.
+  getAuditLog: (params: {
+    action?: AuditAction;
+    targetType?: string;
+    search?: string;
+    page?: number;
+    size?: number;
+  }) =>
+    api.get<ApiResponse<PageResponse<AuditLogResponse>>>("/api/v1/admin/audit-log", {
+      params: {
+        action: params.action,
+        targetType: params.targetType,
+        search: params.search,
+        page: params.page ?? 0,
+        size: params.size ?? 20,
+      },
+    }),
+};
+
+// ── Reports — user-filed content moderation reports ────────────────────────────
+// Meldungen — von Benutzern eingereichte Inhalts-Meldungen
+//
+// Note: ReportController has no class-level @RequestMapping — its routes
+// (/api/v1/reports, /api/v1/admin/reports/**) live directly on the methods,
+// not nested under AdminController. / Hinweis: ReportController hat kein
+// klassenweites @RequestMapping — seine Routen liegen direkt auf den
+// Methoden, nicht unter AdminController.
+export const reportsApi = {
+  create: (data: CreateReportRequest) =>
+    api.post<ApiResponse<ReportResponse>>("/api/v1/reports", data),
+
+  adminList: (params: {
+    status?: ReportStatus;
+    targetType?: ReportTargetType;
+    search?: string;
+    page?: number;
+    size?: number;
+  }) =>
+    api.get<ApiResponse<PageResponse<ReportResponse>>>("/api/v1/admin/reports", {
+      params: {
+        status: params.status,
+        targetType: params.targetType,
+        search: params.search,
+        page: params.page ?? 0,
+        size: params.size ?? 20,
+      },
+    }),
+
+  adminGet: (id: string) =>
+    api.get<ApiResponse<ReportResponse>>(`/api/v1/admin/reports/${id}`),
+
+  // /review takes no request body. / /review erwartet keinen Request-Body.
+  adminReview: (id: string) =>
+    api.post<ApiResponse<ReportResponse>>(`/api/v1/admin/reports/${id}/review`),
+
+  adminResolve: (id: string, resolutionNote?: string) =>
+    api.post<ApiResponse<ReportResponse>>(`/api/v1/admin/reports/${id}/resolve`, {
+      resolutionNote,
+    }),
+
+  adminDismiss: (id: string, resolutionNote?: string) =>
+    api.post<ApiResponse<ReportResponse>>(`/api/v1/admin/reports/${id}/dismiss`, {
+      resolutionNote,
+    }),
+
+  adminWarn: (id: string, resolutionNote?: string) =>
+    api.post<ApiResponse<ReportResponse>>(`/api/v1/admin/reports/${id}/warn`, {
+      resolutionNote,
+    }),
+
+  adminBan: (id: string, resolutionNote?: string) =>
+    api.post<ApiResponse<ReportResponse>>(`/api/v1/admin/reports/${id}/ban`, {
+      resolutionNote,
+    }),
 };
 
 // ── Notifications ─────────────────────────────────────────────────────────────
@@ -665,6 +774,21 @@ export const businessApi = {
     api.get<ApiResponse<BookingResponse[]>>("/api/v1/business/bookings/calendar", {
       params: { from, to },
     }),
+
+  getOverviewExtras: () =>
+    api.get<ApiResponse<BusinessOverviewExtrasResponse>>(
+      "/api/v1/business/dashboard/overview-extras"
+    ),
+
+  // Richer analytics layer — daily booking/revenue chart, popular bikes,
+  // average rental duration, views-to-bookings conversion rate. The backend
+  // endpoint (BusinessDashboardController.getAnalytics) already existed in
+  // full; this call was never added, so the page calling it never existed.
+  getAnalytics: (days = 30) =>
+    api.get<ApiResponse<BusinessAnalyticsResponse>>(
+      "/api/v1/business/dashboard/analytics",
+      { params: { days } }
+    ),
 
   bulkCreateBikes: (data: BulkCreateBikeRequest) =>
     api.post<ApiResponse<BikeResponse[]>>("/api/v1/bikes/bulk", data),

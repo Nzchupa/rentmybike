@@ -3,7 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Search, ShieldBan, ShieldCheck, Trash2, BadgeCheck, BadgeX } from "lucide-react";
+import {
+  Search,
+  ShieldBan,
+  ShieldCheck,
+  Trash2,
+  BadgeCheck,
+  BadgeX,
+  PauseCircle,
+  PlayCircle,
+  Briefcase,
+  Crown,
+} from "lucide-react";
 import toast from "react-hot-toast";
 import { adminApi } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
@@ -19,7 +30,19 @@ export default function AdminUsersPage() {
   const t = useTranslations("admin.users");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = 20;
   const queryClient = useQueryClient();
+
+  // Reset to the first page whenever the search term actually changes —
+  // otherwise a search narrowing the result set could leave `page` pointing
+  // past the new last page, rendering an empty table with no obvious cause.
+  // Zurück zur ersten Seite bei jeder Suchänderung — sonst könnte `page`
+  // nach einer Eingrenzung der Ergebnisse über die neue letzte Seite
+  // hinauszeigen und eine leere Tabelle ohne ersichtlichen Grund anzeigen.
+  useEffect(() => {
+    setPage(0);
+  }, [debouncedSearch]);
 
   // Debounce search — a timer stashed on `window` leaked across remounts
   // (e.g. fast nav away + back) and was never cleared on unmount, so a
@@ -58,8 +81,8 @@ export default function AdminUsersPage() {
   // schwer diagnostizierbaren "Benutzerverwaltung zeigt keine Daten"-Bericht
   // etwas Handlungsfähiges.
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["admin-users", debouncedSearch],
-    queryFn: () => adminApi.listUsers(debouncedSearch || undefined, 0, 50),
+    queryKey: ["admin-users", debouncedSearch, page],
+    queryFn: () => adminApi.listUsers(debouncedSearch || undefined, page, PAGE_SIZE),
     select: (r) => r.data.data,
   });
 
@@ -96,7 +119,32 @@ export default function AdminUsersPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const { mutate: suspend } = useMutation({
+    mutationFn: adminApi.suspendUser,
+    onSuccess: () => { toast.success(t("userSuspended")); invalidate(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const { mutate: unsuspend } = useMutation({
+    mutationFn: adminApi.unsuspendUser,
+    onSuccess: () => { toast.success(t("userUnsuspended")); invalidate(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const { mutate: promoteToBusiness } = useMutation({
+    mutationFn: adminApi.promoteToBusiness,
+    onSuccess: () => { toast.success(t("userPromotedBusiness")); invalidate(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const { mutate: promoteToAdmin } = useMutation({
+    mutationFn: adminApi.promoteToAdmin,
+    onSuccess: () => { toast.success(t("userPromotedAdmin")); invalidate(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const users = data?.content ?? [];
+  const totalPages = data?.totalPages ?? 0;
 
   return (
     <div className="space-y-6">
@@ -136,6 +184,7 @@ export default function AdminUsersPage() {
                   <th className="text-left px-4 py-3 font-medium text-slate-600">{t("userColumn")}</th>
                   <th className="text-left px-4 py-3 font-medium text-slate-600">{t("role")}</th>
                   <th className="text-left px-4 py-3 font-medium text-slate-600">{t("status")}</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600">{t("activity")}</th>
                   <th className="text-left px-4 py-3 font-medium text-slate-600">{t("joined")}</th>
                   <th className="text-right px-4 py-3 font-medium text-slate-600">{t("actions")}</th>
                 </tr>
@@ -151,6 +200,9 @@ export default function AdminUsersPage() {
                             {user.firstName} {user.lastName}
                           </p>
                           <p className="text-xs text-slate-500">{user.email}</p>
+                          {user.businessName && (
+                            <p className="text-xs text-slate-400">{user.businessName}</p>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -167,10 +219,24 @@ export default function AdminUsersPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3">
+                      {/* Banned and suspended are distinct states on the DTO
+                          (bannedAt vs suspendedAt) — previously collapsed
+                          into the same "not active" bucket, hiding which
+                          one actually applied. Banned takes visual priority
+                          since it's the more severe state. */}
                       {user.banned ? (
                         <Badge variant="red">{t("banned")}</Badge>
+                      ) : user.suspendedAt ? (
+                        <Badge variant="yellow">{t("suspended")}</Badge>
                       ) : (
                         <Badge variant="green">{t("active")}</Badge>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-slate-500 text-xs">
+                      <p>{t("bikesCount", { count: user.bikeCount })}</p>
+                      <p>{t("bookingsCount", { count: user.bookingCount })}</p>
+                      {user.lastActivityAt && (
+                        <p className="text-slate-400">{formatDate(user.lastActivityAt)}</p>
                       )}
                     </td>
                     <td className="px-4 py-3 text-slate-500">
@@ -201,6 +267,27 @@ export default function AdminUsersPage() {
                         )}
                         {user.role !== "ADMIN" && (
                           <>
+                            {user.suspendedAt ? (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                title={t("unsuspend")}
+                                onClick={() => unsuspend(user.id)}
+                              >
+                                <PlayCircle size={15} className="text-green-600" />
+                              </Button>
+                            ) : (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                title={t("suspend")}
+                                onClick={() => {
+                                  if (confirm(t("suspendConfirm"))) suspend(user.id);
+                                }}
+                              >
+                                <PauseCircle size={15} className="text-amber-600" />
+                              </Button>
+                            )}
                             {user.banned ? (
                               <Button
                                 size="sm"
@@ -222,6 +309,28 @@ export default function AdminUsersPage() {
                                 <ShieldBan size={15} className="text-amber-600" />
                               </Button>
                             )}
+                            {user.role === "USER" && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                title={t("promoteToBusiness")}
+                                onClick={() => {
+                                  if (confirm(t("promoteToBusinessConfirm"))) promoteToBusiness(user.id);
+                                }}
+                              >
+                                <Briefcase size={15} className="text-blue-600" />
+                              </Button>
+                            )}
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              title={t("promoteToAdmin")}
+                              onClick={() => {
+                                if (confirm(t("promoteToAdminConfirm"))) promoteToAdmin(user.id);
+                              }}
+                            >
+                              <Crown size={15} className="text-purple-600" />
+                            </Button>
                             <Button
                               size="sm"
                               variant="ghost"
@@ -245,6 +354,31 @@ export default function AdminUsersPage() {
               <p className="text-center py-10 text-slate-500">{t("noUsersFound")}</p>
             )}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 py-4 border-t border-slate-100">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page === 0}
+                onClick={() => setPage((p) => p - 1)}
+              >
+                {t("previous")}
+              </Button>
+              <span className="flex items-center px-4 text-sm text-slate-600">
+                {page + 1} / {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={page >= totalPages - 1}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                {t("next")}
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -56,6 +56,9 @@ public class BikeResponse {
     /** Convenience: URL of the primary photo / Bequemlichkeit: URL des Primärfotos */
     private String primaryPhotoUrl;
 
+    /** Number of public detail-page views — see Bike.viewCount / Anzahl öffentlicher Detailseiten-Aufrufe — siehe Bike.viewCount */
+    private long viewCount;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

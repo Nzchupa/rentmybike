@@ -4,14 +4,19 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
-import { BarChart3, Users, Bike } from "lucide-react";
+import { BarChart3, Users, Bike, ScrollText, ShieldAlert, Bell, Flag, BadgeCheck } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { cn } from "@/lib/utils";
 
 const tabs = [
-  { key: "stats",  labelKey: "stats", icon: BarChart3, href: "/admin" },
-  { key: "users",  labelKey: "users", icon: Users,     href: "/admin/users" },
-  { key: "bikes",  labelKey: "bikes", icon: Bike,      href: "/admin/bikes" },
+  { key: "stats",      labelKey: "stats",      icon: BarChart3,   href: "/admin" },
+  { key: "users",      labelKey: "users",      icon: Users,       href: "/admin/users" },
+  { key: "bikes",      labelKey: "bikes",      icon: Bike,        href: "/admin/bikes" },
+  { key: "moderation", labelKey: "moderation", icon: ShieldAlert, href: "/admin/moderation" },
+  { key: "businessVerification", labelKey: "businessVerification", icon: BadgeCheck, href: "/admin/business-verification" },
+  { key: "reports",    labelKey: "reports",    icon: Flag,        href: "/admin/reports" },
+  { key: "auditLog",   labelKey: "auditLog",   icon: ScrollText,  href: "/admin/audit-log" },
+  { key: "notifications", labelKey: "notifications", icon: Bell, href: "/admin/notifications" },
 ];
 
 /**
@@ -43,6 +48,39 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      {/* Mobile tab strip — the desktop sidebar below is hidden under `md`,
+          and without this there was no way to move between admin sections
+          on a phone at all (no bottom-nav equivalent exists for /admin).
+          Horizontally scrollable so it degrades gracefully as more tabs
+          get added. */}
+      {/* Mobile-Tableiste — die Desktop-Seitenleiste ist unter `md` verborgen,
+          ohne dies gab es auf dem Handy keine Möglichkeit, zwischen den
+          Admin-Bereichen zu wechseln. Horizontal scrollbar. */}
+      <nav className="md:hidden -mx-4 sm:-mx-6 mb-6 px-4 sm:px-6 flex gap-1.5 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden">
+        {tabs.map(({ key, labelKey, icon: Icon, href }) => {
+          const fullHref = `/${locale}${href}`;
+          const active =
+            href === "/admin"
+              ? pathname === fullHref
+              : pathname.startsWith(fullHref);
+          return (
+            <Link
+              key={key}
+              href={fullHref}
+              className={cn(
+                "shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-colors",
+                active
+                  ? "bg-slate-900 text-white"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              )}
+            >
+              <Icon size={14} />
+              {tNav(labelKey)}
+            </Link>
+          );
+        })}
+      </nav>
+
       <div className="flex gap-8">
         {/* Sidebar */}
         <aside className="hidden md:flex flex-col w-48 shrink-0 gap-1">

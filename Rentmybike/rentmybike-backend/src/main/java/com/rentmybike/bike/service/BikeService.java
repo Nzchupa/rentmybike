@@ -1,5 +1,7 @@
 package com.rentmybike.bike.service;
 
+import com.rentmybike.audit.entity.AuditAction;
+import com.rentmybike.audit.service.AuditLogService;
 import com.rentmybike.bike.dto.*;
 import com.rentmybike.bike.entity.ApprovalStatus;
 import com.rentmybike.bike.entity.Bike;
@@ -7,12 +9,14 @@ import com.rentmybike.bike.entity.BikeCategory;
 import com.rentmybike.bike.entity.BikePhoto;
 import com.rentmybike.bike.repository.BikePhotoRepository;
 import com.rentmybike.bike.repository.BikeRepository;
+import com.rentmybike.booking.entity.BookingStatus;
 import com.rentmybike.booking.repository.BookingRepository;
 import com.rentmybike.common.exception.AccessDeniedException;
 import com.rentmybike.common.exception.BusinessException;
 import com.rentmybike.common.exception.ResourceNotFoundException;
 import com.rentmybike.common.response.PageResponse;
 import com.rentmybike.common.service.CloudinaryService;
+import com.rentmybike.notification.service.NotificationService;
 import com.rentmybike.user.entity.User;
 import com.rentmybike.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +57,8 @@ public class BikeService {
     private final UserRepository userRepository;
     private final CloudinaryService cloudinaryService;
     private final BookingRepository bookingRepository;
+    private final AuditLogService auditLogService;
+    private final NotificationService notificationService;
 
     // ──────────────────────────────────────────────────────────────────────────
     // CREATE / ERSTELLEN
@@ -92,6 +98,8 @@ public class BikeService {
         bikeRepository.save(bike);
         log.info("Bike created: {} by owner: {} / Fahrrad erstellt: {} von Eigentümer: {}",
                 bike.getId(), ownerId, bike.getId(), ownerId);
+
+        notificationService.notifyAdminsOfNewPendingBike(bike);
 
         return toBikeResponse(bike, true);
     }
@@ -139,6 +147,13 @@ public class BikeService {
         log.info("{} bikes bulk-created by owner: {} / {} Fahrräder massenhaft erstellt von Eigentümer: {}",
                 bikes.size(), ownerId, bikes.size(), ownerId);
 
+        // One admin notification per bike, same as a single create — bulk
+        // submissions still need individual moderation attention.
+        // Eine Admin-Benachrichtigung pro Fahrrad, genauso wie bei einer
+        // Einzel-Erstellung — auch Massen-Einreichungen benötigen
+        // individuelle Moderationsaufmerksamkeit.
+        bikes.forEach(notificationService::notifyAdminsOfNewPendingBike);
+
         return bikes.stream().map(bike -> toBikeResponse(bike, true)).toList();
     }
 
@@ -171,7 +186,17 @@ public class BikeService {
      * Get a single bike by ID — public endpoint, only returns APPROVED bikes.
      * Einzelnes Fahrrad nach ID abrufen — öffentlicher Endpunkt, nur APPROVED-Fahrräder.
      */
-    @Transactional(readOnly = true)
+    // Not readOnly: this method also increments the view counter via a
+    // @Modifying query, which cannot run inside a read-only transaction.
+    // The increment happens after the visibility check, in the same
+    // transaction as the fetch, so the response below already reflects it.
+    //
+    // Nicht readOnly: diese Methode erhöht auch den Aufrufzähler über eine
+    // @Modifying-Abfrage, die nicht innerhalb einer Read-Only-Transaktion
+    // ausgeführt werden kann. Die Erhöhung erfolgt nach der
+    // Sichtbarkeitsprüfung, in derselben Transaktion wie der Abruf, sodass
+    // die untenstehende Antwort sie bereits berücksichtigt.
+    @Transactional
     public BikeResponse getPublicBike(UUID bikeId) {
         Bike bike = bikeRepository.findByIdWithDetails(bikeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bike", bikeId));
@@ -179,6 +204,9 @@ public class BikeService {
         if (!bike.isPubliclyVisible()) {
             throw new ResourceNotFoundException("Bike", bikeId);
         }
+
+        bikeRepository.incrementViewCount(bikeId);
+        bike.setViewCount(bike.getViewCount() + 1); // keep in-memory entity in sync for the response below
 
         return toBikeResponse(bike, false);
     }
@@ -227,6 +255,55 @@ public class BikeService {
         return toBikeResponse(bike, true);
     }
 
+    /**
+     * Owner: per-bike stats panel (view count + booking breakdown + revenue).
+     * Eigentümer: Pro-Fahrrad-Statistikpanel (Aufrufzähler + Buchungsaufschlüsselung + Umsatz).
+     */
+    @Transactional(readOnly = true)
+    public BikeStatsResponse getBikeStats(UUID bikeId, UUID ownerId) {
+        Bike bike = bikeRepository.findById(bikeId)
+                .filter(b -> !b.isDeleted())
+                .orElseThrow(() -> new ResourceNotFoundException("Bike", bikeId));
+
+        requireOwner(bike, ownerId);
+        return buildBikeStats(bike);
+    }
+
+    /**
+     * Admin: per-bike stats panel — same data as {@link #getBikeStats}, no
+     * ownership check.
+     * Admin: Pro-Fahrrad-Statistikpanel — gleiche Daten wie {@link
+     * #getBikeStats}, ohne Eigentümerschaftsprüfung.
+     */
+    @Transactional(readOnly = true)
+    public BikeStatsResponse adminGetBikeStats(UUID bikeId) {
+        Bike bike = bikeRepository.findById(bikeId)
+                .filter(b -> !b.isDeleted())
+                .orElseThrow(() -> new ResourceNotFoundException("Bike", bikeId));
+
+        return buildBikeStats(bike);
+    }
+
+    /**
+     * Shared aggregation logic behind {@link #getBikeStats} / {@link #adminGetBikeStats}.
+     * Geteilte Aggregationslogik hinter {@link #getBikeStats} / {@link #adminGetBikeStats}.
+     */
+    private BikeStatsResponse buildBikeStats(Bike bike) {
+        UUID bikeId = bike.getId();
+
+        return BikeStatsResponse.builder()
+                .bikeId(bikeId)
+                .viewCount(bike.getViewCount())
+                .totalBookings(bookingRepository.countByBikeIdAndDeletedAtIsNull(bikeId))
+                .pendingBookings(bookingRepository.countByBikeIdAndStatusAndDeletedAtIsNull(bikeId, BookingStatus.PENDING))
+                .acceptedBookings(bookingRepository.countByBikeIdAndStatusAndDeletedAtIsNull(bikeId, BookingStatus.ACCEPTED))
+                .completedBookings(bookingRepository.countByBikeIdAndStatusAndDeletedAtIsNull(bikeId, BookingStatus.COMPLETED))
+                .cancelledBookings(bookingRepository.countByBikeIdAndStatusAndDeletedAtIsNull(bikeId, BookingStatus.CANCELLED))
+                .rejectedBookings(bookingRepository.countByBikeIdAndStatusAndDeletedAtIsNull(bikeId, BookingStatus.REJECTED))
+                .totalRevenue(bookingRepository.sumTotalPriceOfCompletedByBikeId(bikeId))
+                .build();
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // UPDATE / AKTUALISIEREN
     // ──────────────────────────────────────────────────────────────────────────
@@ -263,9 +340,20 @@ public class BikeService {
         bike.setLongitude(request.getLongitude());
         bike.setAvailable(request.getAvailable());
 
-        // Reset to PENDING if meaningful content changed on an already-approved bike
-        // Auf PENDING zurücksetzen, wenn sich wichtiger Inhalt bei einem genehmigten Fahrrad geändert hat
-        if (contentChanged && bike.getApprovalStatus() == ApprovalStatus.APPROVED) {
+        // Reset to PENDING if meaningful content changed on an already-approved bike,
+        // OR unconditionally if the bike was CHANGES_REQUESTED — that status exists
+        // specifically so the owner's next save sends it back into the moderation
+        // queue, even if the edit looks minor to this check.
+        // Auf PENDING zurücksetzen, wenn sich wichtiger Inhalt bei einem genehmigten
+        // Fahrrad geändert hat, ODER unbedingt, wenn das Fahrrad CHANGES_REQUESTED
+        // war — dieser Status existiert speziell dafür, dass die nächste Speicherung
+        // des Eigentümers es zurück in die Moderationswarteschlange schickt, auch
+        // wenn die Bearbeitung dieser Prüfung nach geringfügig aussieht.
+        boolean shouldResetToPending =
+                (contentChanged && bike.getApprovalStatus() == ApprovalStatus.APPROVED)
+                || bike.getApprovalStatus() == ApprovalStatus.CHANGES_REQUESTED;
+
+        if (shouldResetToPending) {
             bike.setApprovalStatus(ApprovalStatus.PENDING);
             bike.setRejectionReason(null);
             log.info("Bike {} reset to PENDING after owner update / Fahrrad {} nach Eigentümer-Update auf PENDING zurückgesetzt",
@@ -412,7 +500,7 @@ public class BikeService {
      * Admin approves a bike listing — makes it visible in public search.
      * Admin genehmigt ein Fahrrad-Inserat — macht es in öffentlicher Suche sichtbar.
      */
-    public BikeResponse approveBike(UUID bikeId) {
+    public BikeResponse approveBike(UUID bikeId, UUID adminId, String adminName) {
         Bike bike = bikeRepository.findByIdWithDetails(bikeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bike", bikeId));
 
@@ -425,6 +513,10 @@ public class BikeService {
         bikeRepository.save(bike);
 
         log.info("Bike APPROVED: {} / Fahrrad GENEHMIGT: {}", bikeId, bikeId);
+
+        auditLogService.record(adminId, adminName, AuditAction.BIKE_APPROVED,
+                "BIKE", bikeId, null);
+
         return toBikeResponse(bike, true);
     }
 
@@ -435,7 +527,7 @@ public class BikeService {
      * <p>The owner will see the rejection reason so they can fix and resubmit.
      * <p>Der Eigentümer sieht den Ablehnungsgrund, damit er Probleme beheben und erneut einreichen kann.
      */
-    public BikeResponse rejectBike(UUID bikeId, RejectBikeRequest request) {
+    public BikeResponse rejectBike(UUID bikeId, RejectBikeRequest request, UUID adminId, String adminName) {
         Bike bike = bikeRepository.findByIdWithDetails(bikeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bike", bikeId));
 
@@ -452,6 +544,54 @@ public class BikeService {
         bikeRepository.save(bike);
 
         log.info("Bike REJECTED: {} / Fahrrad ABGELEHNT: {}", bikeId, bikeId);
+
+        auditLogService.record(adminId, adminName, AuditAction.BIKE_REJECTED,
+                "BIKE", bikeId, bike.getRejectionReason());
+
+        return toBikeResponse(bike, true);
+    }
+
+    /**
+     * Admin requests changes on a bike listing — a softer alternative to
+     * {@link #rejectBike} for when the listing is close but needs specific
+     * fixes (e.g. better photos, clearer description) rather than an outright
+     * rejection. The owner sees the feedback via the same {@code
+     * rejectionReason} field, and {@link #updateBike} automatically returns
+     * the bike to PENDING as soon as the owner saves an edit, so the admin
+     * sees it again in the moderation queue without a separate "resubmit"
+     * action.
+     * Admin fordert Änderungen an einem Fahrrad-Inserat an — eine mildere
+     * Alternative zu {@link #rejectBike}, wenn das Inserat fast fertig ist,
+     * aber konkrete Korrekturen benötigt (z. B. bessere Fotos, klarere
+     * Beschreibung), statt einer vollständigen Ablehnung. Der Eigentümer
+     * sieht das Feedback über dasselbe Feld {@code rejectionReason}, und
+     * {@link #updateBike} setzt das Fahrrad automatisch auf PENDING zurück,
+     * sobald der Eigentümer eine Bearbeitung speichert — ohne separate
+     * "Erneut einreichen"-Aktion.
+     */
+    public BikeResponse requestChanges(UUID bikeId, RejectBikeRequest request, UUID adminId, String adminName) {
+        Bike bike = bikeRepository.findByIdWithDetails(bikeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Bike", bikeId));
+
+        if (bike.getApprovalStatus() == ApprovalStatus.APPROVED) {
+            throw new BusinessException(
+                    "Cannot request changes on an already-approved bike — reject it instead if needed "
+                            + "/ Änderungen können bei einem bereits genehmigten Fahrrad nicht angefordert werden — bei Bedarf stattdessen ablehnen");
+        }
+        if (bike.getApprovalStatus() == ApprovalStatus.CHANGES_REQUESTED) {
+            throw new BusinessException(
+                    "Changes have already been requested for this bike / Für dieses Fahrrad wurden bereits Änderungen angefordert");
+        }
+
+        bike.setApprovalStatus(ApprovalStatus.CHANGES_REQUESTED);
+        bike.setRejectionReason(request.getReason().strip());
+        bikeRepository.save(bike);
+
+        log.info("Bike CHANGES_REQUESTED: {} / Fahrrad ÄNDERUNGEN_ANGEFORDERT: {}", bikeId, bikeId);
+
+        auditLogService.record(adminId, adminName, AuditAction.BIKE_CHANGES_REQUESTED,
+                "BIKE", bikeId, bike.getRejectionReason());
+
         return toBikeResponse(bike, true);
     }
 
@@ -513,6 +653,7 @@ public class BikeService {
                 .rejectionReason(includePrivate ? bike.getRejectionReason() : null)
                 .photos(photoResponses)
                 .primaryPhotoUrl(primaryUrl)
+                .viewCount(bike.getViewCount())
                 .createdAt(bike.getCreatedAt())
                 .updatedAt(bike.getUpdatedAt())
                 .build();

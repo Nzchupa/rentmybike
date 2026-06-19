@@ -24,5 +24,9 @@ public enum NotificationType {
     /** A renter submitted a new booking request for one of the owner's bikes. */
     NEW_BOOKING_REQUEST,
     /** The other participant in a booking's chat thread sent a new message. */
-    NEW_CHAT_MESSAGE
+    NEW_CHAT_MESSAGE,
+    /** Admin-facing: a new bike listing is awaiting approval. */
+    ADMIN_NEW_PENDING_BIKE,
+    /** Admin-facing: a new report was filed and needs triage. */
+    ADMIN_NEW_REPORT
 }

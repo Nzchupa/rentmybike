@@ -128,13 +128,24 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
             <span className="text-slate-400">· {booking.rentalDays}d</span>
           </div>
 
-          {/* Participant */}
-          {view === "owner" && (
-            <div className="flex items-center gap-2 mt-2">
-              <Avatar name={booking.renterName} avatarUrl={booking.renterAvatarUrl} size="sm" />
-              <span className="text-sm text-slate-600">{booking.renterName}</span>
-            </div>
-          )}
+          {/* Participant — the counterpart on the *other* side of the booking.
+              Previously this only rendered for view==="owner" (showing the
+              renter), so the renter's own booking list never showed who the
+              bike owner was at all. Both views now show the other party. */}
+          {/* Gegenpartei — zeigt jetzt in beiden Ansichten die andere Seite
+              der Buchung (vorher fehlte der Eigentümername in der
+              Mieteransicht komplett). */}
+          <div className="flex items-center gap-2 mt-2">
+            <Avatar
+              name={view === "owner" ? booking.renterName : booking.ownerName}
+              avatarUrl={view === "owner" ? booking.renterAvatarUrl : booking.ownerAvatarUrl}
+              size="sm"
+            />
+            <span className="text-sm text-slate-600">
+              {t(view === "owner" ? "renterLabel" : "ownerLabel")}{" "}
+              {view === "owner" ? booking.renterName : booking.ownerName}
+            </span>
+          </div>
 
           {hasBreakdown && (
             <div className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-sm space-y-1">

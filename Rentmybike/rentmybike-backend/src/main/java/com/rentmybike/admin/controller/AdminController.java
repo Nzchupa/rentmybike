@@ -1,8 +1,12 @@
 package com.rentmybike.admin.controller;
 
+import com.rentmybike.admin.dto.AdminAnalyticsResponse;
 import com.rentmybike.admin.dto.AdminStatsResponse;
 import com.rentmybike.admin.dto.AdminUserResponse;
 import com.rentmybike.admin.service.AdminService;
+import com.rentmybike.audit.dto.AuditLogResponse;
+import com.rentmybike.audit.entity.AuditAction;
+import com.rentmybike.audit.service.AuditLogService;
 import com.rentmybike.common.response.ApiResponse;
 import com.rentmybike.common.response.PageResponse;
 import com.rentmybike.user.entity.User;
@@ -23,16 +27,25 @@ import java.util.UUID;
  *
  * <p>User management / Benutzerverwaltung:
  * <ul>
- *   <li>GET    /users             — paginated list with optional search</li>
- *   <li>GET    /users/{id}        — single user detail</li>
- *   <li>POST   /users/{id}/ban    — ban user</li>
- *   <li>POST   /users/{id}/unban  — unban user</li>
- *   <li>DELETE /users/{id}        — soft delete user</li>
+ *   <li>GET    /users                       — paginated list with optional search</li>
+ *   <li>GET    /users/{id}                  — single user detail</li>
+ *   <li>POST   /users/{id}/ban               — ban user</li>
+ *   <li>POST   /users/{id}/unban             — unban user</li>
+ *   <li>POST   /users/{id}/suspend           — suspend user</li>
+ *   <li>POST   /users/{id}/unsuspend         — unsuspend user</li>
+ *   <li>PATCH  /users/{id}/promote-to-business — promote USER to BUSINESS</li>
+ *   <li>PATCH  /users/{id}/promote-to-admin    — promote USER/BUSINESS to ADMIN</li>
+ *   <li>DELETE /users/{id}                  — soft delete user</li>
  * </ul>
  *
  * <p>Stats / Statistiken:
  * <ul>
  *   <li>GET    /stats             — platform aggregate statistics</li>
+ * </ul>
+ *
+ * <p>Audit log / Audit-Log:
+ * <ul>
+ *   <li>GET    /audit-log         — paginated, filterable admin/moderation/account event log</li>
  * </ul>
  *
  * <p>Bike moderation / Fahrrad-Moderation:
@@ -53,6 +66,7 @@ import java.util.UUID;
 public class AdminController {
 
     private final AdminService adminService;
+    private final AuditLogService auditLogService;
 
     // ──────────────────────────────────────────────────────────────────────────
     // User management / Benutzerverwaltung
@@ -116,6 +130,66 @@ public class AdminController {
 
         AdminUserResponse response = adminService.unbanUser(currentAdmin.getId(), userId);
         return ResponseEntity.ok(ApiResponse.success(response, "User unbanned / Benutzer entsperrt"));
+    }
+
+    /**
+     * Suspend a user — sets suspendedAt. Cannot suspend other admins.
+     * Benutzer suspendieren — setzt suspendedAt. Kann keine anderen Admins suspendieren.
+     *
+     * <p>POST /api/v1/admin/users/{id}/suspend
+     */
+    @PostMapping("/users/{id}/suspend")
+    public ResponseEntity<ApiResponse<AdminUserResponse>> suspendUser(
+            @PathVariable("id") UUID userId,
+            @AuthenticationPrincipal User currentAdmin) {
+
+        AdminUserResponse response = adminService.suspendUser(currentAdmin.getId(), userId);
+        return ResponseEntity.ok(ApiResponse.success(response, "User suspended / Benutzer suspendiert"));
+    }
+
+    /**
+     * Unsuspend a user — clears suspendedAt.
+     * Benutzer entsuspendieren — löscht suspendedAt.
+     *
+     * <p>POST /api/v1/admin/users/{id}/unsuspend
+     */
+    @PostMapping("/users/{id}/unsuspend")
+    public ResponseEntity<ApiResponse<AdminUserResponse>> unsuspendUser(
+            @PathVariable("id") UUID userId,
+            @AuthenticationPrincipal User currentAdmin) {
+
+        AdminUserResponse response = adminService.unsuspendUser(currentAdmin.getId(), userId);
+        return ResponseEntity.ok(ApiResponse.success(response, "User unsuspended / Benutzer entsuspendiert"));
+    }
+
+    /**
+     * Promote a USER account to BUSINESS.
+     * Befördert ein USER-Konto zu BUSINESS.
+     *
+     * <p>PATCH /api/v1/admin/users/{id}/promote-to-business
+     */
+    @PatchMapping("/users/{id}/promote-to-business")
+    public ResponseEntity<ApiResponse<AdminUserResponse>> promoteToBusiness(
+            @PathVariable("id") UUID userId,
+            @AuthenticationPrincipal User currentAdmin) {
+
+        AdminUserResponse response = adminService.promoteToBusiness(currentAdmin.getId(), userId);
+        return ResponseEntity.ok(ApiResponse.success(response, "User promoted to BUSINESS / Benutzer zu BUSINESS befördert"));
+    }
+
+    /**
+     * Promote a USER or BUSINESS account to ADMIN.
+     * Befördert ein USER- oder BUSINESS-Konto zu ADMIN.
+     *
+     * <p>PATCH /api/v1/admin/users/{id}/promote-to-admin
+     */
+    @PatchMapping("/users/{id}/promote-to-admin")
+    public ResponseEntity<ApiResponse<AdminUserResponse>> promoteToAdmin(
+            @PathVariable("id") UUID userId,
+            @AuthenticationPrincipal User currentAdmin) {
+
+        AdminUserResponse response = adminService.promoteToAdmin(currentAdmin.getId(), userId);
+        return ResponseEntity.ok(ApiResponse.success(response, "User promoted to ADMIN / Benutzer zu ADMIN befördert"));
     }
 
     /**
@@ -183,5 +257,53 @@ public class AdminController {
     @GetMapping("/stats")
     public ResponseEntity<ApiResponse<AdminStatsResponse>> getStats() {
         return ResponseEntity.ok(ApiResponse.success(adminService.getStats()));
+    }
+
+    /**
+     * Daily-bucketed activity time-series (new users, new bikes, new
+     * bookings, revenue) for the admin dashboard's charts.
+     * Täglich gebündelte Aktivitäts-Zeitreihe (neue Benutzer, neue
+     * Fahrräder, neue Buchungen, Umsatz) für die Diagramme des
+     * Admin-Dashboards.
+     *
+     * <p>GET /api/v1/admin/analytics?days=30
+     *
+     * @param days trailing window in days, clamped to [1, 365], defaults to 30 / zurückliegendes Fenster in Tagen, begrenzt auf [1, 365], Standard 30
+     */
+    @GetMapping("/analytics")
+    public ResponseEntity<ApiResponse<AdminAnalyticsResponse>> getAnalytics(
+            @RequestParam(defaultValue = "30") int days) {
+
+        int clamped = Math.max(1, Math.min(days, 365));
+        return ResponseEntity.ok(ApiResponse.success(adminService.getAnalytics(clamped)));
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // Audit log / Audit-Log
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Paginated, filterable audit log of admin/moderation/account events.
+     * Paginiertes, filterbares Audit-Log von Admin-/Moderations-/Kontoereignissen.
+     *
+     * <p>GET /api/v1/admin/audit-log?action=USER_BANNED&targetType=USER&search=john&page=0&size=20
+     */
+    @GetMapping("/audit-log")
+    public ResponseEntity<ApiResponse<PageResponse<AuditLogResponse>>> getAuditLog(
+            @RequestParam(required = false) AuditAction action,
+            @RequestParam(required = false) String targetType,
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+
+        // Same pitfall as listUsers above: AuditLogRepository.findAllForAdmin's
+        // @Query already has an explicit ORDER BY a.createdAt DESC, so the
+        // Pageable passed here must stay unsorted to avoid a double ORDER BY.
+        //
+        // Gleiche Falle wie oben bei listUsers: AuditLogRepository.findAllForAdmin
+        // hat bereits ein explizites ORDER BY a.createdAt DESC, daher muss das hier
+        // übergebene Pageable unsortiert bleiben, um ein doppeltes ORDER BY zu vermeiden.
+        PageRequest pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(ApiResponse.success(auditLogService.list(action, targetType, search, pageable)));
     }
 }

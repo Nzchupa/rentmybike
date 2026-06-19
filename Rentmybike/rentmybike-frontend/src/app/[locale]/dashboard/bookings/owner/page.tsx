@@ -6,9 +6,10 @@ import { useQuery } from "@tanstack/react-query";
 import { CalendarCheck, AlertCircle } from "lucide-react";
 import { bookingsApi } from "@/lib/api";
 import { BookingCard } from "@/components/booking/BookingCard";
+import { ReviewModal } from "@/components/booking/ReviewModal";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
-import type { BookingStatus } from "@/types";
+import type { BookingResponse, BookingStatus } from "@/types";
 
 const STATUS_FILTERS: (BookingStatus | "ALL")[] = [
   "ALL", "PENDING", "ACCEPTED", "COMPLETED", "CANCELLED",
@@ -23,6 +24,15 @@ export default function OwnerBookingsPage() {
   const tb = useTranslations("booking.status");
   const tBookings = useTranslations("dashboard.bookings");
   const [statusFilter, setStatusFilter] = useState<BookingStatus | undefined>(undefined);
+  // Booking currently being reviewed — the owner leaves an OWNER_TO_RENTER
+  // review once a booking is reviewable (see BookingResponse.reviewable on
+  // the backend). Previously BookingCard's onReview callback was never
+  // passed from here, so the "Write a review" button never rendered.
+  // Aktuell zu bewertende Buchung — der Eigentümer gibt eine
+  // OWNER_TO_RENTER-Bewertung ab, sobald eine Buchung bewertbar ist. Vorher
+  // wurde der onReview-Callback von BookingCard hier nie übergeben, sodass
+  // die "Bewertung schreiben"-Schaltfläche nie angezeigt wurde.
+  const [reviewTarget, setReviewTarget] = useState<BookingResponse | null>(null);
 
   // Surface isError instead of letting a failed request render identically to
   // "you have no incoming bookings" — see the BookingService.getOwnerBookings
@@ -82,9 +92,22 @@ export default function OwnerBookingsPage() {
       ) : (
         <div className="space-y-3">
           {bookings.map((b) => (
-            <BookingCard key={b.id} booking={b} view="owner" />
+            <BookingCard
+              key={b.id}
+              booking={b}
+              view="owner"
+              onReview={setReviewTarget}
+            />
           ))}
         </div>
+      )}
+
+      {reviewTarget && (
+        <ReviewModal
+          booking={reviewTarget}
+          type="OWNER_TO_RENTER"
+          onClose={() => setReviewTarget(null)}
+        />
       )}
     </div>
   );

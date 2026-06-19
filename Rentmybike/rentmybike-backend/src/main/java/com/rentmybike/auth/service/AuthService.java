@@ -1,5 +1,7 @@
 package com.rentmybike.auth.service;
 
+import com.rentmybike.audit.entity.AuditAction;
+import com.rentmybike.audit.service.AuditLogService;
 import com.rentmybike.auth.dto.AuthResponse;
 import com.rentmybike.auth.dto.LoginRequest;
 import com.rentmybike.auth.dto.RegisterRequest;
@@ -52,6 +54,7 @@ public class AuthService {
     private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
     private final AppProperties appProperties;
+    private final AuditLogService auditLogService;
 
     // ──────────────────────────────────────────────────────────────────────────
     // Registration / Registrierung
@@ -123,6 +126,14 @@ public class AuthService {
                 user.getEmail(),
                 autoVerify ? " (auto-verifiziert)" : "",
                 user.getEmail());
+
+        // The new user is their own actor here — they triggered their own
+        // registration, so actorId/actorName reference themselves.
+        // Der neue Benutzer ist hier sein eigener Akteur — er hat seine
+        // eigene Registrierung ausgelöst, daher verweisen actorId/actorName
+        // auf ihn selbst.
+        auditLogService.record(user.getId(), user.getFullName(), AuditAction.USER_REGISTERED,
+                "USER", user.getId(), null);
 
         // Send verification email only when not auto-verifying / Verifizierungs-E-Mail nur senden, wenn nicht auto-verifiziert
         if (autoVerify) {
