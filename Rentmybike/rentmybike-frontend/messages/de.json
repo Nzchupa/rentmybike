@@ -53,9 +53,9 @@
   },
   "pages": {
     "about": {
-      "title": "Über RentMyBike",
-      "body1": "Mein Name ist Nazar, und ich bin der Entwickler hinter RentMyBike. Meine Hauptidee war es, jedem die Möglichkeit zu geben, sein Fahrrad zu vermieten — und kleinen Fahrradvermietungsunternehmen eine einfache Online-Buchung für ihre Kunden zu ermöglichen.",
-      "body2": "RentMyBike ist ein Peer-to-Peer-Marktplatz, auf dem Eigentümer mit Fahrrädern verdienen, die sie nicht jeden Tag nutzen, und Mieter direkt mit Einheimischen abwickeln — ohne den Aufpreis eines klassischen Verleihladens. Eigentümer legen ihren eigenen Preis und ihre Verfügbarkeit fest; Mieter buchen direkt bei ihnen.",
+      "title": "Über Velohood",
+      "body1": "Mein Name ist Nazar, und ich bin der Entwickler hinter Velohood. Meine Hauptidee war es, jedem die Möglichkeit zu geben, sein Fahrrad zu vermieten — und kleinen Fahrradvermietungsunternehmen eine einfache Online-Buchung für ihre Kunden zu ermöglichen.",
+      "body2": "Velohood ist ein Peer-to-Peer-Marktplatz, auf dem Eigentümer mit Fahrrädern verdienen, die sie nicht jeden Tag nutzen, und Mieter direkt mit Einheimischen abwickeln — ohne den Aufpreis eines klassischen Verleihladens. Eigentümer legen ihren eigenen Preis und ihre Verfügbarkeit fest; Mieter buchen direkt bei ihnen.",
       "body3": "Für mich ist dieses Projekt eine kleine Möglichkeit, die Welt ein bisschen besser zu machen — von Menschen, für Menschen."
     },
     "contact": {
@@ -66,7 +66,7 @@
     },
     "privacy": {
       "title": "Datenschutz",
-      "intro": "RentMyBike ist ein Studienprojekt. Die folgenden Informationen erklären, wie deine Daten auf dieser Plattform verarbeitet werden. Dies ist kein Ersatz für rechtliche Beratung.",
+      "intro": "Velohood ist ein Studienprojekt. Die folgenden Informationen erklären, wie deine Daten auf dieser Plattform verarbeitet werden. Dies ist kein Ersatz für rechtliche Beratung.",
       "section1Title": "Welche Daten wir erfassen",
       "section1Body": "Wir erfassen die Informationen, die du bei der Kontoerstellung angibst (Vorname, Nachname, E-Mail-Adresse und optional Telefonnummer und Profilfoto), sowie die von dir erstellten Fahrradangebote, Buchungsanfragen, Nachrichten über den In-App-Chat und Zustandsfotos, die während einer Vermietung hochgeladen werden.",
       "section2Title": "Wie wir deine Daten verwenden",
@@ -82,9 +82,9 @@
     },
     "terms": {
       "title": "Nutzungsbedingungen",
-      "intro": "Diese Bedingungen gelten für die Nutzung von RentMyBike. Dies ist ein Studienprojekt, und diese Bedingungen decken möglicherweise nicht jeden rechtlichen Fall ab. Sie beschreiben jedoch die Verantwortlichkeiten von Fahrradbesitzern und Mietern auf der Plattform.",
+      "intro": "Diese Bedingungen gelten für die Nutzung von Velohood. Dies ist ein Studienprojekt, und diese Bedingungen decken möglicherweise nicht jeden rechtlichen Fall ab. Sie beschreiben jedoch die Verantwortlichkeiten von Fahrradbesitzern und Mietern auf der Plattform.",
       "section1Title": "Die Plattform",
-      "section1Body": "RentMyBike ist ein Marktplatz, der Fahrradbesitzer und Mieter verbindet. RentMyBike selbst ist nicht Eigentümer eines gelisteten Fahrrads und ist nicht Vertragspartei des Mietvertrags zwischen den Nutzern. Streitigkeiten zwischen Nutzern werden direkt zwischen den beteiligten Parteien gelöst.",
+      "section1Body": "Velohood ist ein Marktplatz, der Fahrradbesitzer und Mieter verbindet. Velohood selbst ist nicht Eigentümer eines gelisteten Fahrrads und ist nicht Vertragspartei des Mietvertrags zwischen den Nutzern. Streitigkeiten zwischen Nutzern werden direkt zwischen den beteiligten Parteien gelöst.",
       "section2Title": "Anforderungen an Fahrradangebote",
       "section2Body": "Indem du ein Fahrrad inserierst, bestätigst du, dass: das Fahrrad sich in einem sicheren, funktionsfähigen Zustand befindet; Bremsen, Gangschaltung, Lenker und Reifen korrekt funktionieren und sicher zu benutzen sind; deine Angebotsfotos den tatsächlichen Zustand des Fahrrads genau wiedergeben; du das Recht hast, das Fahrrad zu vermieten; und der angegebene Preis und die Verfügbarkeit korrekt sind.",
       "section3Title": "Regeln für Mieter",
@@ -97,7 +97,7 @@
       "section6Body": "Diese Bedingungen können sich im Laufe des Projekts ändern. Die weitere Nutzung der Plattform nach einer Aktualisierung gilt als Zustimmung zu den überarbeiteten Bedingungen."
     },
     "howItWorks": {
-      "title": "So funktioniert RentMyBike",
+      "title": "So funktioniert Velohood",
       "subtitle": "Ein Peer-to-Peer-Marktplatz, der Fahrradbesitzer mit Mietinteressenten verbindet — hier ist der vollständige Ablauf für beide Seiten.",
       "forRentersTitle": "Ein Fahrrad mieten",
       "forRentersSubtitle": "Drei Schritte von der Suche bis zur Fahrt.",
@@ -130,7 +130,7 @@
     },
     "trust": {
       "title": "Vertrauen & Sicherheit",
-      "intro": "RentMyBike basiert auf einer Reihe von Funktionen, die Vermietungen für Fahrradbesitzer und Mieter sicher machen sollen. Hier erfährst du, wie wir beide Seiten schützen.",
+      "intro": "Velohood basiert auf einer Reihe von Funktionen, die Vermietungen für Fahrradbesitzer und Mieter sicher machen sollen. Hier erfährst du, wie wir beide Seiten schützen.",
       "section1Title": "Kontobestätigung",
       "section1Body": "Jedes Konto muss seine E-Mail-Adresse bestätigen, bevor es aktiviert wird. Anonyme oder unverifizierte Konten können auf der Plattform keine Buchungen aufgeben oder annehmen.",
       "section2Title": "Angebotsmoderations",
@@ -150,7 +150,7 @@
       "bookingQ": "Wie funktioniert die Buchung eines Fahrrads?",
       "bookingA": "Suche nach Stadt und Datum und sende dann eine Buchungsanfrage mit deinen gewünschten Daten an den Eigentümer. Die Buchung ist erst bestätigt, wenn der Eigentümer sie annimmt — du siehst den Status und kannst in der Zwischenzeit mit dem Eigentümer chatten.",
       "paymentQ": "Wie und wann bezahle ich?",
-      "paymentA": "RentMyBike ist als Studierendenprojekt ein Peer-to-Peer-Marktplatz — die Bezahlung wird derzeit direkt zwischen Mieter und Eigentümer außerhalb der App vereinbart, sobald eine Buchung angenommen wurde.",
+      "paymentA": "Velohood ist als Studierendenprojekt ein Peer-to-Peer-Marktplatz — die Bezahlung wird derzeit direkt zwischen Mieter und Eigentümer außerhalb der App vereinbart, sobald eine Buchung angenommen wurde.",
       "damageQ": "Was passiert, wenn das Fahrrad während der Mietzeit beschädigt wird?",
       "damageA": "Eigentümer und Mieter können für jede Buchung Vorher-/Nachher-Fotos hochladen, um den Zustand des Fahrrads bei Übergabe und Rückgabe zu dokumentieren — das hilft, Unstimmigkeiten über Schäden zu klären.",
       "cancelQ": "Kann ich eine Buchung stornieren?",
@@ -177,7 +177,7 @@
       "trustBikeTypes": "Alle Fahrradtypen"
     },
     "features": {
-      "title": "Warum RentMyBike?",
+      "title": "Warum Velohood?",
       "peer": "Peer-to-Peer",
       "peerDesc": "Direkt von lokalen Eigentümern mieten. Kein Mittelsmann, faire Preise.",
       "flexible": "Flexible Termine",
@@ -220,7 +220,7 @@
     },
     "business": {
       "title": "Du hast einen Fahrradverleih?",
-      "subtitle": "RentMyBike bietet ein eigenes Toolkit für Unternehmen mit mehreren Fahrrädern.",
+      "subtitle": "Velohood bietet ein eigenes Toolkit für Unternehmen mit mehreren Fahrrädern.",
       "item1": "Business-Dashboard mit Umsatz- und Buchungsstatistiken",
       "item2": "Buchungskalender für alle deine Fahrräder",
       "item3": "Massenverwaltung des Inventars",
@@ -237,7 +237,7 @@
   "auth": {
     "login": {
       "title": "Willkommen zurück",
-      "subtitle": "Bei Ihrem RentMyBike-Konto anmelden",
+      "subtitle": "Bei Ihrem Velohood-Konto anmelden",
       "email": "E-Mail-Adresse",
       "password": "Passwort",
       "submit": "Anmelden",
@@ -247,7 +247,7 @@
     },
     "register": {
       "title": "Konto erstellen",
-      "subtitle": "Bei RentMyBike anmelden und losradeln",
+      "subtitle": "Bei Velohood anmelden und losradeln",
       "firstName": "Vorname",
       "lastName": "Nachname",
       "email": "E-Mail-Adresse",

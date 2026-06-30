@@ -53,9 +53,9 @@
   },
   "pages": {
     "about": {
-      "title": "About RentMyBike",
-      "body1": "My name is Nazar, and I am the developer behind RentMyBike. My main idea was to give everyone the ability to list their bicycle for rent — and to help small bike rental companies offer easy online booking to their customers.",
-      "body2": "RentMyBike is a peer-to-peer marketplace where owners earn from bikes they are not using every day, and renters skip the rental shop markup and deal directly with local people. Owners set their own prices and availability; renters book directly with them.",
+      "title": "About Velohood",
+      "body1": "My name is Nazar, and I am the developer behind Velohood. My main idea was to give everyone the ability to list their bicycle for rent — and to help small bike rental companies offer easy online booking to their customers.",
+      "body2": "Velohood is a peer-to-peer marketplace where owners earn from bikes they are not using every day, and renters skip the rental shop markup and deal directly with local people. Owners set their own prices and availability; renters book directly with them.",
       "body3": "For me, this project is one small way to make the world a little better — built by people, for people."
     },
     "contact": {
@@ -66,7 +66,7 @@
     },
     "privacy": {
       "title": "Privacy Policy",
-      "intro": "RentMyBike is a student project. The information below explains how your data is handled on this platform. This is not a substitute for formal legal advice.",
+      "intro": "Velohood is a student project. The information below explains how your data is handled on this platform. This is not a substitute for formal legal advice.",
       "section1Title": "What data we collect",
       "section1Body": "We collect the information you provide when creating an account (first name, last name, email address, and optionally a phone number and profile photo), as well as bike listings you create, booking requests, messages sent through the in-app chat, and condition photos uploaded during a rental.",
       "section2Title": "How we use your data",
@@ -82,9 +82,9 @@
     },
     "terms": {
       "title": "Terms of Service",
-      "intro": "These terms apply to your use of RentMyBike. This is a student project and these terms may not cover every legal scenario, but they outline the responsibilities of both bike owners and renters on the platform.",
+      "intro": "These terms apply to your use of Velohood. This is a student project and these terms may not cover every legal scenario, but they outline the responsibilities of both bike owners and renters on the platform.",
       "section1Title": "The platform",
-      "section1Body": "RentMyBike is a marketplace that connects bike owners and renters. RentMyBike itself is not the owner of any listed bike and is not a party to the rental agreement between users. Disputes between users are resolved directly between the parties involved.",
+      "section1Body": "Velohood is a marketplace that connects bike owners and renters. Velohood itself is not the owner of any listed bike and is not a party to the rental agreement between users. Disputes between users are resolved directly between the parties involved.",
       "section2Title": "Bike listing requirements",
       "section2Body": "By listing a bike, you confirm that: the bike is in safe, working condition; brakes, gears, handlebars, and tires function correctly and are safe to use; your listing photos accurately reflect the real condition of the bike; you have the right to rent out the bike; and the stated price and availability are accurate.",
       "section3Title": "Rental rules",
@@ -97,7 +97,7 @@
       "section6Body": "These terms may be updated as the project evolves. Continued use of the platform after any update constitutes acceptance of the revised terms."
     },
     "howItWorks": {
-      "title": "How RentMyBike works",
+      "title": "How Velohood works",
       "subtitle": "A peer-to-peer marketplace connecting bike owners with people who want to rent — here's the full flow for both sides.",
       "forRentersTitle": "Renting a bike",
       "forRentersSubtitle": "Three steps from search to ride.",
@@ -130,7 +130,7 @@
     },
     "trust": {
       "title": "Trust & Safety",
-      "intro": "RentMyBike is built around a set of features designed to make rentals safe for both bike owners and renters. Here is how we protect both sides.",
+      "intro": "Velohood is built around a set of features designed to make rentals safe for both bike owners and renters. Here is how we protect both sides.",
       "section1Title": "Account verification",
       "section1Body": "Every account must confirm their email address before it is activated. Anonymous or unverified accounts cannot place or accept bookings on the platform.",
       "section2Title": "Listing moderation",
@@ -150,7 +150,7 @@
       "bookingQ": "How does booking a bike work?",
       "bookingA": "Search for a bike by city and dates, then send a booking request to the owner with your chosen dates. The booking is only confirmed once the owner accepts it — you'll see the status update and can chat with the owner in the meantime.",
       "paymentQ": "How and when do I pay?",
-      "paymentA": "RentMyBike is a peer-to-peer marketplace as a student project — payment is currently arranged directly between renter and owner, outside the app, once a booking is accepted.",
+      "paymentA": "Velohood is a peer-to-peer marketplace as a student project — payment is currently arranged directly between renter and owner, outside the app, once a booking is accepted.",
       "damageQ": "What happens if the bike is damaged during the rental?",
       "damageA": "Owners and renters can upload before/after condition photos for each booking to document the bike's state at handover and return, which helps resolve any disagreement about damage.",
       "cancelQ": "Can I cancel a booking?",
@@ -177,7 +177,7 @@
       "trustBikeTypes": "All bike types"
     },
     "features": {
-      "title": "Why RentMyBike?",
+      "title": "Why Velohood?",
       "peer": "Peer-to-peer",
       "peerDesc": "Rent directly from local owners. No middleman, fair prices.",
       "flexible": "Flexible dates",
@@ -220,7 +220,7 @@
     },
     "business": {
       "title": "Have a bike rental business?",
-      "subtitle": "RentMyBike has a dedicated toolkit for businesses managing multiple bikes.",
+      "subtitle": "Velohood has a dedicated toolkit for businesses managing multiple bikes.",
       "item1": "Business dashboard with revenue and booking stats",
       "item2": "Booking calendar across all your bikes",
       "item3": "Bulk inventory management",
@@ -237,7 +237,7 @@
   "auth": {
     "login": {
       "title": "Welcome back",
-      "subtitle": "Log in to your RentMyBike account",
+      "subtitle": "Log in to your Velohood account",
       "email": "Email address",
       "password": "Password",
       "submit": "Log in",
@@ -247,7 +247,7 @@
     },
     "register": {
       "title": "Create your account",
-      "subtitle": "Join RentMyBike and start riding",
+      "subtitle": "Join Velohood and start riding",
       "firstName": "First name",
       "lastName": "Last name",
       "email": "Email address",

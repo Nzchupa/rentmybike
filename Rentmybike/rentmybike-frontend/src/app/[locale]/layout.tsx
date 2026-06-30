@@ -12,8 +12,8 @@ import "@/app/globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "RentMyBike",
-    template: "%s | RentMyBike",
+    default: "Velohood",
+    template: "%s | Velohood",
   },
   description:
     "Peer-to-peer bike rental marketplace. Rent bikes from locals in your city.",

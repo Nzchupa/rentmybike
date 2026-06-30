@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { Bike, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
+import { VelohoodLogo } from "@/components/VelohoodLogo";
 
 export function Footer() {
   const locale = useLocale();
@@ -16,8 +17,8 @@ export function Footer() {
               href={`/${locale}/`}
               className="flex items-center gap-2 font-bold text-brand-600 mb-2"
             >
-              <Bike size={20} />
-              RentMyBike
+              <VelohoodLogo size={24} />
+              Velohood
             </Link>
             <p className="text-sm text-slate-500">{t("tagline")}</p>
             <a
@@ -101,7 +102,7 @@ export function Footer() {
 
         <div className="mt-10 pt-6 border-t border-slate-200 text-sm text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p>
-            © {year} RentMyBike. {t("rights")}
+            © {year} Velohood. {t("rights")}
           </p>
           <p>{t("studentProject")}</p>
         </div>

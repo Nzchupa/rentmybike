@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import toast from "react-hot-toast";
-import { Bike } from "lucide-react";
+import { VelohoodLogo } from "@/components/VelohoodLogo";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -60,8 +60,8 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 text-brand-600 font-bold text-2xl mb-1">
-            <Bike size={28} />
-            RentMyBike
+            <VelohoodLogo size={32} />
+            Velohood
           </div>
           <h1 className="text-2xl font-bold text-slate-900">{t("title")}</h1>
           <p className="text-slate-500 text-sm mt-1">{t("subtitle")}</p>

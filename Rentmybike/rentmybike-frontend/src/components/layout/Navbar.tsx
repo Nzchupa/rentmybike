@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Bike, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import { VelohoodLogo } from "@/components/VelohoodLogo";
 import { useState } from "react";
 import { useAuthStore } from "@/store/auth.store";
 import { useAuth } from "@/hooks/useAuth";
@@ -69,8 +70,8 @@ export function Navbar() {
 
           {/* Logo */}
           <Link href={localePath("/")} className="flex items-center gap-2 font-bold text-brand-600 text-lg">
-            <Bike size={24} className="text-brand-500" />
-            RentMyBike
+            <VelohoodLogo size={28} />
+            Velohood
           </Link>
 
           {/* Desktop nav */}
