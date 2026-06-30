@@ -54,8 +54,9 @@
   "pages": {
     "about": {
       "title": "About RentMyBike",
-      "body1": "RentMyBike is a peer-to-peer bike rental marketplace built as a student project. It connects bike owners — individuals and small rental businesses — with people who want to rent a bike for a day, a week, or longer.",
-      "body2": "The goal is to make short-term bike rental simple and affordable, without going through a traditional rental shop: owners set their own prices and availability, and renters book directly with them."
+      "body1": "My name is Nazar, and I am the developer behind RentMyBike. My main idea was to give everyone the ability to list their bicycle for rent — and to help small bike rental companies offer easy online booking to their customers.",
+      "body2": "RentMyBike is a peer-to-peer marketplace where owners earn from bikes they are not using every day, and renters skip the rental shop markup and deal directly with local people. Owners set their own prices and availability; renters book directly with them.",
+      "body3": "For me, this project is one small way to make the world a little better — built by people, for people."
     },
     "contact": {
       "title": "Contact",

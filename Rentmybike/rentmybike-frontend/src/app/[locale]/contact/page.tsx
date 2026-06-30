@@ -19,7 +19,7 @@ export default function ContactPage() {
         <p>{t("body1")}</p>
         <div className="flex items-center gap-2 text-slate-900 font-medium">
           <Mail size={18} className="text-brand-600" />
-          <span>{t("emailLabel")}: contact@rentmybike.xyz</span>
+          <span>{t("emailLabel")}: nazarchuprii@gmail.com</span>
         </div>
         <p>{t("body2")}</p>
       </div>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { Bike } from "lucide-react";
+import { Bike, Mail } from "lucide-react";
 
 export function Footer() {
   const locale = useLocale();
@@ -20,6 +20,13 @@ export function Footer() {
               RentMyBike
             </Link>
             <p className="text-sm text-slate-500">{t("tagline")}</p>
+            <a
+              href="mailto:nazarchuprii@gmail.com"
+              className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition-colors mt-2"
+            >
+              <Mail size={14} />
+              nazarchuprii@gmail.com
+            </a>
           </div>
 
           <div>

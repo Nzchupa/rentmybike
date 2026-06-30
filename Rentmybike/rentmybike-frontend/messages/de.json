@@ -54,8 +54,9 @@
   "pages": {
     "about": {
       "title": "Über RentMyBike",
-      "body1": "RentMyBike ist ein Peer-to-Peer-Marktplatz für Fahrradverleih, der als Studienprojekt entwickelt wurde. Er verbindet Fahrradbesitzer — Privatpersonen und kleine Verleihbetriebe — mit Menschen, die ein Fahrrad für einen Tag, eine Woche oder länger mieten möchten.",
-      "body2": "Das Ziel ist es, kurzfristigen Fahrradverleih einfach und günstig zu machen, ohne den Umweg über einen klassischen Verleihladen: Eigentümer legen ihren eigenen Preis und ihre Verfügbarkeit fest, und Mieter buchen direkt bei ihnen."
+      "body1": "Mein Name ist Nazar, und ich bin der Entwickler hinter RentMyBike. Meine Hauptidee war es, jedem die Möglichkeit zu geben, sein Fahrrad zu vermieten — und kleinen Fahrradvermietungsunternehmen eine einfache Online-Buchung für ihre Kunden zu ermöglichen.",
+      "body2": "RentMyBike ist ein Peer-to-Peer-Marktplatz, auf dem Eigentümer mit Fahrrädern verdienen, die sie nicht jeden Tag nutzen, und Mieter direkt mit Einheimischen abwickeln — ohne den Aufpreis eines klassischen Verleihladens. Eigentümer legen ihren eigenen Preis und ihre Verfügbarkeit fest; Mieter buchen direkt bei ihnen.",
+      "body3": "Für mich ist dieses Projekt eine kleine Möglichkeit, die Welt ein bisschen besser zu machen — von Menschen, für Menschen."
     },
     "contact": {
       "title": "Kontakt",

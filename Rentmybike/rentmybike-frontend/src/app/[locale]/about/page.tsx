@@ -17,6 +17,7 @@ export default function AboutPage() {
       <div className="space-y-4 text-slate-600 leading-relaxed">
         <p>{t("body1")}</p>
         <p>{t("body2")}</p>
+        <p>{t("body3")}</p>
       </div>
     </div>
   );
