@@ -3,13 +3,13 @@ import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("pages.privacy");
+  const t = await getTranslations("pages.trust");
   return { title: t("title") };
 }
 
-export default function PrivacyPage() {
+export default function TrustPage() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const t = useTranslations("pages.privacy");
+  const t = useTranslations("pages.trust");
 
   const sections = [1, 2, 3, 4, 5, 6] as const;
 

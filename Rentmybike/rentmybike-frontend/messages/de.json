@@ -47,6 +47,7 @@
     "legal": "Rechtliches",
     "privacy": "Datenschutz",
     "terms": "Nutzungsbedingungen",
+    "trust": "Vertrauen & Sicherheit",
     "rights": "Alle Rechte vorbehalten.",
     "studentProject": "Ein Studienprojekt."
   },
@@ -64,27 +65,35 @@
     },
     "privacy": {
       "title": "Datenschutz",
-      "intro": "Dies ist ein Studienprojekt. Die folgenden Hinweise beschreiben den aktuellen Umgang mit Daten — sie ersetzen keine rechtliche Beratung.",
-      "section1Title": "Was wir erfassen",
-      "section1Body": "Von dir angegebene Kontoinformationen (Name, E-Mail, Telefon), Fahrradangebote, Buchungsdetails, Nachrichten über den In-App-Chat sowie für Vermietungen hochgeladene Fotos.",
-      "section2Title": "Wie es verwendet wird",
-      "section2Body": "Ausschließlich zum Betrieb des Marktplatzes: zum Erstellen von Buchungen, Anzeigen von Angeboten, zur Kommunikation zwischen Mietern und Eigentümern sowie zur Kontoverwaltung.",
-      "section3Title": "Weitergabe",
-      "section3Body": "Deine Daten werden nicht verkauft oder zu Werbezwecken an Dritte weitergegeben. Für andere Nutzer sichtbare Informationen (z. B. Name und Bewertungen) sind auf das für die Vermietung Notwendige beschränkt.",
-      "section4Title": "Kontakt",
-      "section4Body": "Bei Fragen zu deinen Daten wende dich bitte über die Kontaktseite an uns."
+      "intro": "RentMyBike ist ein Studienprojekt. Die folgenden Informationen erklären, wie deine Daten auf dieser Plattform verarbeitet werden. Dies ist kein Ersatz für rechtliche Beratung.",
+      "section1Title": "Welche Daten wir erfassen",
+      "section1Body": "Wir erfassen die Informationen, die du bei der Kontoerstellung angibst (Vorname, Nachname, E-Mail-Adresse und optional Telefonnummer und Profilfoto), sowie die von dir erstellten Fahrradangebote, Buchungsanfragen, Nachrichten über den In-App-Chat und Zustandsfotos, die während einer Vermietung hochgeladen werden.",
+      "section2Title": "Wie wir deine Daten verwenden",
+      "section2Body": "Deine Daten werden ausschließlich zum Betrieb des Marktplatzes genutzt: zur Bearbeitung von Buchungen, Anzeige von Angeboten, Kommunikation zwischen Mietern und Eigentümern, zum Versand von E-Mail-Verifizierungslinks und Benachrichtigungen sowie zur Kontoverwaltung.",
+      "section3Title": "Datenweitergabe",
+      "section3Body": "Wir verkaufen deine Daten nicht und geben sie nicht zu Werbezwecken an Dritte weiter. Für andere Nutzer sichtbare Informationen (z. B. Name, Profilfoto und Bewertungen) sind auf das für die Vermietung Notwendige beschränkt. Fahrradangebote sind öffentlich sichtbar, damit Mieter Fahrräder finden und buchen können.",
+      "section4Title": "Sicherheit",
+      "section4Body": "Alle Konten müssen ihre E-Mail-Adresse vor der Aktivierung bestätigen. Neue Fahrradangebote werden von einem Moderator geprüft, bevor sie veröffentlicht werden. Konten, die gegen Plattformregeln verstoßen, können von einem Administrator gesperrt oder dauerhaft gesperrt werden. Passwörter werden verschlüsselt gespeichert und niemals im Klartext.",
+      "section5Title": "Deine Rechte und Datenlöschung",
+      "section5Body": "Du kannst deine Profilinformationen jederzeit in deinen Kontoeinstellungen aktualisieren oder löschen. Um eine vollständige Kontolöschung zu beantragen oder eine Frage zu deinen Daten zu stellen, kontaktiere uns per E-Mail über die Kontaktseite.",
+      "section6Title": "Kontakt",
+      "section6Body": "Bei Fragen zum Datenschutz oder zu deinen Daten wende dich bitte über die Kontaktseite an uns."
     },
     "terms": {
       "title": "Nutzungsbedingungen",
-      "intro": "Diese Bedingungen dienen als Grundlage für dieses Studienprojekt und decken möglicherweise nicht jeden rechtlichen Fall ab.",
-      "section1Title": "Der Dienst",
-      "section1Body": "RentMyBike ist eine Plattform, die Fahrradbesitzer und Mieter verbindet. RentMyBike ist nicht Eigentümer der gelisteten Fahrräder und ist nicht Vertragspartei des Mietvertrags zwischen den Nutzern.",
-      "section2Title": "Verantwortlichkeiten der Nutzer",
-      "section2Body": "Eigentümer sind für die Richtigkeit ihrer Angebote und den Zustand ihrer Fahrräder verantwortlich. Mieter sind dafür verantwortlich, Fahrräder im erhaltenen Zustand zurückzugeben und für während der Mietdauer verursachte Schäden.",
-      "section3Title": "Buchungen",
-      "section3Body": "Eine Buchungsanfrage ist erst bestätigt, wenn der Eigentümer sie annimmt. Beide Seiten können den In-App-Chat nutzen, um Abholung, Rückgabe und etwaige Probleme zu klären.",
-      "section4Title": "Änderungen",
-      "section4Body": "Diese Bedingungen können sich im Laufe des Projekts ändern."
+      "intro": "Diese Bedingungen gelten für die Nutzung von RentMyBike. Dies ist ein Studienprojekt, und diese Bedingungen decken möglicherweise nicht jeden rechtlichen Fall ab. Sie beschreiben jedoch die Verantwortlichkeiten von Fahrradbesitzern und Mietern auf der Plattform.",
+      "section1Title": "Die Plattform",
+      "section1Body": "RentMyBike ist ein Marktplatz, der Fahrradbesitzer und Mieter verbindet. RentMyBike selbst ist nicht Eigentümer eines gelisteten Fahrrads und ist nicht Vertragspartei des Mietvertrags zwischen den Nutzern. Streitigkeiten zwischen Nutzern werden direkt zwischen den beteiligten Parteien gelöst.",
+      "section2Title": "Anforderungen an Fahrradangebote",
+      "section2Body": "Indem du ein Fahrrad inserierst, bestätigst du, dass: das Fahrrad sich in einem sicheren, funktionsfähigen Zustand befindet; Bremsen, Gangschaltung, Lenker und Reifen korrekt funktionieren und sicher zu benutzen sind; deine Angebotsfotos den tatsächlichen Zustand des Fahrrads genau wiedergeben; du das Recht hast, das Fahrrad zu vermieten; und der angegebene Preis und die Verfügbarkeit korrekt sind.",
+      "section3Title": "Regeln für Mieter",
+      "section3Body": "Durch das Mieten eines Fahrrads stimmst du zu: das Fahrrad im selben Zustand zurückzugeben, in dem du es erhalten hast; das Fahrrad während der Mietdauer mit angemessener Sorgfalt zu behandeln. Normaler Verschleiß (kleinere Oberflächenkratzer durch normale Nutzung) liegt nicht in der Verantwortung des Mieters. Schäden, die über normalen Verschleiß hinausgehen — einschließlich Schäden durch einen Unfall, gebrochene Teile oder absichtlich verursachte Schäden — müssen vom Mieter an den Eigentümer erstattet werden. Das Fahrrad muss zum vereinbarten Zeitpunkt zurückgegeben werden, oder eine Verlängerung muss vorab mit dem Eigentümer abgestimmt werden.",
+      "section4Title": "Buchungen",
+      "section4Body": "Eine Buchungsanfrage ist erst bestätigt, wenn der Eigentümer sie ausdrücklich annimmt. Beide Seiten können über den In-App-Chat kommunizieren, um Abholung, Rückgabe und etwaige Probleme zu koordinieren. Jede Partei kann vor Beginn des Mietzeitraums stornieren.",
+      "section5Title": "Plattformregeln",
+      "section5Body": "Nutzer dürfen keine falschen oder irreführenden Angebote einstellen, den Chat missbrauchen oder Belästigung oder Betrug betreiben. Konten, die gegen diese Regeln verstoßen, können gesperrt oder dauerhaft gebannt werden. Nutzer können Verstöße über die Meldefunktion bei Angeboten oder Nutzerprofilen melden.",
+      "section6Title": "Änderungen",
+      "section6Body": "Diese Bedingungen können sich im Laufe des Projekts ändern. Die weitere Nutzung der Plattform nach einer Aktualisierung gilt als Zustimmung zu den überarbeiteten Bedingungen."
     },
     "howItWorks": {
       "title": "So funktioniert RentMyBike",
@@ -117,6 +126,22 @@
       "safetyChatDesc": "Koordiniere Abholdetails und stelle Fragen über den In-App-Chat — keine Telefonnummer nötig.",
       "faqPrompt": "Noch Fragen?",
       "faqCta": "FAQ lesen"
+    },
+    "trust": {
+      "title": "Vertrauen & Sicherheit",
+      "intro": "RentMyBike basiert auf einer Reihe von Funktionen, die Vermietungen für Fahrradbesitzer und Mieter sicher machen sollen. Hier erfährst du, wie wir beide Seiten schützen.",
+      "section1Title": "Kontobestätigung",
+      "section1Body": "Jedes Konto muss seine E-Mail-Adresse bestätigen, bevor es aktiviert wird. Anonyme oder unverifizierte Konten können auf der Plattform keine Buchungen aufgeben oder annehmen.",
+      "section2Title": "Angebotsmoderations",
+      "section2Body": "Jedes neue Fahrradangebot wird von einem Moderator geprüft, bevor es veröffentlicht wird. Angebote, die unseren Standards nicht entsprechen — ungenaue Fotos, fehlende Informationen oder Fahrräder, die nicht vermietbar sind — werden abgelehnt oder zur Überarbeitung zurückgeschickt.",
+      "section3Title": "Bewertungen und Ratings",
+      "section3Body": "Nach jeder abgeschlossenen Vermietung werden Mieter und Eigentümer eingeladen, eine Bewertung und ein Rating zu hinterlassen. Diese sind in Profilen öffentlich sichtbar und helfen Nutzern, fundierte Entscheidungen zu treffen, an wen sie vermieten oder von wem sie mieten.",
+      "section4Title": "Meldungen",
+      "section4Body": "Jedes Angebot oder jeder Nutzer kann über die Meldefunktion auf der gesamten Plattform gemeldet werden. Meldungen werden von einem Administrator geprüft, der Konten warnen, sperren oder dauerhaft bannen kann.",
+      "section5Title": "Zustandsdokumentation",
+      "section5Body": "Eigentümer und Mieter können für jede Buchung Vorher- und Nachher-Fotos hochladen, die den Zustand des Fahrrads bei Übergabe und Rückgabe dokumentieren. So entsteht ein klares Protokoll für den Fall von Streitigkeiten über Schäden.",
+      "section6Title": "Fragen oder Probleme?",
+      "section6Body": "Wenn du ein Anliegen hast, das sich nicht mit den integrierten Plattform-Tools lösen lässt, kontaktiere uns bitte über die Kontaktseite."
     },
     "faq": {
       "title": "Häufig gestellte Fragen",
@@ -232,7 +257,14 @@
       "submit": "Konto erstellen",
       "haveAccount": "Bereits ein Konto?",
       "signIn": "Anmelden",
-      "termsNote": "Mit der Registrierung stimmen Sie unseren Nutzungsbedingungen zu."
+      "agreeToTerms": {
+        "before": "Ich habe die ",
+        "terms": "Nutzungsbedingungen",
+        "middle": " und die ",
+        "privacy": "Datenschutzerklärung",
+        "after": " gelesen und stimme zu.",
+        "required": "Du musst den Nutzungsbedingungen und der Datenschutzerklärung zustimmen"
+      }
     },
     "verify": {
       "title": "E-Mail bestätigen",

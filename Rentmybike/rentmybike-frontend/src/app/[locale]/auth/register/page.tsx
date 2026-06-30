@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import toast from "react-hot-toast";
@@ -27,6 +27,9 @@ function makeRegisterSchema(t: (key: string) => string) {
       email:     z.string().email(t("auth.errors.invalidEmail")),
       password:  z.string().min(8, t("auth.errors.weakPassword")),
       confirmPassword: z.string(),
+      agreedToTerms: z.boolean().refine((v) => v === true, {
+        message: t("auth.register.agreeToTerms.required"),
+      }),
     })
     .refine((d) => d.password === d.confirmPassword, {
       message: t("auth.errors.passwordMismatch"),
@@ -49,8 +52,12 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterForm>({ resolver: zodResolver(makeRegisterSchema(tRoot)) });
+  } = useForm<RegisterForm>({
+    resolver: zodResolver(makeRegisterSchema(tRoot)),
+    defaultValues: { agreedToTerms: false },
+  });
 
   async function onSubmit(data: RegisterForm) {
     try {
@@ -120,7 +127,44 @@ export default function RegisterPage() {
               {...register("confirmPassword")}
             />
 
-            <p className="text-xs text-slate-500">{t("termsNote")}</p>
+            <div className="space-y-1">
+              <Controller
+                name="agreedToTerms"
+                control={control}
+                render={({ field }) => (
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={field.onChange}
+                      className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer"
+                    />
+                    <span className="text-xs text-slate-600">
+                      {t("agreeToTerms.before")}
+                      <Link
+                        href={`/${locale}/terms`}
+                        className="font-medium text-brand-600 hover:underline"
+                        target="_blank"
+                      >
+                        {t("agreeToTerms.terms")}
+                      </Link>
+                      {t("agreeToTerms.middle")}
+                      <Link
+                        href={`/${locale}/privacy`}
+                        className="font-medium text-brand-600 hover:underline"
+                        target="_blank"
+                      >
+                        {t("agreeToTerms.privacy")}
+                      </Link>
+                      {t("agreeToTerms.after")}
+                    </span>
+                  </label>
+                )}
+              />
+              {errors.agreedToTerms && (
+                <p className="text-xs text-red-500">{errors.agreedToTerms.message}</p>
+              )}
+            </div>
 
             <Button type="submit" className="w-full" loading={isSubmitting}>
               {t("submit")}

@@ -11,7 +11,7 @@ export default function TermsPage() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const t = useTranslations("pages.terms");
 
-  const sections = [1, 2, 3, 4] as const;
+  const sections = [1, 2, 3, 4, 5, 6] as const;
 
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16">

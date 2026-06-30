@@ -47,6 +47,7 @@
     "legal": "Legal",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
+    "trust": "Trust & Safety",
     "rights": "All rights reserved.",
     "studentProject": "A student project."
   },
@@ -64,27 +65,35 @@
     },
     "privacy": {
       "title": "Privacy Policy",
-      "intro": "This is a student project. The notes below describe how data is currently handled — this is not a substitute for formal legal advice.",
-      "section1Title": "What we collect",
-      "section1Body": "Account information you provide (name, email, phone), bike listings, booking details, messages exchanged through the in-app chat, and photos uploaded for rentals.",
-      "section2Title": "How it's used",
-      "section2Body": "Solely to operate the marketplace: creating bookings, showing listings, enabling communication between renters and owners, and account management.",
-      "section3Title": "Sharing",
-      "section3Body": "Your data is not sold or shared with third parties for advertising. Information visible to other users (like your name and reviews) is limited to what's needed to complete a rental.",
-      "section4Title": "Contact",
-      "section4Body": "If you have questions about your data, reach out via the Contact page."
+      "intro": "RentMyBike is a student project. The information below explains how your data is handled on this platform. This is not a substitute for formal legal advice.",
+      "section1Title": "What data we collect",
+      "section1Body": "We collect the information you provide when creating an account (first name, last name, email address, and optionally a phone number and profile photo), as well as bike listings you create, booking requests, messages sent through the in-app chat, and condition photos uploaded during a rental.",
+      "section2Title": "How we use your data",
+      "section2Body": "Your data is used solely to operate the marketplace: to process bookings, display bike listings, enable communication between renters and owners, send email verification links and notifications, and manage your account.",
+      "section3Title": "Data sharing",
+      "section3Body": "We do not sell your data or share it with third parties for advertising. Information visible to other users (such as your name, profile photo, and reviews) is limited to what is needed to complete a rental. Bike listing details are publicly visible to allow renters to find and book bikes.",
+      "section4Title": "Security",
+      "section4Body": "All accounts require email verification before activation. New bike listings are reviewed by a moderator before going live. Accounts that violate platform rules can be suspended or permanently banned by an administrator. Passwords are stored in encrypted form and never in plain text.",
+      "section5Title": "Your rights and data deletion",
+      "section5Body": "You can update or delete your profile information at any time from your account settings. To request full account deletion or ask a question about your data, contact us by email via the Contact page.",
+      "section6Title": "Contact",
+      "section6Body": "For questions about privacy or data, reach out via the Contact page."
     },
     "terms": {
       "title": "Terms of Service",
-      "intro": "These terms are provided as a baseline for this student project and may not cover every legal scenario.",
-      "section1Title": "The service",
-      "section1Body": "RentMyBike is a platform that connects bike owners and renters. RentMyBike is not the owner of the bikes listed and is not a party to the rental agreement between users.",
-      "section2Title": "User responsibilities",
-      "section2Body": "Owners are responsible for the accuracy of their listings and the condition of their bikes. Renters are responsible for returning bikes in the condition received and for any damage caused during the rental period.",
-      "section3Title": "Bookings",
-      "section3Body": "A booking request is not confirmed until the owner accepts it. Either party can use the in-app chat to coordinate pickup, return, and any issues.",
-      "section4Title": "Changes",
-      "section4Body": "These terms may be updated as the project evolves."
+      "intro": "These terms apply to your use of RentMyBike. This is a student project and these terms may not cover every legal scenario, but they outline the responsibilities of both bike owners and renters on the platform.",
+      "section1Title": "The platform",
+      "section1Body": "RentMyBike is a marketplace that connects bike owners and renters. RentMyBike itself is not the owner of any listed bike and is not a party to the rental agreement between users. Disputes between users are resolved directly between the parties involved.",
+      "section2Title": "Bike listing requirements",
+      "section2Body": "By listing a bike, you confirm that: the bike is in safe, working condition; brakes, gears, handlebars, and tires function correctly and are safe to use; your listing photos accurately reflect the real condition of the bike; you have the right to rent out the bike; and the stated price and availability are accurate.",
+      "section3Title": "Rental rules",
+      "section3Body": "By renting a bike, you agree to: return it in the same condition in which it was received; handle the bike with reasonable care during the rental period. Normal wear (minor surface scratches from ordinary use) is not the renter's responsibility. Damage beyond normal wear — including damage from an accident, broken parts, or deliberately caused damage — must be compensated by the renter to the owner. The bike must be returned by the agreed time, or any extension coordinated with the owner in advance.",
+      "section4Title": "Bookings",
+      "section4Body": "A booking request is not confirmed until the owner explicitly accepts it. Both parties can communicate through the in-app chat to coordinate pickup, return, and any issues. Either party may cancel before the rental period begins.",
+      "section5Title": "Platform rules",
+      "section5Body": "Users must not post false or misleading listings, misuse the chat, or engage in harassment or fraud. Accounts found to be in violation may be suspended or permanently banned. Users can report violations using the report feature on any listing or user profile.",
+      "section6Title": "Changes",
+      "section6Body": "These terms may be updated as the project evolves. Continued use of the platform after any update constitutes acceptance of the revised terms."
     },
     "howItWorks": {
       "title": "How RentMyBike works",
@@ -117,6 +126,22 @@
       "safetyChatDesc": "Coordinate pickup details and ask questions through the in-app chat, no phone number needed.",
       "faqPrompt": "Still have questions?",
       "faqCta": "Read the FAQ"
+    },
+    "trust": {
+      "title": "Trust & Safety",
+      "intro": "RentMyBike is built around a set of features designed to make rentals safe for both bike owners and renters. Here is how we protect both sides.",
+      "section1Title": "Account verification",
+      "section1Body": "Every account must confirm their email address before it is activated. Anonymous or unverified accounts cannot place or accept bookings on the platform.",
+      "section2Title": "Listing moderation",
+      "section2Body": "Every new bike listing is reviewed by a moderator before it goes live. Listings that do not meet our standards — inaccurate photos, missing information, or bikes that are not in rentable condition — are rejected or sent back for corrections.",
+      "section3Title": "Reviews and ratings",
+      "section3Body": "After every completed rental, both the renter and the owner are invited to leave a review and rating. These are publicly visible on profiles and help users make informed decisions about who to rent to or from.",
+      "section4Title": "Reporting",
+      "section4Body": "Any listing or user can be reported using the report button available throughout the platform. Reports are reviewed by an administrator, who can warn, suspend, or permanently ban accounts found to be in violation.",
+      "section5Title": "Condition documentation",
+      "section5Body": "Owners and renters can upload before and after photos for each booking, documenting the bike's condition at handover and return. This creates a clear record in case of any dispute about damage.",
+      "section6Title": "Questions or issues?",
+      "section6Body": "If you have a concern not resolved through the platform's built-in tools, reach out to us through the Contact page."
     },
     "faq": {
       "title": "Frequently asked questions",
@@ -232,7 +257,14 @@
       "submit": "Create account",
       "haveAccount": "Already have an account?",
       "signIn": "Log in",
-      "termsNote": "By signing up you agree to our Terms of Service."
+      "agreeToTerms": {
+        "before": "I have read and agree to the ",
+        "terms": "Terms of Service",
+        "middle": " and ",
+        "privacy": "Privacy Policy",
+        "after": ".",
+        "required": "You must accept the Terms of Service and Privacy Policy to continue"
+      }
     },
     "verify": {
       "title": "Verify your email",

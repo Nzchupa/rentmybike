@@ -83,6 +83,11 @@ export function Footer() {
                   {t("terms")}
                 </Link>
               </li>
+              <li>
+                <Link href={`/${locale}/trust`} className="hover:text-slate-900 transition-colors">
+                  {t("trust")}
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
