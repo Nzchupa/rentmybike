@@ -106,7 +106,7 @@
       "renterStep2Title": "Send a request",
       "renterStep2Desc": "Pick your dates, add an optional message, and send a booking request to the owner.",
       "renterStep3Title": "Meet up and ride",
-      "renterStep3Desc": "Once the owner accepts, coordinate pickup in the in-app chat, then get the bike and go explore.",
+      "renterStep3Desc": "Once the owner accepts, coordinate pickup in the in-app chat, then collect the bike and ride.",
       "forRentersCta": "Browse bikes",
       "forOwnersTitle": "Listing your bike",
       "forOwnersSubtitle": "Turn a bike you're not using every day into income.",
@@ -168,8 +168,8 @@
   "home": {
     "hero": {
       "badge": "Peer-to-peer bike rental",
-      "title": "Rent a Bike, Explore Your City",
-      "subtitle": "The peer-to-peer marketplace to rent bikes from locals. Affordable, flexible, eco-friendly.",
+      "title": "Find a bike near you. Rent it from a local.",
+      "subtitle": "Rent bikes directly from local owners — no rental shop, no markup.",
       "cta": "Browse Bikes",
       "ctaOwner": "List Your Bike",
       "trustPeerToPeer": "100% peer-to-peer",
@@ -182,8 +182,8 @@
       "peerDesc": "Rent directly from local owners. No middleman, fair prices.",
       "flexible": "Flexible dates",
       "flexibleDesc": "Book for a day, a week, or longer. Cancel anytime before acceptance.",
-      "trusted": "Trusted community",
-      "trustedDesc": "Verified reviews from real renters and owners."
+      "trusted": "Real reviews",
+      "trustedDesc": "Renters and owners rate each other after every completed booking."
     },
     "howItWorks": {
       "title": "How it works",
@@ -192,7 +192,7 @@
       "step2Title": "Send a request",
       "step2Desc": "Pick your dates and send a booking request to the owner.",
       "step3Title": "Meet up and ride",
-      "step3Desc": "Once accepted, meet the owner, get the bike, and go explore."
+      "step3Desc": "Once accepted, meet the owner, collect the bike, and ride."
     },
     "safety": {
       "title": "Safe and transparent rentals",
@@ -339,7 +339,9 @@
       "backToSearch": "Back to search",
       "reviewsCount": "{count, plural, one {# review} other {# reviews}}",
       "ownerNotice": "This is your bike.",
-      "editInDashboard": "Edit in Dashboard"
+      "editInDashboard": "Edit in Dashboard",
+      "verifiedShop": "Verified shop",
+      "moderationNotice": "All listings are reviewed by our team before going live."
     },
     "approvalStatus": {
       "PENDING": "Pending review",

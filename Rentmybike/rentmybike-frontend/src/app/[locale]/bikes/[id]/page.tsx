@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { MapPin, ChevronLeft } from "lucide-react";
+import { MapPin, ChevronLeft, ShieldCheck } from "lucide-react";
 import { bikesApi, reviewsApi } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
@@ -177,7 +177,21 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
               className="flex items-center gap-3 hover:opacity-80"
             >
               <Avatar name={bike.ownerName} avatarUrl={bike.ownerAvatarUrl} size="md" />
-              <span className="font-medium text-slate-900">{bike.ownerName}</span>
+              <div>
+                <span className="font-medium text-slate-900">
+                  {bike.ownerBusinessVerified && bike.ownerBusinessName
+                    ? bike.ownerBusinessName
+                    : bike.ownerName}
+                </span>
+                {bike.ownerBusinessVerified && (
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <ShieldCheck size={13} className="text-emerald-600" />
+                    <span className="text-xs font-medium text-emerald-700">
+                      {t("verifiedShop")}
+                    </span>
+                  </div>
+                )}
+              </div>
             </Link>
           </div>
 
@@ -218,7 +232,7 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
 
         {/* Right: Booking panel */}
         <div className="lg:col-span-1">
-          <div className="sticky top-24">
+          <div className="sticky top-24 space-y-3">
             {bike.approvalStatus === "APPROVED" && bike.available && !isOwner ? (
               <BookingForm bike={bike} />
             ) : isOwner ? (
@@ -237,6 +251,11 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
                 </p>
               </div>
             )}
+            {/* Moderation trust notice */}
+            <p className="flex items-start gap-1.5 text-xs text-slate-400 px-1">
+              <ShieldCheck size={13} className="mt-0.5 shrink-0 text-slate-400" />
+              {t("moderationNotice")}
+            </p>
           </div>
         </div>
       </div>

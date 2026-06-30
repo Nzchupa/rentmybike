@@ -168,8 +168,8 @@
   "home": {
     "hero": {
       "badge": "Peer-to-Peer-Fahrradverleih",
-      "title": "Fahrrad mieten, Stadt entdecken",
-      "subtitle": "Der Peer-to-Peer-Marktplatz für Fahrradverleih von Privatpersonen. Günstig, flexibel, umweltfreundlich.",
+      "title": "Fahrrad mieten — direkt von Privatpersonen in deiner Stadt.",
+      "subtitle": "Direkt von lokalen Fahrradbesitzern mieten — ohne Aufschlag.",
       "cta": "Fahrräder durchsuchen",
       "ctaOwner": "Fahrrad inserieren",
       "trustPeerToPeer": "100% Peer-to-Peer",
@@ -182,8 +182,8 @@
       "peerDesc": "Direkt von lokalen Eigentümern mieten. Kein Mittelsmann, faire Preise.",
       "flexible": "Flexible Termine",
       "flexibleDesc": "Für einen Tag, eine Woche oder länger buchen. Jederzeit vor Annahme stornieren.",
-      "trusted": "Vertrauenswürdige Community",
-      "trustedDesc": "Verifizierte Bewertungen von echten Mietern und Eigentümern."
+      "trusted": "Echte Bewertungen",
+      "trustedDesc": "Mieter und Eigentümer bewerten sich gegenseitig nach jeder abgeschlossenen Buchung."
     },
     "howItWorks": {
       "title": "So funktioniert's",
@@ -339,7 +339,9 @@
       "backToSearch": "Zurück zur Suche",
       "reviewsCount": "{count, plural, one {# Bewertung} other {# Bewertungen}}",
       "ownerNotice": "Dies ist Ihr Fahrrad.",
-      "editInDashboard": "Im Dashboard bearbeiten"
+      "editInDashboard": "Im Dashboard bearbeiten",
+      "verifiedShop": "Verifizierter Shop",
+      "moderationNotice": "Alle Inserate werden von unserem Team geprüft, bevor sie veröffentlicht werden."
     },
     "approvalStatus": {
       "PENDING": "Ausstehende Prüfung",

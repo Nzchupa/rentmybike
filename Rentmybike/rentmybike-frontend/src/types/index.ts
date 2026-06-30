@@ -129,6 +129,10 @@ export interface BikeResponse {
   ownerId: string;
   ownerName: string;
   ownerAvatarUrl: string | null;
+  /** Set when the owner is a business account verified by admins */
+  ownerBusinessVerified?: boolean;
+  /** Business display name, present when ownerBusinessVerified is true */
+  ownerBusinessName?: string | null;
   title: string;
   description: string;
   category: BikeCategory;
