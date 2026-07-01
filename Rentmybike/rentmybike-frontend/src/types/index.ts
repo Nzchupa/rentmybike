@@ -357,7 +357,9 @@ export type NotificationType =
   // notifyAdminsOfNewReport on the backend) — every admin gets one row per event.
   // Nur für Admins — Fan-out-Typen, jeder Admin erhält eine Zeile pro Ereignis.
   | "ADMIN_NEW_PENDING_BIKE"
-  | "ADMIN_NEW_REPORT";
+  | "ADMIN_NEW_REPORT"
+  | "ADMIN_NEW_SUPPORT_TICKET"
+  | "SUPPORT_TICKET_REPLY";
 
 export interface NotificationResponse {
   id: string;
@@ -407,7 +409,9 @@ export type AuditAction =
   | "BIKE_CHANGES_REQUESTED"
   | "BUSINESS_VERIFIED"
   | "BUSINESS_UNVERIFIED"
-  | "BOOKING_CANCELLED";
+  | "BOOKING_CANCELLED"
+  | "SUPPORT_TICKET_RESOLVED"
+  | "SUPPORT_TICKET_CLOSED";
 
 export interface AuditLogResponse {
   id: string;
@@ -541,4 +545,52 @@ export interface BusinessAnalyticsResponse {
   popularBikes: PopularBikeResponse[];
   averageBookingDurationDays: number;
   conversionRate: number;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Support tickets / Support-Tickets — user-facing help desk
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type SupportCategory = "BOOKING" | "PAYMENT" | "ACCOUNT" | "BIKE_LISTING" | "OTHER";
+
+export type SupportTicketStatus = "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED";
+
+export interface SupportMessageResponse {
+  id: string;
+  senderId: string;
+  senderName: string;
+  fromAdmin: boolean;
+  body: string;
+  createdAt: string;
+}
+
+export interface SupportTicketResponse {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  subject: string;
+  category: SupportCategory;
+  status: SupportTicketStatus;
+  messageCount: number;
+  lastMessagePreview: string | null;
+  lastMessageAt: string | null;
+  /** Full thread — populated only by single-ticket "get" calls, null on list responses. */
+  messages: SupportMessageResponse[] | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateSupportTicketRequest {
+  subject: string;
+  category: SupportCategory;
+  message: string;
+}
+
+export interface SendSupportMessageRequest {
+  body: string;
+}
+
+export interface UpdateSupportTicketStatusRequest {
+  status: SupportTicketStatus;
 }

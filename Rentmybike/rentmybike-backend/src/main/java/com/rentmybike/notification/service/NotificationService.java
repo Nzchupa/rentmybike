@@ -11,6 +11,7 @@ import com.rentmybike.notification.entity.Notification;
 import com.rentmybike.notification.entity.NotificationType;
 import com.rentmybike.notification.repository.NotificationRepository;
 import com.rentmybike.report.entity.Report;
+import com.rentmybike.support.entity.SupportTicket;
 import com.rentmybike.user.entity.User;
 import com.rentmybike.user.entity.UserRole;
 import com.rentmybike.user.repository.UserRepository;
@@ -207,6 +208,53 @@ public class NotificationService {
                 + " wegen " + report.getReason().name().toLowerCase().replace('_', ' ') + " gemeldet.";
 
         fanOutToAdmins(NotificationType.ADMIN_NEW_REPORT, title, message);
+    }
+
+    /**
+     * Fans out an in-app notification to every admin when a user opens a new
+     * support ticket, so it surfaces in the admin notification center
+     * alongside the moderation queue and report inbox.
+     * Verteilt eine In-App-Benachrichtigung an jeden Admin, wenn ein Benutzer
+     * ein neues Support-Ticket eröffnet, damit es im
+     * Admin-Benachrichtigungszentrum neben der Moderationswarteschlange und
+     * dem Meldungs-Posteingang erscheint.
+     *
+     * @param ticket the newly-filed ticket / das neu eingereichte Ticket
+     */
+    public void notifyAdminsOfNewSupportTicket(SupportTicket ticket) {
+        String title = "New support ticket / Neues Support-Ticket";
+        String message = ticket.getUserName() + " opened a ticket: \"" + ticket.getSubject() + "\""
+                + " / " + ticket.getUserName() + " hat ein Ticket eröffnet: \"" + ticket.getSubject() + "\".";
+
+        fanOutToAdmins(NotificationType.ADMIN_NEW_SUPPORT_TICKET, title, message);
+    }
+
+    /**
+     * Notifies the ticket's filing user that an admin replied. In-app only,
+     * same rationale as {@link #notifyNewChatMessage} — a real-time channel
+     * already exists for anyone with the ticket open, and an email per reply
+     * would be spammy for a back-and-forth thread.
+     * Benachrichtigt den einreichenden Benutzer eines Tickets, dass ein Admin
+     * geantwortet hat. Nur In-App, gleiche Begründung wie bei
+     * {@link #notifyNewChatMessage}.
+     *
+     * @param ticket the ticket that received a reply / das Ticket, das eine Antwort erhielt
+     * @param recipient the filing user / der einreichende Benutzer
+     * @param content the reply text (truncated for the preview) / der Antworttext (für die Vorschau gekürzt)
+     */
+    public void notifySupportTicketReply(SupportTicket ticket, User recipient, String content) {
+        String preview = content.length() > 120 ? content.substring(0, 120) + "…" : content;
+
+        String title = "Reply to \"" + ticket.getSubject() + "\" / Antwort auf \"" + ticket.getSubject() + "\"";
+        String message = preview;
+
+        Notification notification = Notification.builder()
+                .user(recipient)
+                .type(NotificationType.SUPPORT_TICKET_REPLY)
+                .title(title)
+                .message(message)
+                .build();
+        notificationRepository.save(notification);
     }
 
     /**

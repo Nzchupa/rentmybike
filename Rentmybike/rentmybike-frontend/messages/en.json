@@ -61,6 +61,9 @@
     "contact": {
       "title": "Contact",
       "body1": "This project is currently maintained by a single developer as a student project.",
+      "ticketTitle": "Open a support ticket",
+      "ticketBody": "Logged in? Open a tracked ticket instead of email — you'll get a reply right here and can follow the status.",
+      "ticketCta": "Go to support",
       "emailLabel": "Email",
       "body2": "For questions, bug reports, or feedback, feel free to reach out by email."
     },
@@ -433,10 +436,30 @@
       "asOwner": "As Owner",
       "favorites": "Favorites",
       "notifications": "Notifications",
+      "support": "Support",
       "profile": "Profile",
       "business": "Business",
       "more": "More",
       "closeMore": "Close menu"
+    },
+    "support": {
+      "title": "Support",
+      "newTicket": "New ticket",
+      "subjectLabel": "Subject",
+      "subjectPlaceholder": "Briefly summarize your issue",
+      "categoryLabel": "Category",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Describe what's going on...",
+      "submit": "Submit ticket",
+      "empty": "You haven't opened any support tickets yet.",
+      "loadError": "Couldn't load your tickets — please try again.",
+      "notFound": "Ticket not found.",
+      "backToList": "Back to tickets",
+      "replyPlaceholder": "Type your reply...",
+      "send": "Send",
+      "supportTeam": "Support team",
+      "closedNotice": "This ticket is closed. Open a new ticket if you need further help.",
+      "ticketCreated": "Ticket submitted — our team will reply soon"
     },
     "favorites": {
       "title": "My Favorites",
@@ -648,6 +671,7 @@
       "moderation": "Moderation",
       "businessVerification": "Business Verification",
       "reports": "Reports",
+      "support": "Support",
       "auditLog": "Audit Log",
       "notifications": "Notifications"
     },
@@ -810,6 +834,23 @@
       "loadError": "Couldn't load reports — please try again.",
       "resolvedBy": "Resolved by {name}"
     },
+    "support": {
+      "title": "Support tickets",
+      "searchPlaceholder": "Search by subject, name, or email...",
+      "allStatuses": "All statuses",
+      "allCategories": "All categories",
+      "noTicketsFound": "No support tickets found.",
+      "loadError": "Couldn't load support tickets — please try again.",
+      "notFound": "Ticket not found.",
+      "backToList": "Back to tickets",
+      "filedBy": "Filed by {name}",
+      "replyPlaceholder": "Type your reply...",
+      "send": "Send",
+      "replySent": "Reply sent",
+      "statusUpdated": "Ticket status updated",
+      "moveTo": "Mark {status}",
+      "closedNotice": "This ticket is closed."
+    },
     "auditLog": {
       "title": "Audit Log",
       "searchPlaceholder": "Search by actor, target, or details...",
@@ -840,7 +881,9 @@
         "BIKE_CHANGES_REQUESTED": "Bike changes requested",
         "BUSINESS_VERIFIED": "Business verified",
         "BUSINESS_UNVERIFIED": "Business unverified",
-        "BOOKING_CANCELLED": "Booking cancelled"
+        "BOOKING_CANCELLED": "Booking cancelled",
+        "SUPPORT_TICKET_RESOLVED": "Support ticket resolved",
+        "SUPPORT_TICKET_CLOSED": "Support ticket closed"
       }
     },
     "notifications": {
@@ -857,6 +900,21 @@
     "viewAll": "View all notifications",
     "types": {
       "NEW_BOOKING_REQUEST": "New rental request"
+    }
+  },
+  "support": {
+    "categories": {
+      "BOOKING": "Booking",
+      "PAYMENT": "Payment",
+      "ACCOUNT": "Account",
+      "BIKE_LISTING": "Bike listing",
+      "OTHER": "Other"
+    },
+    "status": {
+      "OPEN": "Open",
+      "IN_PROGRESS": "In progress",
+      "RESOLVED": "Resolved",
+      "CLOSED": "Closed"
     }
   },
   "errors": {

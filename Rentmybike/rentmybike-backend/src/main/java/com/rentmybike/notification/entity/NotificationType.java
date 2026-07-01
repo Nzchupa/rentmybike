@@ -28,5 +28,9 @@ public enum NotificationType {
     /** Admin-facing: a new bike listing is awaiting approval. */
     ADMIN_NEW_PENDING_BIKE,
     /** Admin-facing: a new report was filed and needs triage. */
-    ADMIN_NEW_REPORT
+    ADMIN_NEW_REPORT,
+    /** Admin-facing: a new support ticket was filed and needs a reply. */
+    ADMIN_NEW_SUPPORT_TICKET,
+    /** User-facing: an admin replied to one of the user's support tickets. */
+    SUPPORT_TICKET_REPLY
 }

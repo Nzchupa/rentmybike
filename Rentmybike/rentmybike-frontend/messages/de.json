@@ -61,6 +61,9 @@
     "contact": {
       "title": "Kontakt",
       "body1": "Dieses Projekt wird derzeit von einem einzelnen Entwickler als Studienprojekt betreut.",
+      "ticketTitle": "Support-Ticket eröffnen",
+      "ticketBody": "Angemeldet? Eröffne ein nachverfolgbares Ticket statt einer E-Mail — du erhältst die Antwort direkt hier und kannst den Status verfolgen.",
+      "ticketCta": "Zum Support",
       "emailLabel": "E-Mail",
       "body2": "Bei Fragen, Fehlermeldungen oder Feedback kannst du gerne per E-Mail Kontakt aufnehmen."
     },
@@ -433,10 +436,30 @@
       "asOwner": "Als Eigentümer",
       "favorites": "Favoriten",
       "notifications": "Benachrichtigungen",
+      "support": "Support",
       "profile": "Profil",
       "business": "Business",
       "more": "Mehr",
       "closeMore": "Menü schließen"
+    },
+    "support": {
+      "title": "Support",
+      "newTicket": "Neues Ticket",
+      "subjectLabel": "Betreff",
+      "subjectPlaceholder": "Fassen Sie Ihr Anliegen kurz zusammen",
+      "categoryLabel": "Kategorie",
+      "messageLabel": "Nachricht",
+      "messagePlaceholder": "Beschreiben Sie, worum es geht...",
+      "submit": "Ticket einreichen",
+      "empty": "Sie haben noch kein Support-Ticket eröffnet.",
+      "loadError": "Ihre Tickets konnten nicht geladen werden — bitte versuchen Sie es erneut.",
+      "notFound": "Ticket nicht gefunden.",
+      "backToList": "Zurück zu den Tickets",
+      "replyPlaceholder": "Antwort eingeben...",
+      "send": "Senden",
+      "supportTeam": "Support-Team",
+      "closedNotice": "Dieses Ticket ist geschlossen. Eröffnen Sie ein neues Ticket, falls Sie weitere Hilfe benötigen.",
+      "ticketCreated": "Ticket eingereicht — unser Team antwortet in Kürze"
     },
     "favorites": {
       "title": "Meine Favoriten",
@@ -648,6 +671,7 @@
       "moderation": "Moderation",
       "businessVerification": "Geschäftsverifizierung",
       "reports": "Meldungen",
+      "support": "Support",
       "auditLog": "Audit-Protokoll",
       "notifications": "Benachrichtigungen"
     },
@@ -810,6 +834,23 @@
       "loadError": "Meldungen konnten nicht geladen werden.",
       "resolvedBy": "Bearbeitet von {name}"
     },
+    "support": {
+      "title": "Support-Tickets",
+      "searchPlaceholder": "Suche nach Betreff, Name oder E-Mail...",
+      "allStatuses": "Alle Status",
+      "allCategories": "Alle Kategorien",
+      "noTicketsFound": "Keine Support-Tickets gefunden.",
+      "loadError": "Support-Tickets konnten nicht geladen werden — bitte versuchen Sie es erneut.",
+      "notFound": "Ticket nicht gefunden.",
+      "backToList": "Zurück zu den Tickets",
+      "filedBy": "Eingereicht von {name}",
+      "replyPlaceholder": "Antwort eingeben...",
+      "send": "Senden",
+      "replySent": "Antwort gesendet",
+      "statusUpdated": "Ticket-Status aktualisiert",
+      "moveTo": "Als {status} markieren",
+      "closedNotice": "Dieses Ticket ist geschlossen."
+    },
     "auditLog": {
       "title": "Audit-Protokoll",
       "searchPlaceholder": "Suche nach Akteur, Ziel oder Details...",
@@ -840,7 +881,9 @@
         "BIKE_CHANGES_REQUESTED": "Änderungen am Fahrrad angefordert",
         "BUSINESS_VERIFIED": "Business verifiziert",
         "BUSINESS_UNVERIFIED": "Business-Verifizierung aufgehoben",
-        "BOOKING_CANCELLED": "Buchung storniert"
+        "BOOKING_CANCELLED": "Buchung storniert",
+        "SUPPORT_TICKET_RESOLVED": "Support-Ticket gelöst",
+        "SUPPORT_TICKET_CLOSED": "Support-Ticket geschlossen"
       }
     },
     "notifications": {
@@ -857,6 +900,21 @@
     "viewAll": "Alle Benachrichtigungen ansehen",
     "types": {
       "NEW_BOOKING_REQUEST": "Neue Mietanfrage"
+    }
+  },
+  "support": {
+    "categories": {
+      "BOOKING": "Buchung",
+      "PAYMENT": "Zahlung",
+      "ACCOUNT": "Konto",
+      "BIKE_LISTING": "Fahrrad-Inserat",
+      "OTHER": "Sonstiges"
+    },
+    "status": {
+      "OPEN": "Offen",
+      "IN_PROGRESS": "In Bearbeitung",
+      "RESOLVED": "Gelöst",
+      "CLOSED": "Geschlossen"
     }
   },
   "errors": {

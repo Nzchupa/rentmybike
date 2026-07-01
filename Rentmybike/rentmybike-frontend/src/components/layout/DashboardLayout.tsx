@@ -13,6 +13,7 @@ import {
   Heart,
   User,
   Briefcase,
+  LifeBuoy,
   Menu,
   X,
 } from "lucide-react";
@@ -26,6 +27,7 @@ const baseTabs = [
   { key: "asOwner",       icon: CalendarCheck,   href: "/dashboard/bookings/owner" },
   { key: "favorites",     icon: Heart,           href: "/dashboard/favorites" },
   { key: "notifications", icon: Bell,            href: "/dashboard/notifications" },
+  { key: "support",       icon: LifeBuoy,        href: "/dashboard/support" },
   { key: "profile",       icon: User,            href: "/dashboard/profile" },
 ];
 

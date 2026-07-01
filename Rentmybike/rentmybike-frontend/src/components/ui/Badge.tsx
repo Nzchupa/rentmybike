@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import type { BookingStatus, ApprovalStatus, ReportStatus } from "@/types";
+import type { BookingStatus, ApprovalStatus, ReportStatus, SupportTicketStatus } from "@/types";
 
 type BadgeVariant = "green" | "yellow" | "red" | "blue" | "gray";
 type BadgeSize = "sm" | "md";
@@ -91,4 +91,16 @@ const reportStatusVariant: Record<ReportStatus, BadgeVariant> = {
 export function ReportStatusBadge({ status }: { status: ReportStatus }) {
   const t = useTranslations("admin.moderation.status");
   return <Badge variant={reportStatusVariant[status]}>{t(status)}</Badge>;
+}
+
+const supportStatusVariant: Record<SupportTicketStatus, BadgeVariant> = {
+  OPEN:        "yellow",
+  IN_PROGRESS: "blue",
+  RESOLVED:    "green",
+  CLOSED:      "gray",
+};
+
+export function SupportTicketStatusBadge({ status }: { status: SupportTicketStatus }) {
+  const t = useTranslations("support.status");
+  return <Badge variant={supportStatusVariant[status]}>{t(status)}</Badge>;
 }

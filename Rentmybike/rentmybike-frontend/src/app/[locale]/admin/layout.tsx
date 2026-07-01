@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
-import { BarChart3, Users, Bike, ScrollText, ShieldAlert, Bell, Flag, BadgeCheck } from "lucide-react";
+import { BarChart3, Users, Bike, ScrollText, ShieldAlert, Bell, Flag, BadgeCheck, LifeBuoy } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +15,7 @@ const tabs = [
   { key: "moderation", labelKey: "moderation", icon: ShieldAlert, href: "/admin/moderation" },
   { key: "businessVerification", labelKey: "businessVerification", icon: BadgeCheck, href: "/admin/business-verification" },
   { key: "reports",    labelKey: "reports",    icon: Flag,        href: "/admin/reports" },
+  { key: "support",    labelKey: "support",    icon: LifeBuoy,    href: "/admin/support" },
   { key: "auditLog",   labelKey: "auditLog",   icon: ScrollText,  href: "/admin/audit-log" },
   { key: "notifications", labelKey: "notifications", icon: Bell, href: "/admin/notifications" },
 ];

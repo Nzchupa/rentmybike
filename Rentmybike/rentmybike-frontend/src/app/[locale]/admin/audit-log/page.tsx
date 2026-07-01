@@ -26,6 +26,8 @@ const ACTIONS: AuditAction[] = [
   "BUSINESS_VERIFIED",
   "BUSINESS_UNVERIFIED",
   "BOOKING_CANCELLED",
+  "SUPPORT_TICKET_RESOLVED",
+  "SUPPORT_TICKET_CLOSED",
 ];
 
 const TARGET_TYPES = ["USER", "BIKE", "BOOKING"];
@@ -53,6 +55,8 @@ const actionVariant: Record<AuditAction, "green" | "yellow" | "red" | "blue" | "
   BUSINESS_VERIFIED: "green",
   BUSINESS_UNVERIFIED: "gray",
   BOOKING_CANCELLED: "yellow",
+  SUPPORT_TICKET_RESOLVED: "green",
+  SUPPORT_TICKET_CLOSED: "gray",
 };
 
 /**

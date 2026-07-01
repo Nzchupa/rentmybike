@@ -346,6 +346,11 @@ import type {
   ReportStatus,
   ReportTargetType,
   CreateReportRequest,
+  SupportTicketResponse,
+  SupportTicketStatus,
+  SupportCategory,
+  CreateSupportTicketRequest,
+  SendSupportMessageRequest,
 } from "@/types";
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
@@ -719,6 +724,54 @@ export const reportsApi = {
     api.post<ApiResponse<ReportResponse>>(`/api/v1/admin/reports/${id}/ban`, {
       resolutionNote,
     }),
+};
+
+// ── Support tickets — user-facing help desk ─────────────────────────────────
+// Support-Tickets — nutzerseitiges Support-System
+//
+// Note: SupportController has no class-level @RequestMapping — its routes
+// (/api/v1/support/tickets/**, /api/v1/admin/support/tickets/**) live
+// directly on the methods, same pattern as ReportController.
+export const supportApi = {
+  create: (data: CreateSupportTicketRequest) =>
+    api.post<ApiResponse<SupportTicketResponse>>("/api/v1/support/tickets", data),
+
+  listMine: (page = 0, size = 20) =>
+    api.get<ApiResponse<PageResponse<SupportTicketResponse>>>("/api/v1/support/tickets", {
+      params: { page, size },
+    }),
+
+  getMine: (id: string) =>
+    api.get<ApiResponse<SupportTicketResponse>>(`/api/v1/support/tickets/${id}`),
+
+  addMyMessage: (id: string, data: SendSupportMessageRequest) =>
+    api.post<ApiResponse<SupportTicketResponse>>(`/api/v1/support/tickets/${id}/messages`, data),
+
+  adminList: (params: {
+    status?: SupportTicketStatus;
+    category?: SupportCategory;
+    search?: string;
+    page?: number;
+    size?: number;
+  }) =>
+    api.get<ApiResponse<PageResponse<SupportTicketResponse>>>("/api/v1/admin/support/tickets", {
+      params: {
+        status: params.status,
+        category: params.category,
+        search: params.search,
+        page: params.page ?? 0,
+        size: params.size ?? 20,
+      },
+    }),
+
+  adminGet: (id: string) =>
+    api.get<ApiResponse<SupportTicketResponse>>(`/api/v1/admin/support/tickets/${id}`),
+
+  adminAddMessage: (id: string, data: SendSupportMessageRequest) =>
+    api.post<ApiResponse<SupportTicketResponse>>(`/api/v1/admin/support/tickets/${id}/messages`, data),
+
+  adminUpdateStatus: (id: string, status: SupportTicketStatus) =>
+    api.post<ApiResponse<SupportTicketResponse>>(`/api/v1/admin/support/tickets/${id}/status`, { status }),
 };
 
 // ── Notifications ─────────────────────────────────────────────────────────────
