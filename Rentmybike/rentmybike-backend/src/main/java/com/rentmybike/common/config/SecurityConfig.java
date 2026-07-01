@@ -55,6 +55,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RateLimitingFilter rateLimitingFilter;
     private final UserRepository userRepository;
     private final CorsConfigurationSource corsConfigurationSource;
     private final AppProperties appProperties;
@@ -175,6 +176,15 @@ public class SecurityConfig {
             // ── Custom JWT filter BEFORE the default username/password filter
             // ── Benutzerdefinierter JWT-Filter VOR dem Standard-Benutzername/Passwort-Filter
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
+            // ── Rate limiter for login/register/resend-verification — also
+            //    placed before the username/password filter so an abusive
+            //    caller is rejected before any authentication work happens.
+            // ── Ratenbegrenzer für login/register/resend-verification —
+            //    ebenfalls vor dem Benutzername/Passwort-Filter platziert,
+            //    damit ein missbräuchlicher Aufrufer abgelehnt wird, bevor
+            //    irgendeine Authentifizierungsarbeit stattfindet.
+            .addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
 
             // ── Use custom AuthenticationProvider / Benutzerdefinierten AuthenticationProvider verwenden
             .authenticationProvider(authenticationProvider());

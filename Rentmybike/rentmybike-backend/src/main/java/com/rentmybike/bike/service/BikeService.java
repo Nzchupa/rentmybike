@@ -16,7 +16,6 @@ import com.rentmybike.common.exception.BusinessException;
 import com.rentmybike.common.exception.ResourceNotFoundException;
 import com.rentmybike.common.response.PageResponse;
 import com.rentmybike.common.service.CloudinaryService;
-import com.rentmybike.notification.service.NotificationService;
 import com.rentmybike.user.entity.User;
 import com.rentmybike.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +39,9 @@ import java.util.UUID;
  *   <li>CRUD for bike listings</li>
  *   <li>Photo upload / delete (max 5 per bike)</li>
  *   <li>Public search with filters + pagination</li>
- *   <li>Admin approval workflow (approve / reject)</li>
+ *   <li>Admin reactive moderation (approve / reject / request changes) — new
+ *       bikes are auto-approved, this is only a post-publication takedown
+ *       tool now, not a pre-publication gate</li>
  * </ul>
  */
 @Service
@@ -58,7 +59,6 @@ public class BikeService {
     private final CloudinaryService cloudinaryService;
     private final BookingRepository bookingRepository;
     private final AuditLogService auditLogService;
-    private final NotificationService notificationService;
 
     // ──────────────────────────────────────────────────────────────────────────
     // CREATE / ERSTELLEN
@@ -68,10 +68,15 @@ public class BikeService {
      * Creates a new bike listing for the authenticated owner.
      * Erstellt ein neues Fahrrad-Inserat für den authentifizierten Eigentümer.
      *
-     * <p>New bikes start in PENDING approval status — invisible to public search
-     * until an admin approves them.
-     * <p>Neue Fahrräder starten im PENDING-Status — unsichtbar in öffentlicher Suche
-     * bis ein Admin sie genehmigt.
+     * <p>New bikes are auto-approved and immediately visible in public search —
+     * admin moderation no longer gates individual bike listings, only
+     * user/business accounts (see AdminService). An admin can still reject a
+     * listing after the fact (e.g. in response to a report).
+     * <p>Neue Fahrräder werden automatisch genehmigt und sind sofort in der
+     * öffentlichen Suche sichtbar — die Admin-Moderation blockiert nicht mehr
+     * einzelne Fahrrad-Inserate, sondern nur noch Benutzer-/Geschäftskonten
+     * (siehe AdminService). Ein Admin kann ein Inserat weiterhin nachträglich
+     * ablehnen (z. B. nach einer Meldung).
      *
      * @param ownerId owner's UUID / UUID des Eigentümers
      * @param request listing data / Inserat-Daten
@@ -94,14 +99,27 @@ public class BikeService {
                 .latitude(request.getLatitude())
                 .longitude(request.getLongitude())
                 .available(true)
-                .approvalStatus(ApprovalStatus.PENDING)
+                // Admin moderation now only covers users/business accounts, not
+                // individual bike listings — new bikes go straight to APPROVED
+                // and are immediately visible in public search. The ApprovalStatus
+                // workflow (PENDING/REJECTED/CHANGES_REQUESTED) and the admin
+                // approve/reject/request-changes endpoints in BikeController are
+                // kept as-is so a bad listing can still be taken down reactively
+                // (e.g. after a report), just without a pre-publication gate.
+                // Admin-Moderation deckt jetzt nur noch Benutzer-/Geschäftskonten
+                // ab, nicht einzelne Fahrrad-Inserate — neue Fahrräder gehen
+                // direkt auf APPROVED und sind sofort in der öffentlichen Suche
+                // sichtbar. Der ApprovalStatus-Workflow und die Admin-Endpunkte
+                // approve/reject/request-changes in BikeController bleiben
+                // unverändert bestehen, damit ein schlechtes Inserat weiterhin
+                // reaktiv entfernt werden kann (z. B. nach einer Meldung), nur
+                // ohne Vorab-Veröffentlichungssperre.
+                .approvalStatus(ApprovalStatus.APPROVED)
                 .build();
 
         bikeRepository.save(bike);
-        log.info("Bike created: {} by owner: {} / Fahrrad erstellt: {} von Eigentümer: {}",
+        log.info("Bike created (auto-approved): {} by owner: {} / Fahrrad erstellt (automatisch genehmigt): {} von Eigentümer: {}",
                 bike.getId(), ownerId, bike.getId(), ownerId);
-
-        notificationService.notifyAdminsOfNewPendingBike(bike);
 
         return toBikeResponse(bike, true);
     }
@@ -109,12 +127,11 @@ public class BikeService {
     /**
      * Creates multiple bike listings at once for the authenticated BUSINESS
      * owner — lets bike shops onboard their fleet in one request instead of
-     * one-by-one. Each entry gets the same PENDING approval workflow as a
-     * single-bike create.
+     * one-by-one. Each entry is auto-approved, same as a single-bike create.
      * Erstellt mehrere Fahrrad-Inserate gleichzeitig für den authentifizierten
      * BUSINESS-Eigentümer — ermöglicht es Fahrradläden, ihre Flotte in einer
-     * Anfrage anzulegen, statt einzeln. Jeder Eintrag erhält denselben
-     * PENDING-Genehmigungsablauf wie eine Einzel-Erstellung.
+     * Anfrage anzulegen, statt einzeln. Jeder Eintrag wird automatisch
+     * genehmigt, genauso wie bei einer Einzel-Erstellung.
      *
      * <p>Not wrapped in a single all-or-nothing check beyond the surrounding
      * {@code @Transactional} on the class — a validation failure on any one
@@ -143,20 +160,17 @@ public class BikeService {
                         .latitude(request.getLatitude())
                         .longitude(request.getLongitude())
                         .available(true)
-                        .approvalStatus(ApprovalStatus.PENDING)
+                        // Same auto-approval as the single-bike create above —
+                        // see the comment there for why. / Gleiche automatische
+                        // Genehmigung wie bei der Einzel-Erstellung oben —
+                        // siehe dortigen Kommentar für den Grund.
+                        .approvalStatus(ApprovalStatus.APPROVED)
                         .build())
                 .toList();
 
         bikeRepository.saveAll(bikes);
-        log.info("{} bikes bulk-created by owner: {} / {} Fahrräder massenhaft erstellt von Eigentümer: {}",
+        log.info("{} bikes bulk-created (auto-approved) by owner: {} / {} Fahrräder massenhaft erstellt (automatisch genehmigt) von Eigentümer: {}",
                 bikes.size(), ownerId, bikes.size(), ownerId);
-
-        // One admin notification per bike, same as a single create — bulk
-        // submissions still need individual moderation attention.
-        // Eine Admin-Benachrichtigung pro Fahrrad, genauso wie bei einer
-        // Einzel-Erstellung — auch Massen-Einreichungen benötigen
-        // individuelle Moderationsaufmerksamkeit.
-        bikes.forEach(notificationService::notifyAdminsOfNewPendingBike);
 
         return bikes.stream().map(bike -> toBikeResponse(bike, true)).toList();
     }
@@ -321,10 +335,21 @@ public class BikeService {
      * Owner updates their bike listing.
      * Eigentümer aktualisiert sein Fahrrad-Inserat.
      *
-     * <p>If the bike was APPROVED, updating it resets it to PENDING for re-review,
-     * because the content has changed. Toggling availability alone does NOT reset status.
-     * <p>Wenn das Fahrrad APPROVED war, setzt ein Update es auf PENDING zurück,
-     * da sich der Inhalt geändert hat. Das Umschalten der Verfügbarkeit setzt den Status NICHT zurück.
+     * <p>Since bikes are no longer gated behind admin approval (see {@link
+     * #createBike}), an edit to an already-APPROVED bike no longer bounces it
+     * back to PENDING — that used to silently reintroduce a per-edit
+     * moderation gate, which defeats the point of removing bike verification.
+     * The one exception: a bike an admin explicitly flagged as
+     * CHANGES_REQUESTED still returns to PENDING on the owner's next save, so
+     * the admin's reactive feedback loop still closes.
+     * <p>Da Fahrräder nicht mehr hinter einer Admin-Genehmigung stehen (siehe
+     * {@link #createBike}), springt ein bereits genehmigtes Fahrrad bei einer
+     * Bearbeitung nicht mehr auf PENDING zurück — das hätte sonst stillschweigend
+     * pro Bearbeitung wieder ein Moderations-Gate eingeführt, was den Sinn der
+     * entfernten Fahrrad-Verifizierung zunichtemachen würde. Einzige Ausnahme:
+     * ein Fahrrad, das ein Admin explizit als CHANGES_REQUESTED markiert hat,
+     * kehrt bei der nächsten Speicherung des Eigentümers weiterhin zu PENDING
+     * zurück, damit sich die reaktive Feedback-Schleife des Admins schließt.
      */
     public BikeResponse updateBike(UUID bikeId, UUID ownerId, UpdateBikeRequest request) {
         Bike bike = bikeRepository.findByIdWithDetails(bikeId)
@@ -333,16 +358,6 @@ public class BikeService {
         requireOwner(bike, ownerId);
 
         String newModel = normalizeModel(request.getModel());
-        boolean depositChanged = !java.util.Objects.equals(
-                normalizeAmount(bike.getDepositAmount()), normalizeAmount(request.getDepositAmount()));
-        boolean contentChanged =
-                !bike.getTitle().equals(request.getTitle().strip())
-                || !bike.getDescription().equals(request.getDescription().strip())
-                || bike.getCategory() != request.getCategory()
-                || bike.getPricePerDay().compareTo(request.getPricePerDay()) != 0
-                || !bike.getCity().equals(request.getCity().strip())
-                || !java.util.Objects.equals(bike.getModel(), newModel)
-                || depositChanged;
 
         bike.setTitle(request.getTitle().strip());
         bike.setDescription(request.getDescription().strip());
@@ -356,23 +371,17 @@ public class BikeService {
         bike.setLongitude(request.getLongitude());
         bike.setAvailable(request.getAvailable());
 
-        // Reset to PENDING if meaningful content changed on an already-approved bike,
-        // OR unconditionally if the bike was CHANGES_REQUESTED — that status exists
-        // specifically so the owner's next save sends it back into the moderation
-        // queue, even if the edit looks minor to this check.
-        // Auf PENDING zurücksetzen, wenn sich wichtiger Inhalt bei einem genehmigten
-        // Fahrrad geändert hat, ODER unbedingt, wenn das Fahrrad CHANGES_REQUESTED
-        // war — dieser Status existiert speziell dafür, dass die nächste Speicherung
-        // des Eigentümers es zurück in die Moderationswarteschlange schickt, auch
-        // wenn die Bearbeitung dieser Prüfung nach geringfügig aussieht.
-        boolean shouldResetToPending =
-                (contentChanged && bike.getApprovalStatus() == ApprovalStatus.APPROVED)
-                || bike.getApprovalStatus() == ApprovalStatus.CHANGES_REQUESTED;
-
-        if (shouldResetToPending) {
+        // Only CHANGES_REQUESTED (an explicit admin action) still routes back
+        // through PENDING on save — plain content edits to an APPROVED bike
+        // no longer do.
+        // Nur CHANGES_REQUESTED (eine explizite Admin-Aktion) läuft bei der
+        // Speicherung weiterhin über PENDING — einfache Inhaltsänderungen an
+        // einem APPROVED-Fahrrad tun das nicht mehr.
+        if (bike.getApprovalStatus() == ApprovalStatus.CHANGES_REQUESTED) {
             bike.setApprovalStatus(ApprovalStatus.PENDING);
             bike.setRejectionReason(null);
-            log.info("Bike {} reset to PENDING after owner update / Fahrrad {} nach Eigentümer-Update auf PENDING zurückgesetzt",
+            log.info("Bike {} reset to PENDING after owner addressed requested changes / "
+                    + "Fahrrad {} nach Bearbeitung der angeforderten Änderungen auf PENDING zurückgesetzt",
                     bikeId, bikeId);
         }
 
@@ -627,20 +636,6 @@ public class BikeService {
         if (model == null) return null;
         String stripped = model.strip();
         return stripped.isEmpty() ? null : stripped;
-    }
-
-    /**
-     * Normalizes a nullable BigDecimal to a scale-independent comparable
-     * form (e.g. so 5.0 and 5.00 are treated as equal) — plain {@code
-     * BigDecimal.equals()} is scale-sensitive and would otherwise flag a
-     * no-op re-save as a content change.
-     * Normalisiert ein nullable BigDecimal in eine skalenunabhängig
-     * vergleichbare Form (z. B. damit 5.0 und 5.00 als gleich gelten) —
-     * einfaches {@code BigDecimal.equals()} ist skalenabhängig und würde
-     * sonst ein wirkungsloses erneutes Speichern als Inhaltsänderung werten.
-     */
-    private BigDecimal normalizeAmount(BigDecimal amount) {
-        return amount == null ? null : amount.stripTrailingZeros();
     }
 
     /**
