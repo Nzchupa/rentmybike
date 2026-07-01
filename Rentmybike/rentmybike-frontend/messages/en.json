@@ -77,7 +77,7 @@
       "section3Title": "Data sharing",
       "section3Body": "We do not sell your data or share it with third parties for advertising. Information visible to other users (such as your name, profile photo, and reviews) is limited to what is needed to complete a rental. Bike listing details are publicly visible to allow renters to find and book bikes.",
       "section4Title": "Security",
-      "section4Body": "All accounts require email verification before activation. New bike listings are reviewed by a moderator before going live. Accounts that violate platform rules can be suspended or permanently banned by an administrator. Passwords are stored in encrypted form and never in plain text.",
+      "section4Body": "All accounts require email verification before activation. Our team monitors bike listings and can remove any that violate platform rules, and accounts that violate those rules can be suspended or permanently banned by an administrator. Passwords are stored in encrypted form and never in plain text.",
       "section5Title": "Your rights and data deletion",
       "section5Body": "You can update or delete your profile information at any time from your account settings. To request full account deletion or ask a question about your data, contact us by email via the Contact page.",
       "section6Title": "Contact",
@@ -114,7 +114,7 @@
       "forOwnersTitle": "Listing your bike",
       "forOwnersSubtitle": "Turn a bike you're not using every day into income.",
       "ownerStep1Title": "List your bike",
-      "ownerStep1Desc": "Add photos, a description, and your price per day. New listings go through a quick review before going live.",
+      "ownerStep1Desc": "Add photos, a description, and your price per day. Your listing goes live immediately — our team can still step in and remove it later if it breaks the rules.",
       "ownerStep2Title": "Accept requests",
       "ownerStep2Desc": "Renters send booking requests for the dates they want — you choose which to accept.",
       "ownerStep3Title": "Get paid and get reviewed",
@@ -137,7 +137,7 @@
       "section1Title": "Account verification",
       "section1Body": "Every account must confirm their email address before it is activated. Anonymous or unverified accounts cannot place or accept bookings on the platform.",
       "section2Title": "Listing moderation",
-      "section2Body": "Every new bike listing is reviewed by a moderator before it goes live. Listings that do not meet our standards — inaccurate photos, missing information, or bikes that are not in rentable condition — are rejected or sent back for corrections.",
+      "section2Body": "New bike listings go live immediately, but our team monitors listings and reactively removes or sends back for correction any that do not meet our standards — inaccurate photos, missing information, or bikes that are not in rentable condition.",
       "section3Title": "Reviews and ratings",
       "section3Body": "After every completed rental, both the renter and the owner are invited to leave a review and rating. These are publicly visible on profiles and help users make informed decisions about who to rent to or from.",
       "section4Title": "Reporting",
@@ -327,7 +327,8 @@
     },
     "card": {
       "perDay": "/ day",
-      "viewDetails": "View details"
+      "viewDetails": "View details",
+      "verifiedShop": "Verified shop"
     },
     "detail": {
       "bookNow": "Book now",
@@ -346,7 +347,7 @@
       "ownerNotice": "This is your bike.",
       "editInDashboard": "Edit in Dashboard",
       "verifiedShop": "Verified shop",
-      "moderationNotice": "All listings are reviewed by our team before going live."
+      "moderationNotice": "Our team monitors listings and removes any that violate our guidelines."
     },
     "approvalStatus": {
       "PENDING": "Pending review",
@@ -550,8 +551,9 @@
       "cityPlaceholder": "e.g. Berlin",
       "addressPlaceholder": "e.g. Alexanderplatz 1 (optional)",
       "selectCategory": "Select category",
-      "bikeListed": "Bike listed! Awaiting review.",
-      "bikeUpdated": "Bike updated! Sent back for review.",
+      "bikeListed": "Bike listed! It's live now.",
+      "bikeUpdated": "Bike updated! It's back with our team for review.",
+      "bikeUpdatedLive": "Bike updated.",
       "bikeNotFound": "Bike not found.",
       "validation": {
         "titleMin": "Title must be at least 5 characters",
@@ -561,8 +563,8 @@
         "cityRequired": "City is required"
       },
       "hints": {
-        "pending": "Your bike will be reviewed by our team before going live (usually within 24h).",
-        "resetToApproval": "Editing content will send the bike back for review."
+        "pending": "Your bike goes live immediately — no waiting for approval.",
+        "resetToApproval": "This listing was sent back with feedback — saving your changes will send it back for review."
       },
       "photos": "Photos",
       "photosHint": "Optional — you can also add photos later from the bike's page.",

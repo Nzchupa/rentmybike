@@ -197,11 +197,29 @@ export function BikeForm({ defaultValues, existingBike, onSubmit, isEditing }: B
         </div>
       )}
 
-      {/* Info banner */}
-      <div className="flex items-start gap-2 rounded-xl bg-blue-50 p-3 text-sm text-blue-700">
-        <Info size={16} className="shrink-0 mt-0.5" />
-        <p>{isEditing ? t("hints.resetToApproval") : t("hints.pending")}</p>
-      </div>
+      {/* Info banner — bikes are auto-approved now (admin moderation only
+          gates user/business accounts, not individual listings), so this
+          only needs to say anything when creating (reassurance that it goes
+          live right away) or when editing a bike an admin flagged with
+          CHANGES_REQUESTED (the one case where saving still sends it back
+          for review — see BikeService.updateBike). For a normal edit to an
+          already-APPROVED bike, there is nothing accurate left to warn
+          about, so no banner is shown at all. */}
+      {/* Info-Banner — Fahrräder werden jetzt automatisch genehmigt (die
+          Admin-Moderation blockiert nur noch Benutzer-/Geschäftskonten,
+          keine einzelnen Inserate), daher muss dies nur beim Erstellen etwas
+          sagen (Bestätigung, dass es sofort live geht) oder beim Bearbeiten
+          eines Fahrrads, das ein Admin als CHANGES_REQUESTED markiert hat —
+          der einzige Fall, in dem das Speichern es weiterhin zur Prüfung
+          zurückschickt (siehe BikeService.updateBike). Bei einer normalen
+          Bearbeitung eines bereits genehmigten Fahrrads gibt es nichts
+          Zutreffendes mehr zu warnen, daher wird kein Banner angezeigt. */}
+      {(!isEditing || existingBike?.approvalStatus === "CHANGES_REQUESTED") && (
+        <div className="flex items-start gap-2 rounded-xl bg-blue-50 p-3 text-sm text-blue-700">
+          <Info size={16} className="shrink-0 mt-0.5" />
+          <p>{isEditing ? t("hints.resetToApproval") : t("hints.pending")}</p>
+        </div>
+      )}
 
       <Button type="submit" loading={isSubmitting} className="w-full" size="lg">
         {t("submit")}

@@ -16,7 +16,7 @@ import { ChatPanel } from "@/components/booking/ChatPanel";
 import { ContractPanel } from "@/components/booking/ContractPanel";
 import { PaymentPanel } from "@/components/booking/PaymentPanel";
 import { useAuthStore } from "@/store/auth.store";
-import { cn, formatPrice, formatDate } from "@/lib/utils";
+import { cn, formatPrice, formatDate, optimizedImageUrl } from "@/lib/utils";
 import type { BookingResponse, PaymentMethod } from "@/types";
 
 const PAYMENT_METHODS: PaymentMethod[] = ["CASH", "PAYPAL", "CARD_ON_SITE"];
@@ -120,7 +120,7 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
           <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-slate-100">
             {booking.bikePrimaryPhotoUrl && (
               <Image
-                src={booking.bikePrimaryPhotoUrl}
+                src={optimizedImageUrl(booking.bikePrimaryPhotoUrl, 160)}
                 alt={booking.bikeTitle}
                 fill
                 className="object-cover"

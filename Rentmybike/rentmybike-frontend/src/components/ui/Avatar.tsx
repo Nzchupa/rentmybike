@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { getInitials, cn } from "@/lib/utils";
+import { getInitials, cn, optimizedImageUrl } from "@/lib/utils";
 
 interface AvatarProps {
   name: string;
@@ -29,7 +29,7 @@ export function Avatar({ name, avatarUrl, size = "md", className }: AvatarProps)
         style={{ width: px, height: px }}
       >
         <Image
-          src={avatarUrl}
+          src={optimizedImageUrl(avatarUrl, 160)}
           alt={name}
           fill
           sizes={`${px}px`}

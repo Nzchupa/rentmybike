@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/Button";
 import { ApprovalStatusBadge } from "@/components/ui/Badge";
 import { BikeImageFallback } from "@/components/bikes/BikeImageFallback";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { formatPrice, cn } from "@/lib/utils";
+import { formatPrice, cn, optimizedImageUrl } from "@/lib/utils";
 import type { BikeResponse } from "@/types";
 
 interface BikeManageCardProps {
@@ -86,7 +86,7 @@ function BikeManageCard({ bike, locale }: BikeManageCardProps) {
       >
         {bike.primaryPhotoUrl ? (
           <Image
-            src={bike.primaryPhotoUrl}
+            src={optimizedImageUrl(bike.primaryPhotoUrl, 640)}
             alt={bike.title}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"

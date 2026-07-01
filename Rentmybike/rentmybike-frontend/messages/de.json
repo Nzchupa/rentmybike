@@ -77,7 +77,7 @@
       "section3Title": "Datenweitergabe",
       "section3Body": "Wir verkaufen deine Daten nicht und geben sie nicht zu Werbezwecken an Dritte weiter. Für andere Nutzer sichtbare Informationen (z. B. Name, Profilfoto und Bewertungen) sind auf das für die Vermietung Notwendige beschränkt. Fahrradangebote sind öffentlich sichtbar, damit Mieter Fahrräder finden und buchen können.",
       "section4Title": "Sicherheit",
-      "section4Body": "Alle Konten müssen ihre E-Mail-Adresse vor der Aktivierung bestätigen. Neue Fahrradangebote werden von einem Moderator geprüft, bevor sie veröffentlicht werden. Konten, die gegen Plattformregeln verstoßen, können von einem Administrator gesperrt oder dauerhaft gesperrt werden. Passwörter werden verschlüsselt gespeichert und niemals im Klartext.",
+      "section4Body": "Alle Konten müssen ihre E-Mail-Adresse vor der Aktivierung bestätigen. Unser Team überwacht Fahrradangebote und kann jedes entfernen, das gegen die Plattformregeln verstößt; Konten, die gegen diese Regeln verstoßen, können von einem Administrator gesperrt oder dauerhaft gesperrt werden. Passwörter werden verschlüsselt gespeichert und niemals im Klartext.",
       "section5Title": "Deine Rechte und Datenlöschung",
       "section5Body": "Du kannst deine Profilinformationen jederzeit in deinen Kontoeinstellungen aktualisieren oder löschen. Um eine vollständige Kontolöschung zu beantragen oder eine Frage zu deinen Daten zu stellen, kontaktiere uns per E-Mail über die Kontaktseite.",
       "section6Title": "Kontakt",
@@ -114,7 +114,7 @@
       "forOwnersTitle": "Dein Fahrrad anbieten",
       "forOwnersSubtitle": "Verdiene mit einem Fahrrad, das du nicht jeden Tag nutzt.",
       "ownerStep1Title": "Fahrrad einstellen",
-      "ownerStep1Desc": "Füge Fotos, eine Beschreibung und deinen Tagespreis hinzu. Neue Anzeigen werden vor der Veröffentlichung kurz geprüft.",
+      "ownerStep1Desc": "Füge Fotos, eine Beschreibung und deinen Tagespreis hinzu. Deine Anzeige ist sofort live — unser Team kann sie später trotzdem entfernen, falls sie gegen die Regeln verstößt.",
       "ownerStep2Title": "Anfragen annehmen",
       "ownerStep2Desc": "Mieter senden Buchungsanfragen für ihre gewünschten Daten — du entscheidest, welche du annimmst.",
       "ownerStep3Title": "Bezahlt werden und bewertet werden",
@@ -136,8 +136,8 @@
       "intro": "Velohood basiert auf einer Reihe von Funktionen, die Vermietungen für Fahrradbesitzer und Mieter sicher machen sollen. Hier erfährst du, wie wir beide Seiten schützen.",
       "section1Title": "Kontobestätigung",
       "section1Body": "Jedes Konto muss seine E-Mail-Adresse bestätigen, bevor es aktiviert wird. Anonyme oder unverifizierte Konten können auf der Plattform keine Buchungen aufgeben oder annehmen.",
-      "section2Title": "Angebotsmoderations",
-      "section2Body": "Jedes neue Fahrradangebot wird von einem Moderator geprüft, bevor es veröffentlicht wird. Angebote, die unseren Standards nicht entsprechen — ungenaue Fotos, fehlende Informationen oder Fahrräder, die nicht vermietbar sind — werden abgelehnt oder zur Überarbeitung zurückgeschickt.",
+      "section2Title": "Angebotsmoderation",
+      "section2Body": "Neue Fahrradangebote gehen sofort live, aber unser Team überwacht Angebote und entfernt oder schickt reaktiv zur Überarbeitung zurück, was unseren Standards nicht entspricht — ungenaue Fotos, fehlende Informationen oder Fahrräder, die nicht vermietbar sind.",
       "section3Title": "Bewertungen und Ratings",
       "section3Body": "Nach jeder abgeschlossenen Vermietung werden Mieter und Eigentümer eingeladen, eine Bewertung und ein Rating zu hinterlassen. Diese sind in Profilen öffentlich sichtbar und helfen Nutzern, fundierte Entscheidungen zu treffen, an wen sie vermieten oder von wem sie mieten.",
       "section4Title": "Meldungen",
@@ -327,7 +327,8 @@
     },
     "card": {
       "perDay": "/ Tag",
-      "viewDetails": "Details ansehen"
+      "viewDetails": "Details ansehen",
+      "verifiedShop": "Verifizierter Shop"
     },
     "detail": {
       "bookNow": "Jetzt buchen",
@@ -346,7 +347,7 @@
       "ownerNotice": "Dies ist Ihr Fahrrad.",
       "editInDashboard": "Im Dashboard bearbeiten",
       "verifiedShop": "Verifizierter Shop",
-      "moderationNotice": "Alle Inserate werden von unserem Team geprüft, bevor sie veröffentlicht werden."
+      "moderationNotice": "Unser Team überwacht Inserate und entfernt alle, die gegen unsere Richtlinien verstoßen."
     },
     "approvalStatus": {
       "PENDING": "Ausstehende Prüfung",
@@ -550,8 +551,9 @@
       "cityPlaceholder": "z.B. Berlin",
       "addressPlaceholder": "z.B. Alexanderplatz 1 (optional)",
       "selectCategory": "Kategorie wählen",
-      "bikeListed": "Fahrrad inseriert! Wartet auf Prüfung.",
-      "bikeUpdated": "Fahrrad aktualisiert! Zurück zur Prüfung gesendet.",
+      "bikeListed": "Fahrrad inseriert! Es ist jetzt live.",
+      "bikeUpdated": "Fahrrad aktualisiert! Es ist wieder bei unserem Team zur Prüfung.",
+      "bikeUpdatedLive": "Fahrrad aktualisiert.",
       "bikeNotFound": "Fahrrad nicht gefunden.",
       "validation": {
         "titleMin": "Titel muss mindestens 5 Zeichen haben",
@@ -561,8 +563,8 @@
         "cityRequired": "Stadt ist erforderlich"
       },
       "hints": {
-        "pending": "Ihr Fahrrad wird von unserem Team geprüft, bevor es live geht (normalerweise innerhalb von 24 Stunden).",
-        "resetToApproval": "Inhaltsänderungen senden das Fahrrad erneut zur Prüfung."
+        "pending": "Ihr Fahrrad geht sofort live — keine Wartezeit auf eine Genehmigung.",
+        "resetToApproval": "Dieses Inserat wurde mit Feedback zurückgeschickt — das Speichern deiner Änderungen sendet es erneut zur Prüfung."
       },
       "photos": "Fotos",
       "photosHint": "Optional — Sie können Fotos auch später über die Fahrradseite hinzufügen.",

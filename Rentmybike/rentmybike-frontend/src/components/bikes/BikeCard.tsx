@@ -3,9 +3,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { MapPin } from "lucide-react";
+import { MapPin, ShieldCheck } from "lucide-react";
 import { StarRating } from "@/components/ui/StarRating";
-import { formatPrice, cn } from "@/lib/utils";
+import { formatPrice, cn, optimizedImageUrl } from "@/lib/utils";
 import { reviewsApi } from "@/lib/api";
 import { FavoriteButton } from "@/components/bikes/FavoriteButton";
 import { BikeImageFallback } from "@/components/bikes/BikeImageFallback";
@@ -57,7 +57,7 @@ export function BikeCard({ bike }: BikeCardProps) {
                 <div className="absolute inset-0 animate-pulse bg-slate-200" />
               )}
               <Image
-                src={bike.primaryPhotoUrl!}
+                src={optimizedImageUrl(bike.primaryPhotoUrl!, 640)}
                 alt={bike.title}
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -89,10 +89,21 @@ export function BikeCard({ bike }: BikeCardProps) {
             <p className="text-xs text-slate-500 mb-1 line-clamp-1">{bike.model}</p>
           )}
 
-          <div className="flex items-center gap-1 text-sm text-slate-500 mb-3">
+          <div className="flex items-center gap-1 text-sm text-slate-500 mb-2">
             <MapPin size={14} className="shrink-0" />
             <span className="line-clamp-1">{bike.city}</span>
           </div>
+
+          {/* Owner-verified-business badge — bike.ownerBusinessVerified is
+              now actually populated by the backend (see BikeService.
+              toBikeResponse); this was already read on the bike detail page
+              but never surfaced on the card itself. */}
+          {bike.ownerBusinessVerified && (
+            <div className="flex items-center gap-1 text-xs font-medium text-emerald-700 mb-2">
+              <ShieldCheck size={12} className="shrink-0" />
+              {t("verifiedShop")}
+            </div>
+          )}
 
           <div className="flex items-center justify-between">
             <div>

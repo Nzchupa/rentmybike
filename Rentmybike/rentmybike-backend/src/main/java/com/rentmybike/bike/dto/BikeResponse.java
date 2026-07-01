@@ -31,6 +31,20 @@ public class BikeResponse {
     private UUID ownerId;
     private String ownerName;
     private String ownerAvatarUrl;
+    /**
+     * Set when the owner is a BUSINESS account verified by an admin. The
+     * frontend bike detail page (and BikeCard) already expected this field
+     * (and ownerBusinessName below) to show a "verified shop" badge, but it
+     * was never populated here — the badge silently never rendered.
+     * Gesetzt, wenn der Eigentümer ein von einem Admin verifiziertes
+     * BUSINESS-Konto ist. Die Frontend-Fahrrad-Detailseite (und BikeCard)
+     * erwarteten dieses Feld (und ownerBusinessName unten) bereits für ein
+     * "Verifizierter Shop"-Abzeichen, es wurde hier aber nie befüllt — das
+     * Abzeichen wurde also nie angezeigt.
+     */
+    private boolean ownerBusinessVerified;
+    /** Business display name — present when ownerBusinessVerified is true / Geschäftsname — vorhanden, wenn ownerBusinessVerified true ist */
+    private String ownerBusinessName;
 
     // Listing / Inserat
     private String title;

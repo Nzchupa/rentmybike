@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
 import { StarRating } from "@/components/ui/StarRating";
 import { ApprovalStatusBadge } from "@/components/ui/Badge";
-import { formatPrice, formatDate } from "@/lib/utils";
+import { formatPrice, formatDate, optimizedImageUrl } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth.store";
 import { useState } from "react";
 import type { BikePhotoResponse } from "@/types";
@@ -101,7 +101,7 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
           <div className="relative h-72 md:h-96 rounded-2xl overflow-hidden bg-slate-100">
             {displayPhoto ? (
               <Image
-                src={displayPhoto}
+                src={optimizedImageUrl(displayPhoto, 1200)}
                 alt={bike.title}
                 fill
                 className="object-cover"
@@ -127,7 +127,7 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
                     i === selectedPhoto ? "border-brand-500" : "border-transparent"
                   }`}
                 >
-                  <Image src={photo.url} alt="" fill className="object-cover" sizes="80px" />
+                  <Image src={optimizedImageUrl(photo.url, 160)} alt="" fill className="object-cover" sizes="80px" />
                 </button>
               ))}
             </div>

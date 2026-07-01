@@ -679,6 +679,8 @@ public class BikeService {
                 .ownerId(bike.getOwner().getId())
                 .ownerName(bike.getOwner().getFullName())
                 .ownerAvatarUrl(bike.getOwner().getAvatarUrl())
+                .ownerBusinessVerified(bike.getOwner().isBusinessVerified())
+                .ownerBusinessName(bike.getOwner().getBusinessName())
                 .title(bike.getTitle())
                 .description(bike.getDescription())
                 .model(bike.getModel())

@@ -48,7 +48,20 @@ export default function EditBikePage({ params }: EditBikePageProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-bikes"] });
       queryClient.invalidateQueries({ queryKey: ["bike", id] });
-      toast.success(t("bikeUpdated"));
+      // Only CHANGES_REQUESTED bikes actually go back for review on save
+      // (see BikeService.updateBike) — a normal edit to an already-APPROVED
+      // bike stays live, so it gets the plain "updated" toast instead of
+      // falsely claiming it was sent back for review.
+      // Nur CHANGES_REQUESTED-Fahrräder gehen beim Speichern tatsächlich
+      // zurück zur Prüfung (siehe BikeService.updateBike) — eine normale
+      // Bearbeitung eines bereits genehmigten Fahrrads bleibt live und
+      // erhält daher den einfachen "aktualisiert"-Toast, statt fälschlich
+      // zu behaupten, es sei zur Prüfung zurückgeschickt worden.
+      toast.success(
+        bike?.approvalStatus === "CHANGES_REQUESTED"
+          ? t("bikeUpdated")
+          : t("bikeUpdatedLive")
+      );
       router.push(`/${locale}/dashboard/bikes`);
     },
     onError: (e: Error) => toast.error(e.message),

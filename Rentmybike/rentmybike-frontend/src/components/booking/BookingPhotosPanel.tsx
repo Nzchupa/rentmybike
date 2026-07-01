@@ -8,6 +8,7 @@ import { Camera, Trash2, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { bookingPhotosApi } from "@/lib/api";
 import { useAuthStore } from "@/store/auth.store";
+import { optimizedImageUrl } from "@/lib/utils";
 import type { BookingPhotoPhase, BookingPhotoResponse } from "@/types";
 
 interface BookingPhotosPanelProps {
@@ -106,7 +107,7 @@ export function BookingPhotosPanel({ bookingId }: BookingPhotosPanelProps) {
             <div className="flex gap-2 overflow-x-auto pb-1">
               {photosFor(phase).map((photo) => (
                 <div key={photo.id} className="relative shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-slate-100 group">
-                  <Image src={photo.photoUrl} alt="" fill className="object-cover" sizes="80px" />
+                  <Image src={optimizedImageUrl(photo.photoUrl, 160)} alt="" fill className="object-cover" sizes="80px" />
                   {photo.uploaderId === user?.id && (
                     <button
                       type="button"

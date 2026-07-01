@@ -8,6 +8,7 @@ import { CheckCircle2, Upload, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { bookingsApi } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
+import { optimizedImageUrl } from "@/lib/utils";
 import type { BookingResponse } from "@/types";
 
 interface PaymentPanelProps {
@@ -92,11 +93,32 @@ export function PaymentPanel({ booking, view }: PaymentPanelProps) {
         )}
       </div>
 
-      {/* Receipt preview */}
+      {/* Receipt preview — wrapped in a link to the original full-resolution
+          image (not the resized/optimized thumbnail below) since the owner
+          needs to be able to zoom in and actually verify the amount/date/
+          transaction ID before confirming payment; the 128px thumbnail
+          alone wasn't enough for that and had no way to view it larger. */}
+      {/* Beleg-Vorschau — mit einem Link zum vollauflösenden Originalbild
+          umschlossen (nicht dem verkleinerten/optimierten Thumbnail unten),
+          da der Eigentümer hineinzoomen und Betrag/Datum/Transaktions-ID
+          tatsächlich prüfen können muss, bevor er die Zahlung bestätigt —
+          das 128px-Thumbnail allein reichte dafür nicht aus und ließ sich
+          nicht vergrößern. */}
       {booking.paymentReceiptUrl && (
-        <div className="relative w-32 h-32 rounded-lg overflow-hidden bg-slate-100">
-          <Image src={booking.paymentReceiptUrl} alt={t("receiptAlt")} fill className="object-cover" sizes="128px" />
-        </div>
+        <a
+          href={booking.paymentReceiptUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative block w-32 h-32 rounded-lg overflow-hidden bg-slate-100"
+        >
+          <Image
+            src={optimizedImageUrl(booking.paymentReceiptUrl, 256)}
+            alt={t("receiptAlt")}
+            fill
+            className="object-cover"
+            sizes="128px"
+          />
+        </a>
       )}
 
       {/* Renter: upload/re-upload receipt (until confirmed) */}

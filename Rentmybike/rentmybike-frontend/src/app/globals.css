@@ -2,7 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+/* Inter is now loaded via next/font in [locale]/layout.tsx (self-hosted,
+   applied through the --font-inter CSS variable wired up in
+   tailwind.config.ts) instead of this CSS @import from Google's CDN — see
+   the comment on the `inter` const in that layout for why. */
+/* Inter wird jetzt über next/font in [locale]/layout.tsx geladen
+   (selbst gehostet, über die in tailwind.config.ts verdrahtete
+   --font-inter-CSS-Variable eingebunden) statt über diesen CSS-@import vom
+   CDN von Google — siehe den Kommentar bei der `inter`-Konstante in diesem
+   Layout für den Grund. */
 
 @layer base {
   :root {
@@ -16,8 +24,7 @@
   }
 
   body {
-    @apply bg-white text-slate-900 antialiased;
-    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+    @apply bg-white text-slate-900 antialiased font-sans;
   }
 
   * {

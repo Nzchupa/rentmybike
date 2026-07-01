@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import { bikesApi } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
 import { ApprovalStatusBadge } from "@/components/ui/Badge";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, optimizedImageUrl } from "@/lib/utils";
 import type { ApprovalStatus } from "@/types";
 
 const STATUS_TABS: (ApprovalStatus | "ALL")[] = ["ALL", "PENDING", "APPROVED", "REJECTED", "CHANGES_REQUESTED"];
@@ -137,7 +137,7 @@ export default function AdminBikesPage() {
                 <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-slate-100">
                   {bike.photos?.[0] ? (
                     <Image
-                      src={bike.photos[0].url}
+                      src={optimizedImageUrl(bike.photos[0].url, 160)}
                       alt={bike.title}
                       width={80}
                       height={80}

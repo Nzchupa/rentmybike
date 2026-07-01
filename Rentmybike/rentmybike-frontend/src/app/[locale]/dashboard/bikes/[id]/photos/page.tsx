@@ -9,6 +9,7 @@ import { ArrowLeft, Star, Trash2, Upload } from "lucide-react";
 import toast from "react-hot-toast";
 import { bikesApi } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
+import { optimizedImageUrl } from "@/lib/utils";
 
 interface BikePhotosPageProps {
   // Next.js 14 (this project's version) passes params synchronously, not as
@@ -158,7 +159,7 @@ export default function BikePhotosPage({ params }: BikePhotosPageProps) {
                 className="relative aspect-square rounded-xl overflow-hidden bg-slate-100 group"
               >
                 <Image
-                  src={photo.url}
+                  src={optimizedImageUrl(photo.url, 400)}
                   alt={bike.title}
                   fill
                   className="object-cover"

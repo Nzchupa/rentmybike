@@ -24,7 +24,12 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        // Points at the CSS variable next/font sets up in [locale]/layout.tsx
+        // (self-hosted Inter) instead of the bare family name "Inter" — see
+        // the comment there. Keeping "Inter" as a plain string here would
+        // silently fall through to the system-ui fallback, since no
+        // @font-face named exactly "Inter" is registered anymore.
+        sans: ["var(--font-inter)", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       borderRadius: {
         xl: "0.875rem",
