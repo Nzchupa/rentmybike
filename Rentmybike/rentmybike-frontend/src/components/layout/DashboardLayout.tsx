@@ -103,8 +103,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 className={cn(
                   "flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors",
                   active
-                    ? "bg-brand-50 text-brand-700"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    ? "bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
                 )}
               >
                 <Icon size={18} />
@@ -115,7 +115,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* Mobile tab bar — 4 primary tabs at full width + "More" sheet for the rest */}
-        <div className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 flex z-40">
+        <div className="md:hidden fixed bottom-0 inset-x-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex z-40">
           {mobilePrimaryTabs.map(({ key, icon: Icon, href }) => {
             const fullHref = `/${locale}${href}`;
             const active = pathname.startsWith(fullHref);
@@ -125,7 +125,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 href={fullHref}
                 className={cn(
                   "flex-1 flex flex-col items-center gap-0.5 py-2 text-[11px] leading-tight",
-                  active ? "text-brand-600" : "text-slate-500"
+                  active ? "text-brand-600 dark:text-brand-400" : "text-slate-500 dark:text-slate-400"
                 )}
               >
                 <Icon size={20} />
@@ -159,13 +159,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               onClick={() => setShowMore(false)}
               className="absolute inset-0 bg-black/30"
             />
-            <div className="relative bg-white rounded-t-2xl pb-[max(1rem,env(safe-area-inset-bottom))] shadow-xl">
+            <div className="relative bg-white dark:bg-slate-900 rounded-t-2xl pb-[max(1rem,env(safe-area-inset-bottom))] shadow-xl">
               <div className="flex items-center justify-between px-5 pt-4 pb-2">
-                <span className="text-sm font-semibold text-slate-900">{t("more")}</span>
+                <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">{t("more")}</span>
                 <button
                   type="button"
                   onClick={() => setShowMore(false)}
-                  className="p-1 text-slate-400 hover:text-slate-700"
+                  className="p-1 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                   aria-label={t("closeMore")}
                 >
                   <X size={18} />
@@ -182,8 +182,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                       className={cn(
                         "flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium",
                         active
-                          ? "bg-brand-50 text-brand-700"
-                          : "text-slate-600 hover:bg-slate-50"
+                          ? "bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-400"
+                          : "text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800"
                       )}
                     >
                       <Icon size={18} />

@@ -309,6 +309,8 @@
     }
   },
   "bikes": {
+    "title": "Find a bike to rent",
+    "resultsCount": "{count, plural, one {# bike found} other {# bikes found}}",
     "search": {
       "placeholder": "City or location...",
       "category": "Category",

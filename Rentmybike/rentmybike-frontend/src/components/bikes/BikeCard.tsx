@@ -84,12 +84,12 @@ export function BikeCard({ bike }: BikeCardProps) {
 
         {/* Info */}
         <div className="p-4">
-          <h3 className="font-semibold text-slate-900 mb-1 line-clamp-1">{bike.title}</h3>
+          <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-1 line-clamp-1">{bike.title}</h3>
           {bike.model && (
-            <p className="text-xs text-slate-500 mb-1 line-clamp-1">{bike.model}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-1 line-clamp-1">{bike.model}</p>
           )}
 
-          <div className="flex items-center gap-1 text-sm text-slate-500 mb-2">
+          <div className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 mb-2">
             <MapPin size={14} className="shrink-0" />
             <span className="line-clamp-1">{bike.city}</span>
           </div>
@@ -99,7 +99,7 @@ export function BikeCard({ bike }: BikeCardProps) {
               toBikeResponse); this was already read on the bike detail page
               but never surfaced on the card itself. */}
           {bike.ownerBusinessVerified && (
-            <div className="flex items-center gap-1 text-xs font-medium text-emerald-700 mb-2">
+            <div className="flex items-center gap-1 text-xs font-medium text-emerald-700 dark:text-emerald-400 mb-2">
               <ShieldCheck size={12} className="shrink-0" />
               {t("verifiedShop")}
             </div>
@@ -107,10 +107,10 @@ export function BikeCard({ bike }: BikeCardProps) {
 
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-lg font-bold text-slate-900">
+              <span className="text-lg font-bold text-slate-900 dark:text-slate-100">
                 {formatPrice(bike.pricePerDay, locale)}
               </span>
-              <span className="text-sm text-slate-500"> {t("perDay")}</span>
+              <span className="text-sm text-slate-500 dark:text-slate-400"> {t("perDay")}</span>
             </div>
 
             <StarRating rating={rating?.averageRating ?? 0} size="sm" />

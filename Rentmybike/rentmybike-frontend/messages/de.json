@@ -309,6 +309,8 @@
     }
   },
   "bikes": {
+    "title": "Ein Fahrrad zum Mieten finden",
+    "resultsCount": "{count, plural, one {# Fahrrad gefunden} other {# Fahrräder gefunden}}",
     "search": {
       "placeholder": "Stadt oder Ort...",
       "category": "Kategorie",

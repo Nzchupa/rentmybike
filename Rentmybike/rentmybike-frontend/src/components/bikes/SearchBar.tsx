@@ -56,7 +56,7 @@ export function SearchBar({ defaultValues, onSearch }: SearchBarProps) {
             className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
           />
           <input
-            className="w-full h-10 pl-9 pr-3 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+            className="w-full h-10 pl-9 pr-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
             placeholder={t("placeholder")}
             {...register("city")}
           />
@@ -64,14 +64,14 @@ export function SearchBar({ defaultValues, onSearch }: SearchBarProps) {
 
         {/* Model / brand search */}
         <input
-          className="h-10 w-full px-3 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+          className="h-10 w-full px-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
           placeholder={t("modelPlaceholder")}
           {...register("model")}
         />
 
         {/* Category */}
         <select
-          className="h-10 px-3 rounded-xl border border-slate-300 text-sm bg-white outline-none focus:ring-2 focus:ring-brand-500"
+          className="h-10 px-3 rounded-xl border border-slate-300 dark:border-slate-600 text-sm bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 outline-none focus:ring-2 focus:ring-brand-500"
           {...register("category")}
         >
           <option value="">{t("allCategories")}</option>
@@ -87,7 +87,7 @@ export function SearchBar({ defaultValues, onSearch }: SearchBarProps) {
           <input
             type="number"
             min={0}
-            className="h-10 w-full px-3 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+            className="h-10 w-full px-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm outline-none focus:ring-2 focus:ring-brand-500"
             placeholder={t("minPrice")}
             {...register("minPrice")}
           />
@@ -95,7 +95,7 @@ export function SearchBar({ defaultValues, onSearch }: SearchBarProps) {
           <input
             type="number"
             min={0}
-            className="h-10 w-full px-3 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+            className="h-10 w-full px-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm outline-none focus:ring-2 focus:ring-brand-500"
             placeholder={t("maxPrice")}
             {...register("maxPrice")}
           />
