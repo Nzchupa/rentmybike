@@ -22,6 +22,7 @@ export default function BikesPage() {
   const [filters, setFilters] = useState<SearchFilters>({
     city: "",
     category: "",
+    model: "",
     minPrice: "",
     maxPrice: "",
   });
@@ -42,6 +43,7 @@ export default function BikesPage() {
       bikesApi.search({
         city: filters.city || undefined,
         category: (filters.category as BikeCategory) || undefined,
+        model: filters.model || undefined,
         minPrice: filters.minPrice ? Number(filters.minPrice) : undefined,
         maxPrice: filters.maxPrice ? Number(filters.maxPrice) : undefined,
         page,

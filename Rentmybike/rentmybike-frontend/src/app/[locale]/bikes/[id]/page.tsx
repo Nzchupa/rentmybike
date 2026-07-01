@@ -136,7 +136,10 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
           {/* Title + meta */}
           <div>
             <div className="flex items-start justify-between gap-4">
-              <h1 className="text-3xl font-bold text-slate-900">{bike.title}</h1>
+              <div>
+                <h1 className="text-3xl font-bold text-slate-900">{bike.title}</h1>
+                {bike.model && <p className="text-sm text-slate-500 mt-0.5">{bike.model}</p>}
+              </div>
               <div className="text-right shrink-0">
                 <span className="text-2xl font-bold text-brand-600">
                   {formatPrice(bike.pricePerDay, locale)}

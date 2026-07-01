@@ -35,6 +35,8 @@ public class BikeResponse {
     // Listing / Inserat
     private String title;
     private String description;
+    /** Optional brand/model, e.g. "Trek FX2 Disc" / Optionale Marke/Modell */
+    private String model;
     private BikeCategory category;
     private BigDecimal pricePerDay;
 

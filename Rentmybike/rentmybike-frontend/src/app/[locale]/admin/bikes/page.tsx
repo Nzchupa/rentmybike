@@ -155,6 +155,9 @@ export default function AdminBikesPage() {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <p className="font-semibold text-slate-900 truncate">{bike.title}</p>
+                      {bike.model && (
+                        <p className="text-xs text-slate-500 truncate">{bike.model}</p>
+                      )}
                       <p className="text-sm text-slate-500">
                         {bike.city} · {tc(bike.category)} · {formatPrice(bike.pricePerDay)}{t("perDay")}
                       </p>

@@ -1,5 +1,6 @@
 package com.rentmybike.booking.controller;
 
+import com.rentmybike.booking.dto.AcceptBookingRequest;
 import com.rentmybike.booking.dto.BookedDateRangeResponse;
 import com.rentmybike.booking.dto.BookingResponse;
 import com.rentmybike.booking.dto.CreateBookingRequest;
@@ -167,9 +168,10 @@ public class BookingController {
     @PostMapping("/api/v1/bookings/{id}/accept")
     public ResponseEntity<ApiResponse<BookingResponse>> acceptBooking(
             @PathVariable UUID id,
-            @AuthenticationPrincipal User currentUser) {
+            @AuthenticationPrincipal User currentUser,
+            @Valid @RequestBody AcceptBookingRequest request) {
 
-        BookingResponse accepted = bookingService.acceptBooking(id, currentUser.getId());
+        BookingResponse accepted = bookingService.acceptBooking(id, currentUser.getId(), request.getPaymentMethod());
         return ResponseEntity.ok(ApiResponse.success(accepted,
                 "Booking accepted / Buchung akzeptiert"));
     }

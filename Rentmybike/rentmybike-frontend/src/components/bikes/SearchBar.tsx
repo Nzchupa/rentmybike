@@ -10,6 +10,7 @@ import type { BikeCategory } from "@/types";
 export interface SearchFilters {
   city: string;
   category: BikeCategory | "";
+  model: string;
   minPrice: string;
   maxPrice: string;
 }
@@ -35,6 +36,7 @@ export function SearchBar({ defaultValues, onSearch }: SearchBarProps) {
     defaultValues: {
       city: "",
       category: "",
+      model: "",
       minPrice: "",
       maxPrice: "",
       ...defaultValues,
@@ -46,7 +48,7 @@ export function SearchBar({ defaultValues, onSearch }: SearchBarProps) {
       onSubmit={handleSubmit(onSearch)}
       className="card p-4 md:p-6"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
         {/* City search */}
         <div className="relative lg:col-span-1">
           <Search
@@ -59,6 +61,13 @@ export function SearchBar({ defaultValues, onSearch }: SearchBarProps) {
             {...register("city")}
           />
         </div>
+
+        {/* Model / brand search */}
+        <input
+          className="h-10 w-full px-3 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+          placeholder={t("modelPlaceholder")}
+          {...register("model")}
+        />
 
         {/* Category */}
         <select
@@ -103,7 +112,7 @@ export function SearchBar({ defaultValues, onSearch }: SearchBarProps) {
             variant="outline"
             onClick={() => {
               reset();
-              onSearch({ city: "", category: "", minPrice: "", maxPrice: "" });
+              onSearch({ city: "", category: "", model: "", minPrice: "", maxPrice: "" });
             }}
           >
             <SlidersHorizontal size={16} />

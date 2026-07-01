@@ -58,6 +58,7 @@ public interface BikeRepository extends JpaRepository<Bike, UUID> {
               AND b.available = true
               AND (:city       IS NULL OR LOWER(b.city) LIKE LOWER(CONCAT('%', CAST(:city AS string), '%')))
               AND (:category   IS NULL OR b.category = :category)
+              AND (:model      IS NULL OR LOWER(b.model) LIKE LOWER(CONCAT('%', CAST(:model AS string), '%')))
               AND (:minPrice   IS NULL OR b.pricePerDay >= :minPrice)
               AND (:maxPrice   IS NULL OR b.pricePerDay <= :maxPrice)
             ORDER BY b.createdAt DESC
@@ -65,6 +66,7 @@ public interface BikeRepository extends JpaRepository<Bike, UUID> {
     Page<Bike> searchPublic(
             @Param("city")      String city,
             @Param("category")  BikeCategory category,
+            @Param("model")     String model,
             @Param("minPrice")  BigDecimal minPrice,
             @Param("maxPrice")  BigDecimal maxPrice,
             Pageable pageable

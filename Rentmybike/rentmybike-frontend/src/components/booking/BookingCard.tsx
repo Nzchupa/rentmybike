@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MapPin, Calendar, Camera, MessageCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { MapPin, Calendar, Camera, MessageCircle, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import toast from "react-hot-toast";
 import { bookingsApi } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
@@ -13,8 +13,12 @@ import { BookingStatusBadge } from "@/components/ui/Badge";
 import { Avatar } from "@/components/ui/Avatar";
 import { BookingPhotosPanel } from "@/components/booking/BookingPhotosPanel";
 import { ChatPanel } from "@/components/booking/ChatPanel";
+import { ContractPanel } from "@/components/booking/ContractPanel";
+import { useAuthStore } from "@/store/auth.store";
 import { cn, formatPrice, formatDate } from "@/lib/utils";
-import type { BookingResponse } from "@/types";
+import type { BookingResponse, PaymentMethod } from "@/types";
+
+const PAYMENT_METHODS: PaymentMethod[] = ["CASH", "PAYPAL", "CARD_ON_SITE"];
 
 interface BookingCardProps {
   booking: BookingResponse;
@@ -32,8 +36,19 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
   const tReviews = useTranslations("reviews");
   const locale = useLocale();
   const queryClient = useQueryClient();
+  const isBusiness = useAuthStore((s) => s.isBusiness());
   const [showPhotos, setShowPhotos] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [showContract, setShowContract] = useState(false);
+  const [showAcceptForm, setShowAcceptForm] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>("CASH");
+
+  // The contract only exists once the owner has accepted (that's the moment
+  // it's auto-generated server-side) — see ContractService.generateForBooking.
+  // Der Vertrag existiert erst, sobald der Eigentümer akzeptiert hat (in
+  // diesem Moment wird er serverseitig automatisch erstellt) — siehe
+  // ContractService.generateForBooking.
+  const contractEnabled = booking.status === "ACCEPTED" || booking.status === "COMPLETED";
 
   // Condition photos only make sense once a booking is confirmed — there's
   // nothing to document before that, and the booking record disappears from
@@ -67,8 +82,12 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
   };
 
   const { mutate: accept, isPending: accepting } = useMutation({
-    mutationFn: () => bookingsApi.accept(booking.id),
-    onSuccess: () => { toast.success(t("acceptedToast")); invalidate(); },
+    mutationFn: (paymentMethod: PaymentMethod) => bookingsApi.accept(booking.id, paymentMethod),
+    onSuccess: () => {
+      toast.success(t("acceptedToast"));
+      setShowAcceptForm(false);
+      invalidate();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -177,7 +196,7 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
 
             {/* Actions */}
             <div className={cn("flex gap-2", hasBreakdown && "ml-auto")}>
-              {view === "owner" && booking.status === "PENDING" && (
+              {view === "owner" && booking.status === "PENDING" && !showAcceptForm && (
                 <>
                   <Button
                     size="sm"
@@ -191,10 +210,7 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
                   </Button>
                   <Button
                     size="sm"
-                    loading={accepting}
-                    onClick={() => {
-                      if (confirm(t("acceptConfirm"))) accept();
-                    }}
+                    onClick={() => setShowAcceptForm(true)}
                   >
                     {t("actions.accept")}
                   </Button>
@@ -225,6 +241,49 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
               )}
             </div>
           </div>
+
+          {/* Payment method selection — required in the same step as
+              acceptance, since it's immediately frozen into the
+              auto-generated rental contract. */}
+          {/* Zahlungsmethoden-Auswahl — im selben Schritt wie die Annahme
+              erforderlich, da sie sofort in den automatisch erstellten
+              Mietvertrag eingefroren wird. */}
+          {showAcceptForm && (
+            <div className="mt-3 rounded-xl bg-slate-50 p-3 space-y-2">
+              <p className="text-sm font-medium text-slate-700">{t("selectPaymentMethod")}</p>
+              <div className="flex flex-wrap gap-2">
+                {PAYMENT_METHODS.filter((m) => m !== "CARD_ON_SITE" || isBusiness).map((method) => (
+                  <button
+                    key={method}
+                    type="button"
+                    onClick={() => setSelectedPaymentMethod(method)}
+                    className={cn(
+                      "px-3 py-1.5 rounded-lg text-sm border transition",
+                      selectedPaymentMethod === method
+                        ? "border-brand-500 bg-brand-50 text-brand-700 font-medium"
+                        : "border-slate-200 text-slate-600 hover:border-slate-300"
+                    )}
+                  >
+                    {t(`paymentMethod.${method}`)}
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-2 pt-1">
+                <Button
+                  size="sm"
+                  loading={accepting}
+                  onClick={() => {
+                    if (confirm(t("acceptConfirm"))) accept(selectedPaymentMethod);
+                  }}
+                >
+                  {t("actions.confirmAccept")}
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setShowAcceptForm(false)}>
+                  {t("actions.cancelAccept")}
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -272,6 +331,28 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
           {showChat && (
             <div className="mt-3">
               <ChatPanel bookingId={booking.id} />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Rental contract — auto-generated the moment the booking is accepted */}
+      {/* Mietvertrag — automatisch erstellt, sobald die Buchung akzeptiert wird */}
+      {contractEnabled && (
+        <div className="mt-3 border-t border-slate-100 pt-3">
+          <button
+            type="button"
+            onClick={() => setShowContract((v) => !v)}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900"
+          >
+            <FileText size={15} />
+            {t("contract.title")}
+            {showContract ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+          </button>
+
+          {showContract && (
+            <div className="mt-3">
+              <ContractPanel bookingId={booking.id} />
             </div>
           )}
         </div>

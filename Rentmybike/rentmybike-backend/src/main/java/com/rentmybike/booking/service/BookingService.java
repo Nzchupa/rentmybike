@@ -14,14 +14,17 @@ import com.rentmybike.booking.dto.CreateBookingRequest;
 import com.rentmybike.booking.entity.Booking;
 import com.rentmybike.booking.entity.BookingAccessory;
 import com.rentmybike.booking.entity.BookingStatus;
+import com.rentmybike.booking.entity.PaymentMethod;
 import com.rentmybike.booking.repository.BookingAccessoryRepository;
 import com.rentmybike.booking.repository.BookingRepository;
 import com.rentmybike.common.exception.AccessDeniedException;
 import com.rentmybike.common.exception.BusinessException;
 import com.rentmybike.common.exception.ResourceNotFoundException;
 import com.rentmybike.common.response.PageResponse;
+import com.rentmybike.contract.service.ContractService;
 import com.rentmybike.notification.service.NotificationService;
 import com.rentmybike.user.entity.User;
+import com.rentmybike.user.entity.UserRole;
 import com.rentmybike.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +71,7 @@ public class BookingService {
     private final AccessoryRepository accessoryRepository;
     private final BookingAccessoryRepository bookingAccessoryRepository;
     private final AuditLogService auditLogService;
+    private final ContractService contractService;
 
     // ──────────────────────────────────────────────────────────────────────────
     // CREATE / ERSTELLEN
@@ -346,14 +350,30 @@ public class BookingService {
     // ──────────────────────────────────────────────────────────────────────────
 
     /**
-     * Owner accepts a PENDING booking request.
-     * Eigentümer akzeptiert eine PENDING-Buchungsanfrage.
+     * Owner accepts a PENDING booking request, naming the payment method in
+     * the same step (frozen into the auto-generated rental contract — see
+     * {@link ContractService#generateForBooking}).
+     * Eigentümer akzeptiert eine PENDING-Buchungsanfrage und benennt im
+     * selben Schritt die Zahlungsmethode (wird in den automatisch
+     * erstellten Mietvertrag eingefroren — siehe
+     * {@link ContractService#generateForBooking}).
      */
-    public BookingResponse acceptBooking(UUID bookingId, UUID ownerId) {
+    public BookingResponse acceptBooking(UUID bookingId, UUID ownerId, PaymentMethod paymentMethod) {
         Booking booking = loadBookingForOwner(bookingId, ownerId);
 
         if (booking.getStatus() != BookingStatus.PENDING) {
             throw new BusinessException("Only PENDING bookings can be accepted / Nur PENDING-Buchungen können akzeptiert werden");
+        }
+
+        // CARD_ON_SITE only makes sense for a BUSINESS owner with a physical
+        // storefront — a private USER owner has no shop to swipe a card at.
+        // CARD_ON_SITE ist nur für einen BUSINESS-Eigentümer mit
+        // Ladengeschäft sinnvoll — ein privater USER-Eigentümer hat kein
+        // Geschäft, an dem eine Karte gezogen werden könnte.
+        if (paymentMethod == PaymentMethod.CARD_ON_SITE && booking.getOwner().getRole() != UserRole.BUSINESS) {
+            throw new BusinessException(
+                    "Card-on-site payment is only available for business accounts / " +
+                    "Kartenzahlung vor Ort ist nur für Geschäftskonten verfügbar");
         }
 
         // Lock the bike row for the rest of this transaction, same as createBooking.
@@ -383,7 +403,19 @@ public class BookingService {
         }
 
         booking.setStatus(BookingStatus.ACCEPTED);
+        booking.setPaymentMethod(paymentMethod);
         bookingRepository.save(booking);
+
+        // Auto-generate the frozen rental contract snapshot the instant the
+        // booking is accepted — see ContractService's class Javadoc for why
+        // this data must be denormalized rather than read live off Booking/
+        // Bike/User at display time.
+        // Automatisch die eingefrorene Mietvertrags-Momentaufnahme erstellen,
+        // sobald die Buchung akzeptiert wird — siehe das Klassen-Javadoc von
+        // ContractService dafür, warum diese Daten denormalisiert sein
+        // müssen statt live von Booking/Bike/User zum Anzeigezeitpunkt
+        // gelesen zu werden.
+        contractService.generateForBooking(booking, paymentMethod);
 
         log.info("Booking ACCEPTED: {} by owner: {} / Buchung AKZEPTIERT: {} von Eigentümer: {}",
                 bookingId, ownerId, bookingId, ownerId);
@@ -569,6 +601,7 @@ public class BookingService {
                 .totalPrice(booking.getTotalPrice())
                 .status(booking.getStatus())
                 .message(booking.getMessage())
+                .paymentMethod(booking.getPaymentMethod())
                 .accessories(accessoryResponses)
                 // Timestamps / Zeitstempel
                 .createdAt(booking.getCreatedAt())

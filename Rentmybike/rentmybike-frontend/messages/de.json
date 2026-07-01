@@ -310,6 +310,7 @@
       "placeholder": "Stadt oder Ort...",
       "category": "Kategorie",
       "allCategories": "Alle Kategorien",
+      "modelPlaceholder": "Marke oder Modell (z.B. Trek)...",
       "minPrice": "Mindestpreis",
       "maxPrice": "Höchstpreis",
       "priceRange": "Preisbereich (€/Tag)"
@@ -396,6 +397,8 @@
     },
     "actions": {
       "accept": "Akzeptieren",
+      "confirmAccept": "Annahme bestätigen",
+      "cancelAccept": "Abbrechen",
       "reject": "Ablehnen",
       "cancel": "Buchung stornieren",
       "complete": "Als abgeschlossen markieren"
@@ -406,6 +409,12 @@
     "acceptedToast": "Buchung akzeptiert!",
     "rejectedToast": "Buchung abgelehnt.",
     "cancelledToast": "Buchung storniert.",
+    "selectPaymentMethod": "Wie wird der Mieter bezahlen?",
+    "paymentMethod": {
+      "CASH": "Bar",
+      "PAYPAL": "PayPal",
+      "CARD_ON_SITE": "Karte vor Ort"
+    },
     "photos": {
       "title": "Zustandsfotos",
       "before": "Vor der Abholung",
@@ -421,6 +430,26 @@
       "placeholder": "Nachricht eingeben...",
       "send": "Senden",
       "loadError": "Chatverlauf konnte nicht geladen werden — bitte versuchen Sie es erneut."
+    },
+    "contract": {
+      "title": "Mietvertrag",
+      "acceptConfirm": "Mit der Annahme bestätigen Sie, den Mietvertrag gelesen zu haben und ihm zuzustimmen. Fortfahren?",
+      "accept": "Ich akzeptiere",
+      "acceptedToast": "Vertrag akzeptiert",
+      "bothAccepted": "Beide Parteien haben dem Vertrag zugestimmt",
+      "waitingForOther": "Warten auf Zustimmung der anderen Partei",
+      "notYetAccepted": "Noch nicht akzeptiert — bitte unten prüfen und zustimmen",
+      "download": "PDF herunterladen",
+      "downloadFailed": "PDF konnte nicht erstellt werden — bitte erneut versuchen",
+      "paymentMethodLabel": "Zahlungsmethode",
+      "paymentMethod": {
+        "CASH": "Bar",
+        "PAYPAL": "PayPal",
+        "CARD_ON_SITE": "Karte vor Ort"
+      },
+      "ownerAccepted": "Eigentümer akzeptiert",
+      "renterAccepted": "Mieter akzeptiert",
+      "pending": "Ausstehend"
     }
   },
   "dashboard": {
@@ -488,6 +517,8 @@
       "editTitle": "Fahrrad bearbeiten",
       "title": "Titel",
       "description": "Beschreibung",
+      "model": "Marke / Modell (optional)",
+      "modelPlaceholder": "z.B. Trek FX2 Disc",
       "category": "Kategorie",
       "pricePerDay": "Preis pro Tag (€)",
       "city": "Stadt",

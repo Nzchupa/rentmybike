@@ -310,6 +310,7 @@
       "placeholder": "City or location...",
       "category": "Category",
       "allCategories": "All categories",
+      "modelPlaceholder": "Brand or model (e.g. Trek)...",
       "minPrice": "Min price",
       "maxPrice": "Max price",
       "priceRange": "Price range (€/day)"
@@ -396,6 +397,8 @@
     },
     "actions": {
       "accept": "Accept",
+      "confirmAccept": "Confirm acceptance",
+      "cancelAccept": "Cancel",
       "reject": "Reject",
       "cancel": "Cancel booking",
       "complete": "Mark as completed"
@@ -406,6 +409,12 @@
     "acceptedToast": "Booking accepted!",
     "rejectedToast": "Booking rejected.",
     "cancelledToast": "Booking cancelled.",
+    "selectPaymentMethod": "How will the renter pay?",
+    "paymentMethod": {
+      "CASH": "Cash",
+      "PAYPAL": "PayPal",
+      "CARD_ON_SITE": "Card in-store"
+    },
     "photos": {
       "title": "Condition photos",
       "before": "Before pickup",
@@ -421,6 +430,26 @@
       "placeholder": "Type a message...",
       "send": "Send",
       "loadError": "Couldn't load chat history — please try again."
+    },
+    "contract": {
+      "title": "Rental contract",
+      "acceptConfirm": "By accepting, you confirm you have read and agree to the rental contract. Continue?",
+      "accept": "I accept",
+      "acceptedToast": "Contract accepted",
+      "bothAccepted": "Both parties have accepted the contract",
+      "waitingForOther": "Waiting for the other party to accept",
+      "notYetAccepted": "Not yet accepted — please review and accept below",
+      "download": "Download PDF",
+      "downloadFailed": "Couldn't generate the PDF — please try again",
+      "paymentMethodLabel": "Payment method",
+      "paymentMethod": {
+        "CASH": "Cash",
+        "PAYPAL": "PayPal",
+        "CARD_ON_SITE": "Card in-store"
+      },
+      "ownerAccepted": "Owner accepted",
+      "renterAccepted": "Renter accepted",
+      "pending": "Pending"
     }
   },
   "dashboard": {
@@ -488,6 +517,8 @@
       "editTitle": "Edit bike",
       "title": "Title",
       "description": "Description",
+      "model": "Brand / model (optional)",
+      "modelPlaceholder": "e.g. Trek FX2 Disc",
       "category": "Category",
       "pricePerDay": "Price per day (€)",
       "city": "City",

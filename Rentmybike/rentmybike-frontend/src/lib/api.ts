@@ -351,6 +351,8 @@ import type {
   SupportCategory,
   CreateSupportTicketRequest,
   SendSupportMessageRequest,
+  PaymentMethod,
+  ContractResponse,
 } from "@/types";
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
@@ -409,6 +411,7 @@ export const bikesApi = {
   search: (params: {
     city?: string;
     category?: string;
+    model?: string;
     minPrice?: number;
     maxPrice?: number;
     page?: number;
@@ -515,8 +518,8 @@ export const bookingsApi = {
       params: { status, page, size },
     }),
 
-  accept: (id: string) =>
-    api.post<ApiResponse<BookingResponse>>(`/api/v1/bookings/${id}/accept`),
+  accept: (id: string, paymentMethod: PaymentMethod) =>
+    api.post<ApiResponse<BookingResponse>>(`/api/v1/bookings/${id}/accept`, { paymentMethod }),
 
   reject: (id: string) =>
     api.post<ApiResponse<BookingResponse>>(`/api/v1/bookings/${id}/reject`),
@@ -534,6 +537,30 @@ export const bookingsApi = {
     api.get<ApiResponse<{ startDate: string; endDate: string }[]>>(
       `/api/v1/bookings/bike/${bikeId}/booked-dates`
     ),
+};
+
+// ── Rental contract — auto-generated when the owner accepts a booking ──────
+// Mietvertrag — automatisch erstellt, sobald der Eigentümer eine Buchung
+// akzeptiert.
+
+export const contractApi = {
+  get: (bookingId: string) =>
+    api.get<ApiResponse<ContractResponse>>(`/api/v1/bookings/${bookingId}/contract`),
+
+  // /accept takes no request body — the caller's role (owner vs. renter) is
+  // resolved server-side from the underlying booking.
+  // /accept erwartet keinen Request-Body — die Rolle des Aufrufers
+  // (Eigentümer oder Mieter) wird serverseitig anhand der zugrunde
+  // liegenden Buchung ermittelt.
+  accept: (bookingId: string) =>
+    api.post<ApiResponse<ContractResponse>>(`/api/v1/bookings/${bookingId}/contract/accept`),
+
+  // responseType "blob" so axios hands back raw PDF bytes instead of trying
+  // to parse them as JSON — the caller turns this into a download link.
+  // responseType "blob", damit axios rohe PDF-Bytes zurückgibt, statt sie
+  // als JSON zu parsen — der Aufrufer erzeugt daraus einen Download-Link.
+  downloadPdf: (bookingId: string) =>
+    api.get(`/api/v1/bookings/${bookingId}/contract/pdf`, { responseType: "blob" }),
 };
 
 // ── Booking photos (before/after) ───────────────────────────────────────────

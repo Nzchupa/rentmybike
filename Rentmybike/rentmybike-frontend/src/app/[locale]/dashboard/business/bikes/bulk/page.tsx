@@ -24,6 +24,7 @@ function makeBulkSchema(t: (key: string) => string, tb: (key: string) => string)
         z.object({
           title:       z.string().min(5, t("validation.titleMin")).max(100),
           description: z.string().min(20, t("validation.descriptionMin")).max(3000),
+          model:       z.string().max(150).optional(),
           category:    z.enum(["CITY", "MOUNTAIN", "ROAD", "ELECTRIC", "HYBRID", "CARGO", "KIDS"]),
           pricePerDay: z.coerce.number().min(1, t("validation.priceMin")),
           city:        z.string().min(2, t("validation.cityRequired")).max(100),
@@ -37,7 +38,7 @@ function makeBulkSchema(t: (key: string) => string, tb: (key: string) => string)
 
 type BulkFormValues = z.infer<ReturnType<typeof makeBulkSchema>>;
 
-const emptyRow = { title: "", description: "", category: "CITY" as BikeCategory, pricePerDay: 0, city: "", address: "" };
+const emptyRow = { title: "", description: "", model: "", category: "CITY" as BikeCategory, pricePerDay: 0, city: "", address: "" };
 
 /**
  * Bulk-add bikes page — Stage 3 "Business accounts" / Additional feature.
@@ -75,7 +76,7 @@ export default function BulkAddBikesPage() {
 
   async function onSubmit(values: BulkFormValues) {
     await bulkCreate({
-      bikes: values.bikes.map((b) => ({ ...b, address: b.address || undefined })),
+      bikes: values.bikes.map((b) => ({ ...b, address: b.address || undefined, model: b.model || undefined })),
     });
   }
 
@@ -121,6 +122,13 @@ export default function BulkAddBikesPage() {
                 <p className="field-error">{errors.bikes[index]?.description?.message}</p>
               )}
             </div>
+
+            <Input
+              label={t("model")}
+              placeholder={t("modelPlaceholder")}
+              error={errors.bikes?.[index]?.model?.message}
+              {...register(`bikes.${index}.model`)}
+            />
 
             <div className="grid grid-cols-2 gap-4">
               <div>

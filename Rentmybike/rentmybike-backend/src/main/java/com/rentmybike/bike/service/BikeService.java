@@ -85,6 +85,7 @@ public class BikeService {
                 .owner(owner)
                 .title(request.getTitle().strip())
                 .description(request.getDescription().strip())
+                .model(normalizeModel(request.getModel()))
                 .category(request.getCategory())
                 .pricePerDay(request.getPricePerDay())
                 .city(request.getCity().strip())
@@ -132,6 +133,7 @@ public class BikeService {
                         .owner(owner)
                         .title(request.getTitle().strip())
                         .description(request.getDescription().strip())
+                        .model(normalizeModel(request.getModel()))
                         .category(request.getCategory())
                         .pricePerDay(request.getPricePerDay())
                         .city(request.getCity().strip())
@@ -167,17 +169,18 @@ public class BikeService {
      *
      * @param city      optional city filter / optionaler Stadtfilter
      * @param category  optional category filter / optionaler Kategoriefilter
+     * @param model     optional brand/model filter (substring match) / optionaler Marke/Modell-Filter (Teilstring)
      * @param minPrice  optional min price filter / optionaler Mindestpreisfilter
      * @param maxPrice  optional max price filter / optionaler Höchstpreisfilter
      * @param pageable  pagination / Seitennavigation
      */
     @Transactional(readOnly = true)
     public PageResponse<BikeResponse> searchBikes(
-            String city, BikeCategory category,
+            String city, BikeCategory category, String model,
             BigDecimal minPrice, BigDecimal maxPrice,
             Pageable pageable) {
 
-        Page<Bike> page = bikeRepository.searchPublic(city, category, minPrice, maxPrice, pageable);
+        Page<Bike> page = bikeRepository.searchPublic(city, category, model, minPrice, maxPrice, pageable);
         // Public view: no address, no rejection reason / Öffentliche Ansicht: keine Adresse, kein Ablehnungsgrund
         return PageResponse.from(page.map(bike -> toBikeResponse(bike, false)));
     }
@@ -323,15 +326,18 @@ public class BikeService {
 
         requireOwner(bike, ownerId);
 
+        String newModel = normalizeModel(request.getModel());
         boolean contentChanged =
                 !bike.getTitle().equals(request.getTitle().strip())
                 || !bike.getDescription().equals(request.getDescription().strip())
                 || bike.getCategory() != request.getCategory()
                 || bike.getPricePerDay().compareTo(request.getPricePerDay()) != 0
-                || !bike.getCity().equals(request.getCity().strip());
+                || !bike.getCity().equals(request.getCity().strip())
+                || !java.util.Objects.equals(bike.getModel(), newModel);
 
         bike.setTitle(request.getTitle().strip());
         bike.setDescription(request.getDescription().strip());
+        bike.setModel(newModel);
         bike.setCategory(request.getCategory());
         bike.setPricePerDay(request.getPricePerDay());
         bike.setCity(request.getCity().strip());
@@ -600,6 +606,20 @@ public class BikeService {
     // ──────────────────────────────────────────────────────────────────────────
 
     /**
+     * Normalizes an optional model input: strips whitespace, treats a
+     * blank result as "not provided" (null) rather than storing an empty
+     * string.
+     * Normalisiert eine optionale Modell-Eingabe: entfernt Leerzeichen,
+     * behandelt ein leeres Ergebnis als "nicht angegeben" (null) statt
+     * einen leeren String zu speichern.
+     */
+    private String normalizeModel(String model) {
+        if (model == null) return null;
+        String stripped = model.strip();
+        return stripped.isEmpty() ? null : stripped;
+    }
+
+    /**
      * Verifies that the given user is the owner of the bike.
      * Überprüft, dass der gegebene Benutzer der Eigentümer des Fahrrads ist.
      *
@@ -642,6 +662,7 @@ public class BikeService {
                 .ownerAvatarUrl(bike.getOwner().getAvatarUrl())
                 .title(bike.getTitle())
                 .description(bike.getDescription())
+                .model(bike.getModel())
                 .category(bike.getCategory())
                 .pricePerDay(bike.getPricePerDay())
                 .city(bike.getCity())

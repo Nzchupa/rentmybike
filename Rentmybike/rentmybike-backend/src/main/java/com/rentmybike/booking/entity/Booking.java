@@ -131,6 +131,23 @@ public class Booking extends BaseEntity {
     private String message;
 
     // ──────────────────────────────────────────────────────────────────────────
+    // Payment / Zahlung
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * How the renter pays the owner — chosen by the owner at accept time,
+     * null until then. Once set it is frozen into the rental contract
+     * snapshot (see {@code com.rentmybike.contract.entity.RentalContract}).
+     * Wie der Mieter den Eigentümer bezahlt — vom Eigentümer bei der Annahme
+     * gewählt, bis dahin null. Sobald gesetzt, wird es in die
+     * Mietvertrags-Momentaufnahme eingefroren (siehe
+     * {@code com.rentmybike.contract.entity.RentalContract}).
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method", columnDefinition = "VARCHAR(20)")
+    private PaymentMethod paymentMethod;
+
+    // ──────────────────────────────────────────────────────────────────────────
     // Business logic helpers / Geschäftslogik-Hilfsmethoden
     // ──────────────────────────────────────────────────────────────────────────
 

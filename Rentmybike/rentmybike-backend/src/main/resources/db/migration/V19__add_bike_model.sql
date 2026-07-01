@@ -1,0 +1,12 @@
+-- Optional brand/model for a bike listing (e.g. "Trek FX2 Disc"). Distinct
+-- from the free-text `title` — this is a structured-ish identification
+-- detail surfaced on the generated rental contract and useful for a police
+-- report if a bike is stolen or not returned (theft/loss reports typically
+-- ask for brand, model, and color).
+--
+-- Optionale Marke/Modell eines Fahrrad-Inserats (z. B. "Trek FX2 Disc").
+-- Getrennt vom Freitext-`title` — dieses Detail wird im generierten
+-- Mietvertrag angezeigt und ist bei einer Anzeige wegen Diebstahls oder
+-- Nichtrückgabe hilfreich (Meldeformulare fragen üblicherweise nach Marke,
+-- Modell und Farbe).
+ALTER TABLE bikes ADD COLUMN model VARCHAR(150);

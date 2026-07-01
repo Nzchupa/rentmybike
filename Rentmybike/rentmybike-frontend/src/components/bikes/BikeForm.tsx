@@ -26,6 +26,7 @@ function makeBikeSchema(t: (key: string) => string) {
   return z.object({
     title:       z.string().min(5, t("validation.titleMin")).max(100),
     description: z.string().min(20, t("validation.descriptionMin")).max(3000),
+    model:       z.string().max(150).optional(),
     category:    z.enum(["CITY", "MOUNTAIN", "ROAD", "ELECTRIC", "HYBRID", "CARGO", "KIDS"]),
     pricePerDay: z.coerce.number().min(1, t("validation.priceMin")),
     city:        z.string().min(2, t("validation.cityRequired")).max(100),
@@ -98,6 +99,13 @@ export function BikeForm({ defaultValues, existingBike, onSubmit, isEditing }: B
           <p className="field-error">{errors.description.message}</p>
         )}
       </div>
+
+      <Input
+        label={t("model")}
+        placeholder={t("modelPlaceholder")}
+        error={errors.model?.message}
+        {...register("model")}
+      />
 
       <div>
         <label className="label">{t("category")}</label>

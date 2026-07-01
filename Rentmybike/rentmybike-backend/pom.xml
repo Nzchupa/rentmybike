@@ -145,6 +145,26 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <!-- ── PDF export — rental contract downloads (Stage: rental contracts) ──
+             HTML→PDF renderer chosen over raw Apache PDFBox specifically
+             because it handles text wrapping/pagination automatically —
+             the legal contract text is long-form prose of variable length
+             per booking, and hand-rolling line-wrapping/page-break logic
+             with low-level PDFBox drawing calls is a much larger source of
+             layout bugs.
+             PDF-Export — Mietvertrags-Downloads (Stufe: Mietverträge) ──
+             HTML→PDF-Renderer statt rohem Apache PDFBox gewählt, weil er
+             Textumbruch/Seitenumbrüche automatisch handhabt — der
+             rechtliche Vertragstext ist Fließtext variabler Länge pro
+             Buchung, und selbstgebaute Umbruch-/Seitenumbruchlogik mit
+             PDFBox-Low-Level-Zeichenbefehlen ist eine deutlich größere
+             Fehlerquelle für das Layout. -->
+        <dependency>
+            <groupId>com.openhtmltopdf</groupId>
+            <artifactId>openhtmltopdf-pdfbox</artifactId>
+            <version>1.0.10</version>
+        </dependency>
+
         <!-- ── Test dependencies / Testabhängigkeiten ────────────────── -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

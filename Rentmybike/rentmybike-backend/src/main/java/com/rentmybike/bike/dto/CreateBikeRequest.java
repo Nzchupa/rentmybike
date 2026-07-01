@@ -29,6 +29,10 @@ public class CreateBikeRequest {
     @NotNull(message = "Category is required / Kategorie ist erforderlich")
     private BikeCategory category;
 
+    /** Optional brand/model, e.g. "Trek FX2 Disc" / Optionale Marke/Modell, z. B. "Trek FX2 Disc" */
+    @Size(max = 150, message = "Model too long / Modell zu lang")
+    private String model;
+
     @NotNull(message = "Price per day is required / Preis pro Tag ist erforderlich")
     @DecimalMin(value = "1.00", message = "Minimum price is €1.00 / Mindestpreis ist 1,00 €")
     @DecimalMax(value = "9999.99", message = "Maximum price is €9999.99 / Höchstpreis ist 9999,99 €")

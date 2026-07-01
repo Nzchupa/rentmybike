@@ -85,6 +85,9 @@ export function BikeCard({ bike }: BikeCardProps) {
         {/* Info */}
         <div className="p-4">
           <h3 className="font-semibold text-slate-900 mb-1 line-clamp-1">{bike.title}</h3>
+          {bike.model && (
+            <p className="text-xs text-slate-500 mb-1 line-clamp-1">{bike.model}</p>
+          )}
 
           <div className="flex items-center gap-1 text-sm text-slate-500 mb-3">
             <MapPin size={14} className="shrink-0" />

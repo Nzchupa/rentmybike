@@ -59,6 +59,19 @@ public class Bike extends BaseEntity {
     private String description;
 
     /**
+     * Optional brand/model, e.g. "Trek FX2 Disc" — distinct from the
+     * free-text {@link #title}. Shown on generated rental contracts and
+     * useful for identifying the bike in a police report if it's stolen or
+     * not returned.
+     * Optionale Marke/Modell, z. B. "Trek FX2 Disc" — getrennt vom
+     * Freitext-{@link #title}. Wird auf generierten Mietverträgen angezeigt
+     * und ist nützlich, um das Fahrrad in einer Anzeige bei Diebstahl oder
+     * Nichtrückgabe zu identifizieren.
+     */
+    @Column(length = 150)
+    private String model;
+
+    /**
      * Bike category — stored as VARCHAR(50) since V5 (Hibernate 6 cannot write
      * native Postgres ENUM types via JDBC). Must stay in sync with all values
      * of {@link BikeCategory} — adding a new enum constant here requires no

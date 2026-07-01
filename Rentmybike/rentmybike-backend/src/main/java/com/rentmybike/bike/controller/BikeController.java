@@ -55,6 +55,7 @@ public class BikeController {
     public ResponseEntity<ApiResponse<PageResponse<BikeResponse>>> searchBikes(
             @RequestParam(required = false) String city,
             @RequestParam(required = false) BikeCategory category,
+            @RequestParam(required = false) String model,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(defaultValue = "0")  int page,
@@ -79,7 +80,7 @@ public class BikeController {
         // Pageable bleibt unsortiert; die Query liefert die Sortierung.
         Pageable pageable = PageRequest.of(page, size);
 
-        PageResponse<BikeResponse> result = bikeService.searchBikes(city, category, minPrice, maxPrice, pageable);
+        PageResponse<BikeResponse> result = bikeService.searchBikes(city, category, model, minPrice, maxPrice, pageable);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 

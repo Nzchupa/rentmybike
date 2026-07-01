@@ -135,6 +135,8 @@ export interface BikeResponse {
   ownerBusinessName?: string | null;
   title: string;
   description: string;
+  /** Optional brand/model, e.g. "Trek FX2 Disc" */
+  model: string | null;
   category: BikeCategory;
   pricePerDay: number;
   city: string;
@@ -155,6 +157,8 @@ export interface BikeResponse {
 export interface CreateBikeRequest {
   title: string;
   description: string;
+  /** Optional brand/model, e.g. "Trek FX2 Disc" */
+  model?: string;
   category: BikeCategory;
   pricePerDay: number;
   city: string;
@@ -183,6 +187,9 @@ export type BookingStatus =
   | "CANCELLED"
   | "COMPLETED";
 
+/** How the renter pays the owner — chosen by the owner at accept time. */
+export type PaymentMethod = "CASH" | "PAYPAL" | "CARD_ON_SITE";
+
 export interface BookingResponse {
   id: string;
   bikeId: string;
@@ -201,6 +208,8 @@ export interface BookingResponse {
   totalPrice: number;
   status: BookingStatus;
   message: string | null;
+  /** Set once the owner accepts — null while PENDING / Gesetzt nach Annahme durch den Eigentümer — null solange PENDING */
+  paymentMethod: PaymentMethod | null;
   /** Accessory add-ons (Stage 3 "Business accounts") / Zubehör-Add-ons (Stage 3 "Business-Konten") */
   accessories: BookingAccessoryResponse[];
   cancellable: boolean;
@@ -214,6 +223,44 @@ export interface CreateBookingRequest {
   endDate: string;
   message?: string;
   accessories?: AccessorySelectionRequest[];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Rental contract / Mietvertrag
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface ContractSectionResponse {
+  title: string;
+  body: string;
+}
+
+export interface ContractResponse {
+  id: string;
+  bookingId: string;
+  ownerName: string;
+  ownerEmail: string;
+  renterName: string;
+  renterEmail: string;
+  bikeTitle: string;
+  bikeModel: string | null;
+  bikeCategory: string;
+  bikeCity: string;
+  bikeAddress: string | null;
+  startDate: string;
+  endDate: string;
+  rentalDays: number;
+  pricePerDay: number;
+  totalPrice: number;
+  paymentMethod: PaymentMethod;
+  depositAmount: number | null;
+  ownerAcceptedAt: string | null;
+  renterAcceptedAt: string | null;
+  fullyAccepted: boolean;
+  /** Whether the current viewer (based on which role they hold) has already clicked accept. */
+  acceptedByMe: boolean;
+  createdAt: string;
+  /** Fully rendered legal text, §1 first / Vollständig gerenderter Rechtstext, §1 zuerst */
+  sections: ContractSectionResponse[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -27,6 +27,10 @@ public class UpdateBikeRequest {
     @NotNull(message = "Category is required / Kategorie ist erforderlich")
     private BikeCategory category;
 
+    /** Optional brand/model, e.g. "Trek FX2 Disc" / Optionale Marke/Modell, z. B. "Trek FX2 Disc" */
+    @Size(max = 150)
+    private String model;
+
     @NotNull(message = "Price per day is required / Preis pro Tag ist erforderlich")
     @DecimalMin(value = "1.00")
     @DecimalMax(value = "9999.99")
