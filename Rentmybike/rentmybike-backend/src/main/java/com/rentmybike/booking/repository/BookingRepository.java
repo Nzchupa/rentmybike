@@ -236,6 +236,33 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             """)
     int expireStaleBookings(@Param("expiryCutoff") LocalDateTime expiryCutoff);
 
+    /**
+     * ACCEPTED bookings whose end date has already passed — candidates for
+     * lazy auto-completion (mirrors {@link #expireStaleBookings} but for the
+     * opposite end of the lifecycle: renters were never notified the rental
+     * period was over, and the status just sat on ACCEPTED forever unless an
+     * admin manually completed it). Fetch-joins bike/renter/owner since the
+     * caller needs them immediately afterward to send review-available
+     * notifications.
+     * ACCEPTED-Buchungen, deren Enddatum bereits vergangen ist — Kandidaten
+     * für den lazy Auto-Abschluss (spiegelt {@link #expireStaleBookings},
+     * aber am anderen Ende des Lebenszyklus: Mieter wurden nie informiert,
+     * dass die Mietzeit vorbei war, und der Status blieb auf ACCEPTED
+     * stehen, bis ein Admin manuell abschloss). Lädt bike/renter/owner per
+     * Fetch-Join, da der Aufrufer sie direkt danach für
+     * Bewertungs-verfügbar-Benachrichtigungen benötigt.
+     */
+    @Query("""
+            SELECT b FROM Booking b
+            JOIN FETCH b.bike
+            JOIN FETCH b.renter
+            JOIN FETCH b.owner
+            WHERE b.status = com.rentmybike.booking.entity.BookingStatus.ACCEPTED
+              AND b.endDate < :today
+              AND b.deletedAt IS NULL
+            """)
+    List<Booking> findAcceptedBookingsPastEndDate(@Param("today") LocalDate today);
+
     // ──────────────────────────────────────────────────────────────────────────
     // Review eligibility / Bewertungsberechtigung
     // ──────────────────────────────────────────────────────────────────────────

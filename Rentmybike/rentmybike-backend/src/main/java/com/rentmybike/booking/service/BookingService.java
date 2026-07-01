@@ -293,6 +293,7 @@ public class BookingService {
      */
     public PageResponse<BookingResponse> getRenterBookings(UUID renterId, Pageable pageable) {
         expireStaleBookings(); // lazy expiry / lazy Ablauf
+        autoCompleteFinishedBookings(); // lazy auto-completion / lazy Auto-Abschluss
         Page<Booking> page = bookingRepository.findByRenterIdOrderByCreatedAtDesc(renterId, pageable);
         return PageResponse.from(page.map(this::toBookingResponse));
     }
@@ -319,6 +320,7 @@ public class BookingService {
      */
     public PageResponse<BookingResponse> getOwnerBookings(UUID ownerId, BookingStatus status, Pageable pageable) {
         expireStaleBookings(); // lazy expiry / lazy Ablauf
+        autoCompleteFinishedBookings(); // lazy auto-completion / lazy Auto-Abschluss
         Page<Booking> page = bookingRepository.findByOwnerIdAndStatus(ownerId, status, pageable);
         return PageResponse.from(page.map(this::toBookingResponse));
     }
@@ -623,7 +625,7 @@ public class BookingService {
     }
 
     // ──────────────────────────────────────────────────────────────────────────
-    // LAZY EXPIRY / LAZY-ABLAUF
+    // LAZY EXPIRY / AUTO-COMPLETION / LAZY-ABLAUF / AUTO-ABSCHLUSS
     // ──────────────────────────────────────────────────────────────────────────
 
     /**
@@ -641,6 +643,46 @@ public class BookingService {
         if (expired > 0) {
             log.info("Expired {} stale PENDING bookings (>{}h) / {} veraltete PENDING-Buchungen abgelaufen (>{}h)",
                     expired, PENDING_EXPIRY_HOURS, expired, PENDING_EXPIRY_HOURS);
+        }
+    }
+
+    /**
+     * Auto-completes ACCEPTED bookings whose end date has already passed.
+     * Automatisches Abschließen von ACCEPTED-Buchungen, deren Enddatum bereits vergangen ist.
+     *
+     * <p>Bug fix: previously the only way a booking reached COMPLETED was an
+     * admin manually calling {@link #completeBooking}, so a booking whose
+     * rental period had ended sat on ACCEPTED forever unless an admin
+     * happened to complete it — the status never reflected reality and
+     * reviews never unlocked. Mirrors {@link #expireStaleBookings}'s lazy
+     * pattern: called at the same list-endpoint entry points, no scheduler
+     * needed for dev/MVP. Unlike the bulk-UPDATE expiry, this loads full
+     * entities one-by-one so each transition can fire the same
+     * renter+owner review-available notifications {@link #completeBooking}
+     * already sends.
+     * <p>Bugfix: vorher erreichte eine Buchung COMPLETED nur, wenn ein Admin
+     * manuell {@link #completeBooking} aufrief, sodass eine Buchung mit
+     * abgelaufener Mietzeit für immer auf ACCEPTED stehen blieb, sofern kein
+     * Admin sie zufällig abschloss — der Status spiegelte nie die Realität
+     * wider, und Bewertungen wurden nie freigeschaltet. Spiegelt das lazy
+     * Muster von {@link #expireStaleBookings}: wird an denselben
+     * Listen-Endpunkten aufgerufen, kein Scheduler für Entwicklung/MVP
+     * nötig. Anders als beim Massen-UPDATE der Ablauf-Logik werden hier
+     * vollständige Entitäten einzeln geladen, damit jeder Übergang dieselben
+     * Bewertungs-verfügbar-Benachrichtigungen für Mieter und Eigentümer
+     * auslösen kann, die {@link #completeBooking} bereits versendet.
+     */
+    private void autoCompleteFinishedBookings() {
+        List<Booking> finished = bookingRepository.findAcceptedBookingsPastEndDate(LocalDate.now());
+        for (Booking booking : finished) {
+            booking.setStatus(BookingStatus.COMPLETED);
+            bookingRepository.save(booking);
+            notificationService.notifyReviewAvailable(booking, booking.getRenter());
+            notificationService.notifyReviewAvailable(booking, booking.getOwner());
+        }
+        if (!finished.isEmpty()) {
+            log.info("Auto-completed {} finished ACCEPTED bookings / {} beendete ACCEPTED-Buchungen automatisch abgeschlossen",
+                    finished.size(), finished.size());
         }
     }
 
