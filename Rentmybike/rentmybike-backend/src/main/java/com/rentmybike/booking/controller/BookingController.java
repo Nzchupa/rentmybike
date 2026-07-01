@@ -15,10 +15,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -190,6 +192,45 @@ public class BookingController {
         BookingResponse rejected = bookingService.rejectBooking(id, currentUser.getId());
         return ResponseEntity.ok(ApiResponse.success(rejected,
                 "Booking rejected / Buchung abgelehnt"));
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // PAYMENT ENDPOINTS (PayPal only) / ZAHLUNGS-ENDPUNKTE (nur PayPal)
+    // ══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Renter uploads a PayPal transfer receipt and marks the payment as sent.
+     * Mieter lädt eine PayPal-Überweisungsquittung hoch und markiert die
+     * Zahlung als gesendet.
+     *
+     * <p>POST /api/v1/bookings/{id}/payment/receipt (multipart/form-data, field: "file")
+     */
+    @PostMapping(value = "/api/v1/bookings/{id}/payment/receipt",
+                 consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<BookingResponse>> submitPaymentReceipt(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User currentUser,
+            @RequestParam("file") MultipartFile file) {
+
+        BookingResponse updated = bookingService.submitPaymentReceipt(id, currentUser.getId(), file);
+        return ResponseEntity.ok(ApiResponse.success(updated,
+                "Payment receipt submitted / Zahlungsquittung eingereicht"));
+    }
+
+    /**
+     * Owner confirms the PayPal payment was received.
+     * Eigentümer bestätigt, dass die PayPal-Zahlung eingegangen ist.
+     *
+     * <p>POST /api/v1/bookings/{id}/payment/confirm
+     */
+    @PostMapping("/api/v1/bookings/{id}/payment/confirm")
+    public ResponseEntity<ApiResponse<BookingResponse>> confirmPaymentReceived(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User currentUser) {
+
+        BookingResponse updated = bookingService.confirmPaymentReceived(id, currentUser.getId());
+        return ResponseEntity.ok(ApiResponse.success(updated,
+                "Payment confirmed / Zahlung bestätigt"));
     }
 
     // ══════════════════════════════════════════════════════════════════════════

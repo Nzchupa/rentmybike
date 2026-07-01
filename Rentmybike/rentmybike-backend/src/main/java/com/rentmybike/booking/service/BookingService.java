@@ -15,12 +15,14 @@ import com.rentmybike.booking.entity.Booking;
 import com.rentmybike.booking.entity.BookingAccessory;
 import com.rentmybike.booking.entity.BookingStatus;
 import com.rentmybike.booking.entity.PaymentMethod;
+import com.rentmybike.booking.entity.PaymentStatus;
 import com.rentmybike.booking.repository.BookingAccessoryRepository;
 import com.rentmybike.booking.repository.BookingRepository;
 import com.rentmybike.common.exception.AccessDeniedException;
 import com.rentmybike.common.exception.BusinessException;
 import com.rentmybike.common.exception.ResourceNotFoundException;
 import com.rentmybike.common.response.PageResponse;
+import com.rentmybike.common.service.CloudinaryService;
 import com.rentmybike.contract.service.ContractService;
 import com.rentmybike.notification.service.NotificationService;
 import com.rentmybike.user.entity.User;
@@ -33,6 +35,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -64,6 +67,9 @@ public class BookingService {
     /** Pending bookings older than this are auto-cancelled on next access. */
     private static final int PENDING_EXPIRY_HOURS = 48;
 
+    /** Cloudinary folder for renter-uploaded PayPal transfer receipts. */
+    private static final String PAYMENT_RECEIPT_FOLDER = "rentmybike/payment-receipts";
+
     private final BookingRepository bookingRepository;
     private final BikeRepository bikeRepository;
     private final UserRepository userRepository;
@@ -72,6 +78,7 @@ public class BookingService {
     private final BookingAccessoryRepository bookingAccessoryRepository;
     private final AuditLogService auditLogService;
     private final ContractService contractService;
+    private final CloudinaryService cloudinaryService;
 
     // ──────────────────────────────────────────────────────────────────────────
     // CREATE / ERSTELLEN
@@ -404,6 +411,16 @@ public class BookingService {
 
         booking.setStatus(BookingStatus.ACCEPTED);
         booking.setPaymentMethod(paymentMethod);
+        // Only PAYPAL goes through the manual receipt-upload/confirm state
+        // machine — CASH and CARD_ON_SITE are settled in person, so
+        // paymentStatus stays null for them (see PaymentStatus's Javadoc).
+        // Nur PAYPAL durchläuft die manuelle
+        // Quittungs-Upload-/Bestätigungs-Zustandsmaschine — CASH und
+        // CARD_ON_SITE werden persönlich beglichen, daher bleibt
+        // paymentStatus für sie null (siehe das Javadoc von PaymentStatus).
+        if (paymentMethod == PaymentMethod.PAYPAL) {
+            booking.setPaymentStatus(PaymentStatus.AWAITING_TRANSFER);
+        }
         bookingRepository.save(booking);
 
         // Auto-generate the frozen rental contract snapshot the instant the
@@ -470,6 +487,103 @@ public class BookingService {
 
         auditLogService.record(renterId, booking.getRenter().getFullName(), AuditAction.BOOKING_CANCELLED,
                 "BOOKING", bookingId, null);
+
+        return toBookingResponse(booking);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // PAYMENT CONFIRMATION (PayPal only) / ZAHLUNGSBESTÄTIGUNG (nur PayPal)
+    // ──────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Renter uploads a PayPal transfer receipt and marks the payment as sent.
+     * Mieter lädt eine PayPal-Überweisungsquittung hoch und markiert die
+     * Zahlung als gesendet.
+     *
+     * <p>The platform never touches the money itself — the renter pays the
+     * owner directly via PayPal outside the app, then uploads a screenshot/
+     * receipt here as proof, which the owner reviews before confirming (see
+     * {@link #confirmPaymentReceived}). Re-uploading before the owner
+     * confirms is allowed (e.g. the renter attached the wrong screenshot),
+     * which is why both AWAITING_TRANSFER and RECEIPT_SUBMITTED are accepted
+     * starting states — the previous receipt image is deleted from
+     * Cloudinary so re-uploads don't leak orphaned assets.
+     * <p>Die Plattform fasst das Geld selbst nie an — der Mieter zahlt den
+     * Eigentümer direkt per PayPal außerhalb der App und lädt hier
+     * anschließend einen Screenshot/eine Quittung als Nachweis hoch, den der
+     * Eigentümer vor der Bestätigung prüft (siehe {@link
+     * #confirmPaymentReceived}). Ein erneutes Hochladen vor der Bestätigung
+     * durch den Eigentümer ist erlaubt (z. B. falscher Screenshot angehängt),
+     * weshalb sowohl AWAITING_TRANSFER als auch RECEIPT_SUBMITTED als
+     * Startzustände akzeptiert werden — das vorherige Quittungsbild wird von
+     * Cloudinary gelöscht, damit erneute Uploads keine verwaisten Assets
+     * hinterlassen.
+     */
+    public BookingResponse submitPaymentReceipt(UUID bookingId, UUID renterId, MultipartFile file) {
+        Booking booking = bookingRepository.findByIdWithDetails(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking", bookingId));
+
+        if (!booking.getRenter().getId().equals(renterId)) {
+            throw new AccessDeniedException(
+                    "You are not the renter of this booking / Sie sind nicht der Mieter dieser Buchung");
+        }
+        if (booking.getPaymentMethod() != PaymentMethod.PAYPAL) {
+            throw new BusinessException(
+                    "This booking is not paid via PayPal / Diese Buchung wird nicht per PayPal bezahlt");
+        }
+        if (booking.getPaymentStatus() == PaymentStatus.CONFIRMED) {
+            throw new BusinessException(
+                    "Payment has already been confirmed / Die Zahlung wurde bereits bestätigt");
+        }
+
+        String previousReceiptUrl = booking.getPaymentReceiptUrl();
+        String url = cloudinaryService.uploadImage(file, PAYMENT_RECEIPT_FOLDER);
+        if (previousReceiptUrl != null) {
+            cloudinaryService.deleteImage(previousReceiptUrl);
+        }
+
+        booking.setPaymentReceiptUrl(url);
+        booking.setPaymentReceiptSubmittedAt(LocalDateTime.now());
+        booking.setPaymentStatus(PaymentStatus.RECEIPT_SUBMITTED);
+        bookingRepository.save(booking);
+
+        log.info("Payment receipt submitted for booking: {} by renter: {} / " +
+                 "Zahlungsquittung für Buchung {} von Mieter {} eingereicht",
+                bookingId, renterId, bookingId, renterId);
+
+        notificationService.notifyPaymentReceiptSubmitted(booking);
+
+        return toBookingResponse(booking);
+    }
+
+    /**
+     * Owner confirms the PayPal payment was received, closing out the manual
+     * payment confirmation flow.
+     * Eigentümer bestätigt, dass die PayPal-Zahlung eingegangen ist, und
+     * schließt damit den manuellen Zahlungsbestätigungs-Ablauf ab.
+     */
+    public BookingResponse confirmPaymentReceived(UUID bookingId, UUID ownerId) {
+        Booking booking = loadBookingForOwner(bookingId, ownerId);
+
+        if (booking.getPaymentMethod() != PaymentMethod.PAYPAL) {
+            throw new BusinessException(
+                    "This booking is not paid via PayPal / Diese Buchung wird nicht per PayPal bezahlt");
+        }
+        if (booking.getPaymentStatus() != PaymentStatus.RECEIPT_SUBMITTED) {
+            throw new BusinessException(
+                    "No payment receipt is awaiting confirmation / " +
+                    "Es liegt keine zu bestätigende Zahlungsquittung vor");
+        }
+
+        booking.setPaymentStatus(PaymentStatus.CONFIRMED);
+        booking.setPaymentConfirmedAt(LocalDateTime.now());
+        bookingRepository.save(booking);
+
+        log.info("Payment confirmed for booking: {} by owner: {} / " +
+                 "Zahlung für Buchung {} von Eigentümer {} bestätigt",
+                bookingId, ownerId, bookingId, ownerId);
+
+        notificationService.notifyPaymentConfirmed(booking);
 
         return toBookingResponse(booking);
     }
@@ -602,6 +716,10 @@ public class BookingService {
                 .status(booking.getStatus())
                 .message(booking.getMessage())
                 .paymentMethod(booking.getPaymentMethod())
+                .paymentStatus(booking.getPaymentStatus())
+                .paymentReceiptUrl(booking.getPaymentReceiptUrl())
+                .paymentReceiptSubmittedAt(booking.getPaymentReceiptSubmittedAt())
+                .paymentConfirmedAt(booking.getPaymentConfirmedAt())
                 .accessories(accessoryResponses)
                 // Timestamps / Zeitstempel
                 .createdAt(booking.getCreatedAt())

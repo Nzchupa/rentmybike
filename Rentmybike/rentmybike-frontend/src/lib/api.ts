@@ -530,6 +530,24 @@ export const bookingsApi = {
   adminComplete: (id: string) =>
     api.post<ApiResponse<BookingResponse>>(`/api/v1/admin/bookings/${id}/complete`),
 
+  // Manual PayPal payment confirmation — the platform never touches the
+  // money, it only tracks this two-step state trail (see PaymentStatus).
+  // Manuelle PayPal-Zahlungsbestätigung — die Plattform fasst das Geld nie
+  // an, sie verfolgt nur diese zweistufige Status-Historie (siehe PaymentStatus).
+  submitPaymentReceipt: (id: string, file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    // See bikesApi.uploadPhoto for why Content-Type must stay unset for FormData uploads.
+    return api.post<ApiResponse<BookingResponse>>(
+      `/api/v1/bookings/${id}/payment/receipt`,
+      form,
+      { headers: { "Content-Type": undefined } }
+    );
+  },
+
+  confirmPayment: (id: string) =>
+    api.post<ApiResponse<BookingResponse>>(`/api/v1/bookings/${id}/payment/confirm`),
+
   // Public — occupied date ranges for a bike, used by the booking calendar
   // to disable already-taken dates / Öffentlich — belegte Datumsbereiche für
   // ein Fahrrad, vom Buchungskalender zum Deaktivieren vergebener Termine genutzt.

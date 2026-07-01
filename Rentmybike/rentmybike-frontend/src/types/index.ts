@@ -190,6 +190,9 @@ export type BookingStatus =
 /** How the renter pays the owner — chosen by the owner at accept time. */
 export type PaymentMethod = "CASH" | "PAYPAL" | "CARD_ON_SITE";
 
+/** Manual PayPal confirmation state — only set for PAYPAL bookings. */
+export type PaymentStatus = "AWAITING_TRANSFER" | "RECEIPT_SUBMITTED" | "CONFIRMED";
+
 export interface BookingResponse {
   id: string;
   bikeId: string;
@@ -210,6 +213,11 @@ export interface BookingResponse {
   message: string | null;
   /** Set once the owner accepts — null while PENDING / Gesetzt nach Annahme durch den Eigentümer — null solange PENDING */
   paymentMethod: PaymentMethod | null;
+  /** Only set for PAYPAL bookings / Nur bei PAYPAL-Buchungen gesetzt */
+  paymentStatus: PaymentStatus | null;
+  paymentReceiptUrl: string | null;
+  paymentReceiptSubmittedAt: string | null;
+  paymentConfirmedAt: string | null;
   /** Accessory add-ons (Stage 3 "Business accounts") / Zubehör-Add-ons (Stage 3 "Business-Konten") */
   accessories: BookingAccessoryResponse[];
   cancellable: boolean;
@@ -406,7 +414,9 @@ export type NotificationType =
   | "ADMIN_NEW_PENDING_BIKE"
   | "ADMIN_NEW_REPORT"
   | "ADMIN_NEW_SUPPORT_TICKET"
-  | "SUPPORT_TICKET_REPLY";
+  | "SUPPORT_TICKET_REPLY"
+  | "PAYMENT_RECEIPT_SUBMITTED"
+  | "PAYMENT_CONFIRMED";
 
 export interface NotificationResponse {
   id: string;

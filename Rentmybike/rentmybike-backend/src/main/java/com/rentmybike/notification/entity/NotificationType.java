@@ -32,5 +32,9 @@ public enum NotificationType {
     /** Admin-facing: a new support ticket was filed and needs a reply. */
     ADMIN_NEW_SUPPORT_TICKET,
     /** User-facing: an admin replied to one of the user's support tickets. */
-    SUPPORT_TICKET_REPLY
+    SUPPORT_TICKET_REPLY,
+    /** Owner-facing: the renter uploaded a PayPal transfer receipt and marked payment as sent. */
+    PAYMENT_RECEIPT_SUBMITTED,
+    /** Renter-facing: the owner confirmed the PayPal payment was received. */
+    PAYMENT_CONFIRMED
 }

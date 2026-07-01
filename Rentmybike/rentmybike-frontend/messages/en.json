@@ -450,6 +450,20 @@
       "ownerAccepted": "Owner accepted",
       "renterAccepted": "Renter accepted",
       "pending": "Pending"
+    },
+    "payment": {
+      "title": "PayPal payment",
+      "awaitingTransfer": "Awaiting PayPal transfer from the renter",
+      "receiptAwaitingYourConfirmation": "Receipt uploaded — please confirm you received the payment",
+      "receiptAwaitingOwnerConfirmation": "Receipt uploaded — waiting for the owner to confirm",
+      "confirmed": "Payment confirmed",
+      "receiptAlt": "Payment receipt",
+      "uploadReceipt": "I've paid — upload receipt",
+      "reuploadReceipt": "Upload a different receipt",
+      "receiptUploadedToast": "Receipt uploaded",
+      "confirmReceived": "Confirm payment received",
+      "confirmConfirm": "Confirm that you received this payment?",
+      "confirmedToast": "Payment confirmed"
     }
   },
   "dashboard": {

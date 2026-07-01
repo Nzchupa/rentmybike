@@ -163,6 +163,63 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
+    /**
+     * Notifies the owner that the renter uploaded a PayPal transfer receipt
+     * and marked the payment as sent. In-app only, same reasoning as
+     * {@link #notifyNewChatMessage} — this is a back-and-forth the owner is
+     * expected to check promptly, not something worth a transactional email.
+     * Benachrichtigt den Eigentümer, dass der Mieter eine
+     * PayPal-Überweisungsquittung hochgeladen und die Zahlung als gesendet
+     * markiert hat. Nur In-App, gleiche Begründung wie bei {@link
+     * #notifyNewChatMessage} — dies ist ein Hin und Her, das der Eigentümer
+     * voraussichtlich zeitnah prüft, keine Transaktions-E-Mail wert.
+     *
+     * @param booking the booking whose PayPal receipt was just submitted / die Buchung, deren PayPal-Quittung gerade eingereicht wurde
+     */
+    public void notifyPaymentReceiptSubmitted(Booking booking) {
+        String bikeTitle = booking.getBike().getTitle();
+        String renterName = booking.getRenter().getFullName();
+
+        String title = "Payment receipt submitted / Zahlungsquittung eingereicht";
+        String message = renterName + " marked the payment for \"" + bikeTitle + "\" as sent — please confirm."
+                + " / " + renterName + " hat die Zahlung für \"" + bikeTitle + "\" als gesendet markiert — bitte bestätigen.";
+
+        Notification notification = Notification.builder()
+                .user(booking.getOwner())
+                .booking(booking)
+                .type(NotificationType.PAYMENT_RECEIPT_SUBMITTED)
+                .title(title)
+                .message(message)
+                .build();
+        notificationRepository.save(notification);
+    }
+
+    /**
+     * Notifies the renter that the owner confirmed the PayPal payment was
+     * received — the last step of the manual payment confirmation flow.
+     * Benachrichtigt den Mieter, dass der Eigentümer den Eingang der
+     * PayPal-Zahlung bestätigt hat — der letzte Schritt des manuellen
+     * Zahlungsbestätigungs-Ablaufs.
+     *
+     * @param booking the booking whose payment was just confirmed / die Buchung, deren Zahlung gerade bestätigt wurde
+     */
+    public void notifyPaymentConfirmed(Booking booking) {
+        String bikeTitle = booking.getBike().getTitle();
+
+        String title = "Payment confirmed / Zahlung bestätigt";
+        String message = "The owner confirmed your payment for \"" + bikeTitle + "\"."
+                + " / Der Eigentümer hat Ihre Zahlung für \"" + bikeTitle + "\" bestätigt.";
+
+        Notification notification = Notification.builder()
+                .user(booking.getRenter())
+                .booking(booking)
+                .type(NotificationType.PAYMENT_CONFIRMED)
+                .title(title)
+                .message(message)
+                .build();
+        notificationRepository.save(notification);
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // Admin notification center / Admin-Benachrichtigungszentrum
     // ──────────────────────────────────────────────────────────────────────────

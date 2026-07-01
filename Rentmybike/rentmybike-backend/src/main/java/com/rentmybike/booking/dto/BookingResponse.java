@@ -2,6 +2,7 @@ package com.rentmybike.booking.dto;
 
 import com.rentmybike.booking.entity.BookingStatus;
 import com.rentmybike.booking.entity.PaymentMethod;
+import com.rentmybike.booking.entity.PaymentStatus;
 import lombok.Builder;
 import lombok.Data;
 
@@ -51,6 +52,12 @@ public class BookingResponse {
 
     /** Set once the owner accepts — null while PENDING / Gesetzt nach Annahme durch den Eigentümer — null solange PENDING */
     private PaymentMethod paymentMethod;
+
+    /** Manual PayPal confirmation state — only set for PAYPAL bookings / Manueller PayPal-Bestätigungsstatus — nur bei PAYPAL-Buchungen gesetzt */
+    private PaymentStatus paymentStatus;
+    private String paymentReceiptUrl;
+    private LocalDateTime paymentReceiptSubmittedAt;
+    private LocalDateTime paymentConfirmedAt;
 
     // Accessory add-ons (Stage 3 "Business accounts") / Zubehör-Add-ons (Stage 3 "Business-Konten")
     private List<BookingAccessoryResponse> accessories;

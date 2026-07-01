@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * A rental booking — the central transaction entity of the RentMyBike marketplace.
@@ -146,6 +147,29 @@ public class Booking extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", columnDefinition = "VARCHAR(20)")
     private PaymentMethod paymentMethod;
+
+    /**
+     * Manual PayPal confirmation state — see {@link PaymentStatus}. Stays
+     * null for CASH/CARD_ON_SITE bookings; set to AWAITING_TRANSFER the
+     * moment the owner accepts a PAYPAL booking.
+     * Manueller PayPal-Bestätigungsstatus — siehe {@link PaymentStatus}.
+     * Bleibt bei CASH/CARD_ON_SITE-Buchungen null; wird auf
+     * AWAITING_TRANSFER gesetzt, sobald der Eigentümer eine
+     * PAYPAL-Buchung akzeptiert.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status", columnDefinition = "VARCHAR(20)")
+    private PaymentStatus paymentStatus;
+
+    /** Cloudinary URL of the renter-uploaded PayPal transfer receipt / Cloudinary-URL der vom Mieter hochgeladenen PayPal-Überweisungsquittung */
+    @Column(name = "payment_receipt_url", length = 500)
+    private String paymentReceiptUrl;
+
+    @Column(name = "payment_receipt_submitted_at")
+    private LocalDateTime paymentReceiptSubmittedAt;
+
+    @Column(name = "payment_confirmed_at")
+    private LocalDateTime paymentConfirmedAt;
 
     // ──────────────────────────────────────────────────────────────────────────
     // Business logic helpers / Geschäftslogik-Hilfsmethoden

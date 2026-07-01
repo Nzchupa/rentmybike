@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MapPin, Calendar, Camera, MessageCircle, FileText, ChevronDown, ChevronUp } from "lucide-react";
+import { MapPin, Calendar, Camera, MessageCircle, FileText, Banknote, ChevronDown, ChevronUp } from "lucide-react";
 import toast from "react-hot-toast";
 import { bookingsApi } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
@@ -14,6 +14,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { BookingPhotosPanel } from "@/components/booking/BookingPhotosPanel";
 import { ChatPanel } from "@/components/booking/ChatPanel";
 import { ContractPanel } from "@/components/booking/ContractPanel";
+import { PaymentPanel } from "@/components/booking/PaymentPanel";
 import { useAuthStore } from "@/store/auth.store";
 import { cn, formatPrice, formatDate } from "@/lib/utils";
 import type { BookingResponse, PaymentMethod } from "@/types";
@@ -40,6 +41,7 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
   const [showPhotos, setShowPhotos] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showContract, setShowContract] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
   const [showAcceptForm, setShowAcceptForm] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>("CASH");
 
@@ -49,6 +51,13 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
   // diesem Moment wird er serverseitig automatisch erstellt) — siehe
   // ContractService.generateForBooking.
   const contractEnabled = booking.status === "ACCEPTED" || booking.status === "COMPLETED";
+
+  // The manual PayPal confirmation flow only applies to PAYPAL bookings —
+  // CASH/CARD_ON_SITE are settled in person and never get a paymentStatus.
+  // Der manuelle PayPal-Bestätigungsablauf gilt nur für PAYPAL-Buchungen —
+  // CASH/CARD_ON_SITE werden persönlich beglichen und erhalten nie einen
+  // paymentStatus.
+  const paymentPanelEnabled = contractEnabled && booking.paymentMethod === "PAYPAL";
 
   // Condition photos only make sense once a booking is confirmed — there's
   // nothing to document before that, and the booking record disappears from
@@ -353,6 +362,28 @@ export function BookingCard({ booking, view, onReview }: BookingCardProps) {
           {showContract && (
             <div className="mt-3">
               <ContractPanel bookingId={booking.id} />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Manual PayPal payment confirmation — receipt upload + owner confirm */}
+      {/* Manuelle PayPal-Zahlungsbestätigung — Quittungs-Upload + Eigentümer-Bestätigung */}
+      {paymentPanelEnabled && (
+        <div className="mt-3 border-t border-slate-100 pt-3">
+          <button
+            type="button"
+            onClick={() => setShowPayment((v) => !v)}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900"
+          >
+            <Banknote size={15} />
+            {t("payment.title")}
+            {showPayment ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+          </button>
+
+          {showPayment && (
+            <div className="mt-3">
+              <PaymentPanel booking={booking} view={view} />
             </div>
           )}
         </div>

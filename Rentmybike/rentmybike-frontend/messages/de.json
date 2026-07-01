@@ -450,6 +450,20 @@
       "ownerAccepted": "Eigentümer akzeptiert",
       "renterAccepted": "Mieter akzeptiert",
       "pending": "Ausstehend"
+    },
+    "payment": {
+      "title": "PayPal-Zahlung",
+      "awaitingTransfer": "Warten auf PayPal-Überweisung des Mieters",
+      "receiptAwaitingYourConfirmation": "Quittung hochgeladen — bitte bestätigen Sie den Zahlungseingang",
+      "receiptAwaitingOwnerConfirmation": "Quittung hochgeladen — warten auf Bestätigung des Eigentümers",
+      "confirmed": "Zahlung bestätigt",
+      "receiptAlt": "Zahlungsquittung",
+      "uploadReceipt": "Bezahlt — Quittung hochladen",
+      "reuploadReceipt": "Andere Quittung hochladen",
+      "receiptUploadedToast": "Quittung hochgeladen",
+      "confirmReceived": "Zahlungseingang bestätigen",
+      "confirmConfirm": "Bestätigen Sie, dass Sie diese Zahlung erhalten haben?",
+      "confirmedToast": "Zahlung bestätigt"
     }
   },
   "dashboard": {
