@@ -24,32 +24,32 @@
   }
 
   body {
-    @apply bg-white text-slate-900 antialiased font-sans;
+    @apply bg-white text-slate-900 antialiased font-sans dark:bg-slate-900 dark:text-slate-100;
   }
 
   * {
-    @apply border-slate-200;
+    @apply border-slate-200 dark:border-slate-800;
   }
 }
 
 @layer components {
   /* Reusable card shell */
   .card {
-    @apply rounded-2xl bg-white border border-slate-200 shadow-sm;
+    @apply rounded-2xl bg-white border border-slate-200 shadow-sm dark:bg-slate-800 dark:border-slate-700;
   }
 
   /* Section heading */
   .section-title {
-    @apply text-2xl font-bold text-slate-900;
+    @apply text-2xl font-bold text-slate-900 dark:text-slate-100;
   }
 
   /* Form label */
   .label {
-    @apply block text-sm font-medium text-slate-700 mb-1;
+    @apply block text-sm font-medium text-slate-700 mb-1 dark:text-slate-300;
   }
 
   /* Form field error */
   .field-error {
-    @apply text-xs text-red-600 mt-1;
+    @apply text-xs text-red-600 mt-1 dark:text-red-400;
   }
 }

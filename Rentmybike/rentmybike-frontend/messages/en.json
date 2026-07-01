@@ -32,7 +32,9 @@
     "logout": "Log out",
     "myProfile": "My Profile",
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "switchToLightMode": "Switch to light mode",
+    "switchToDarkMode": "Switch to dark mode"
   },
   "footer": {
     "tagline": "Peer-to-peer bike rental marketplace.",

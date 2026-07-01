@@ -32,7 +32,9 @@
     "logout": "Abmelden",
     "myProfile": "Mein Profil",
     "openMenu": "Menü öffnen",
-    "closeMenu": "Menü schließen"
+    "closeMenu": "Menü schließen",
+    "switchToLightMode": "Zum hellen Modus wechseln",
+    "switchToDarkMode": "Zum dunklen Modus wechseln"
   },
   "footer": {
     "tagline": "Peer-to-Peer-Marktplatz für Fahrradverleih.",

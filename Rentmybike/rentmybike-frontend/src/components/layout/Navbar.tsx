@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { NotificationBell } from "@/components/layout/NotificationBell";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { cn } from "@/lib/utils";
 
 /**
@@ -64,12 +65,12 @@ export function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200">
+    <nav className="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
 
           {/* Logo */}
-          <Link href={localePath("/")} className="flex items-center gap-2 font-bold text-brand-600 text-lg">
+          <Link href={localePath("/")} className="flex items-center gap-2 font-bold text-brand-600 dark:text-brand-400 text-lg">
             <VelohoodLogo size={28} />
             Velohood
           </Link>
@@ -83,8 +84,8 @@ export function Navbar() {
                 className={cn(
                   "text-sm font-medium transition-colors",
                   isActive(link.href)
-                    ? "text-brand-600"
-                    : "text-slate-600 hover:text-slate-900"
+                    ? "text-brand-600 dark:text-brand-400"
+                    : "text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
                 )}
               >
                 {link.label}
@@ -94,10 +95,12 @@ export function Navbar() {
 
           {/* Auth buttons */}
           <div className="hidden md:flex items-center gap-3">
+            <ThemeToggle />
+
             {/* Language switcher */}
             <Link
               href={localeSwitchHref}
-              className="text-xs font-medium text-slate-500 hover:text-slate-900 border border-slate-200 rounded-lg px-2 py-1"
+              className="text-xs font-medium text-slate-500 hover:text-slate-900 border border-slate-200 rounded-lg px-2 py-1 dark:text-slate-400 dark:hover:text-white dark:border-slate-700"
             >
               {locale === "en" ? "DE" : "EN"}
             </Link>
@@ -134,8 +137,9 @@ export function Navbar() {
               Benachrichtigungen über die Navbar. */}
           <div className="flex md:hidden items-center gap-1">
             {authenticated && <NotificationBell />}
+            <ThemeToggle />
             <button
-              className="p-2 text-slate-600 hover:text-slate-900"
+              className="p-2 text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
               aria-label={mobileOpen ? t("closeMenu") : t("openMenu")}
               onClick={() => setMobileOpen(!mobileOpen)}
             >
@@ -147,12 +151,12 @@ export function Navbar() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-slate-200 bg-white px-4 pb-4 pt-2 space-y-2">
+        <div className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pb-4 pt-2 space-y-2">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={localePath(link.href)}
-              className="block py-2 text-sm font-medium text-slate-700"
+              className="block py-2 text-sm font-medium text-slate-700 dark:text-slate-300"
               onClick={() => setMobileOpen(false)}
             >
               {link.label}
@@ -165,14 +169,14 @@ export function Navbar() {
               onClick={() => setMobileOpen(false)}
             >
               <Avatar name={user.fullName} avatarUrl={user.avatarUrl} size="sm" />
-              <span className="text-sm font-medium text-slate-700">{user.fullName}</span>
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{user.fullName}</span>
             </Link>
           )}
 
-          <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
             <Link
               href={localeSwitchHref}
-              className="text-xs font-medium text-slate-500 hover:text-slate-900 border border-slate-200 rounded-lg px-2 py-1"
+              className="text-xs font-medium text-slate-500 hover:text-slate-900 border border-slate-200 rounded-lg px-2 py-1 dark:text-slate-400 dark:hover:text-white dark:border-slate-700"
               onClick={() => setMobileOpen(false)}
             >
               {locale === "en" ? "DE" : "EN"}
