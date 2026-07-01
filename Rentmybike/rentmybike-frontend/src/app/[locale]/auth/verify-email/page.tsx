@@ -38,11 +38,11 @@ function VerifyEmailContent() {
   if (state === "pending") {
     return (
       <div className="text-center">
-        <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
-          <Mail size={32} className="text-blue-600" />
+        <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
+          <Mail size={32} className="text-blue-600 dark:text-blue-400" />
         </div>
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">{t("pendingTitle")}</h1>
-        <p className="text-slate-600 max-w-sm mb-6">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">{t("pendingTitle")}</h1>
+        <p className="text-slate-600 dark:text-slate-400 max-w-sm mb-6">
           {t("pendingMessage", { email: email ?? "your email" })}
         </p>
         <Button asChild>
@@ -56,7 +56,7 @@ function VerifyEmailContent() {
     return (
       <div className="text-center">
         <div className="w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-slate-600">{t("verifying")}</p>
+        <p className="text-slate-600 dark:text-slate-400">{t("verifying")}</p>
       </div>
     );
   }
@@ -64,11 +64,11 @@ function VerifyEmailContent() {
   if (state === "success") {
     return (
       <div className="text-center">
-        <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
-          <CheckCircle size={32} className="text-green-600" />
+        <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
+          <CheckCircle size={32} className="text-green-600 dark:text-green-400" />
         </div>
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">{t("successTitle")}</h1>
-        <p className="text-slate-600 mb-6">{t("successMessage")}</p>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">{t("successTitle")}</h1>
+        <p className="text-slate-600 dark:text-slate-400 mb-6">{t("successMessage")}</p>
         <Button asChild>
           <Link href={`/${locale}/auth/login`}>{t("goToLogin")}</Link>
         </Button>
@@ -78,11 +78,11 @@ function VerifyEmailContent() {
 
   return (
     <div className="text-center">
-      <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
-        <XCircle size={32} className="text-red-500" />
+      <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center">
+        <XCircle size={32} className="text-red-500 dark:text-red-400" />
       </div>
-      <h1 className="text-2xl font-bold text-slate-900 mb-2">{t("errorTitle")}</h1>
-      <p className="text-slate-600 mb-6">{t("errorMessage")}</p>
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">{t("errorTitle")}</h1>
+      <p className="text-slate-600 dark:text-slate-400 mb-6">{t("errorMessage")}</p>
       <Button variant="secondary" asChild>
         <Link href={`/${locale}/auth/register`}>{t("registerAgain")}</Link>
       </Button>
@@ -99,7 +99,7 @@ export default function VerifyEmailPage() {
         <div className="card p-12">
           <Suspense
             fallback={
-              <div className="text-center text-slate-500">{t("title")}...</div>
+              <div className="text-center text-slate-500 dark:text-slate-400">{t("title")}...</div>
             }
           >
             <VerifyEmailContent />

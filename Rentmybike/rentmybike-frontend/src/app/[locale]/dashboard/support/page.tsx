@@ -86,7 +86,7 @@ export default function SupportPage() {
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value as SupportCategory)}
-              className="w-full h-10 px-3 rounded-xl border border-slate-300 bg-white text-sm outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full h-10 px-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm outline-none focus:ring-2 focus:ring-brand-500"
             >
               {CATEGORIES.map((c) => (
                 <option key={c} value={c}>{tCategory(c)}</option>
@@ -102,7 +102,7 @@ export default function SupportPage() {
               placeholder={t("messagePlaceholder")}
               rows={5}
               maxLength={4000}
-              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
 
@@ -120,7 +120,7 @@ export default function SupportPage() {
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="card h-20 animate-pulse bg-slate-100" />
+            <div key={i} className="card h-20 animate-pulse bg-slate-100 dark:bg-slate-700" />
           ))}
         </div>
       ) : isError ? (
@@ -128,28 +128,28 @@ export default function SupportPage() {
       ) : tickets.length === 0 && !showForm ? (
         <EmptyState icon={LifeBuoy} message={t("empty")} />
       ) : (
-        <div className="card divide-y divide-slate-100 overflow-hidden">
+        <div className="card divide-y divide-slate-100 dark:divide-slate-700 overflow-hidden">
           {tickets.map((ticket) => (
             <Link
               key={ticket.id}
               href={`/${locale}/dashboard/support/${ticket.id}`}
-              className="block px-5 py-4 hover:bg-slate-50"
+              className="block px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-700/50"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
                       {tCategory(ticket.category)}
                     </span>
                     <SupportTicketStatusBadge status={ticket.status} />
                   </div>
-                  <p className="font-medium text-slate-900 mt-1 truncate">{ticket.subject}</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100 mt-1 truncate">{ticket.subject}</p>
                   {ticket.lastMessagePreview && (
-                    <p className="text-sm text-slate-500 mt-0.5 truncate">{ticket.lastMessagePreview}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5 truncate">{ticket.lastMessagePreview}</p>
                   )}
                 </div>
                 {ticket.lastMessageAt && (
-                  <span className="shrink-0 text-xs text-slate-400">
+                  <span className="shrink-0 text-xs text-slate-400 dark:text-slate-500">
                     {formatDate(ticket.lastMessageAt, locale)}
                   </span>
                 )}

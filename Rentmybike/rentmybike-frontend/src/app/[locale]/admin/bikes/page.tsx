@@ -121,11 +121,11 @@ export default function AdminBikesPage() {
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="card h-28 animate-pulse bg-slate-100" />
+            <div key={i} className="card h-28 animate-pulse bg-slate-100 dark:bg-slate-700" />
           ))}
         </div>
       ) : bikes.length === 0 ? (
-        <div className="card p-12 text-center text-slate-500">
+        <div className="card p-12 text-center text-slate-500 dark:text-slate-400">
           {t("noBikesFound")}
         </div>
       ) : (
@@ -134,7 +134,7 @@ export default function AdminBikesPage() {
             <div key={bike.id} className="card p-4">
               <div className="flex gap-4">
                 {/* Thumbnail */}
-                <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-slate-100">
+                <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-700">
                   {bike.photos?.[0] ? (
                     <Image
                       src={optimizedImageUrl(bike.photos[0].url, 160)}
@@ -144,7 +144,7 @@ export default function AdminBikesPage() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">
+                    <div className="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500 text-xs">
                       {t("noPhoto")}
                     </div>
                   )}
@@ -154,17 +154,17 @@ export default function AdminBikesPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <p className="font-semibold text-slate-900 truncate">{bike.title}</p>
+                      <p className="font-semibold text-slate-900 dark:text-slate-100 truncate">{bike.title}</p>
                       {bike.model && (
-                        <p className="text-xs text-slate-500 truncate">{bike.model}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{bike.model}</p>
                       )}
-                      <p className="text-sm text-slate-500">
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
                         {bike.city} · {tc(bike.category)} · {formatPrice(bike.pricePerDay)}{t("perDay")}
                       </p>
-                      <p className="text-xs text-slate-400 mt-0.5">
+                      <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                         {t("ownerLabel", { name: bike.ownerName })}
                       </p>
-                      <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
+                      <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 flex items-center gap-1">
                         <Eye size={12} /> {t("viewsLabel", { count: bike.viewCount })}
                       </p>
                     </div>
@@ -176,7 +176,7 @@ export default function AdminBikesPage() {
                       reviewing a REJECTED or CHANGES_REQUESTED bike had no
                       way to see why without checking the database directly. */}
                   {bike.rejectionReason && (
-                    <p className="text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 mt-2">
+                    <p className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 mt-2">
                       <span className="font-medium">{t("reasonLabel")}: </span>
                       {bike.rejectionReason}
                     </p>
@@ -234,7 +234,7 @@ export default function AdminBikesPage() {
                             ? t("rejectReasonPlaceholder")
                             : t("requestChangesReasonPlaceholder")
                         }
-                        className="flex-1 h-9 px-3 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+                        className="flex-1 h-9 px-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm outline-none focus:ring-2 focus:ring-brand-500"
                       />
                       <Button
                         size="sm"
@@ -274,7 +274,7 @@ export default function AdminBikesPage() {
               >
                 {tCommon("previous")}
               </Button>
-              <span className="flex items-center px-4 text-sm text-slate-600">
+              <span className="flex items-center px-4 text-sm text-slate-600 dark:text-slate-400">
                 {page + 1} / {totalPages}
               </span>
               <Button

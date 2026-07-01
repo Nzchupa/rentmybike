@@ -63,8 +63,8 @@ export default function PublicProfilePage({ params }: PublicProfilePageProps) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-10">
         <div className="animate-pulse space-y-4">
-          <div className="h-20 w-20 rounded-full bg-slate-100" />
-          <div className="h-6 bg-slate-100 rounded w-1/3" />
+          <div className="h-20 w-20 rounded-full bg-slate-100 dark:bg-slate-700" />
+          <div className="h-6 bg-slate-100 dark:bg-slate-700 rounded w-1/3" />
         </div>
       </div>
     );
@@ -72,7 +72,7 @@ export default function PublicProfilePage({ params }: PublicProfilePageProps) {
 
   if (!profile) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-10 text-center text-slate-500">
+      <div className="mx-auto max-w-3xl px-4 py-10 text-center text-slate-500 dark:text-slate-400">
         <p>{t("notFound")}</p>
       </div>
     );
@@ -82,7 +82,7 @@ export default function PublicProfilePage({ params }: PublicProfilePageProps) {
     <div className="mx-auto max-w-3xl px-4 sm:px-6 py-10">
       <Link
         href={`/${locale}/bikes`}
-        className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 mb-6"
+        className="inline-flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 mb-6"
       >
         <ChevronLeft size={16} />
         {t("back")}
@@ -91,12 +91,12 @@ export default function PublicProfilePage({ params }: PublicProfilePageProps) {
       <div className="card p-6 flex items-center gap-4">
         <Avatar name={profile.fullName} avatarUrl={profile.avatarUrl} size="xl" />
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">{profile.fullName}</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{profile.fullName}</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             {t("memberSince", { date: formatDate(profile.createdAt, locale) })}
           </p>
           {primaryCity && (
-            <div className="flex items-center gap-1 text-sm text-slate-500 mt-1">
+            <div className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 mt-1">
               <MapPin size={14} className="shrink-0" />
               <span>{primaryCity}</span>
             </div>
@@ -104,7 +104,7 @@ export default function PublicProfilePage({ params }: PublicProfilePageProps) {
           {profile.reviewCount > 0 && (
             <div className="flex items-center gap-2 mt-2">
               <StarRating rating={profile.averageRating} size="sm" />
-              <span className="text-sm text-slate-500">
+              <span className="text-sm text-slate-500 dark:text-slate-400">
                 {profile.averageRating.toFixed(1)} ({t("reviewsCount", { count: profile.reviewCount })})
               </span>
             </div>
@@ -114,7 +114,7 @@ export default function PublicProfilePage({ params }: PublicProfilePageProps) {
 
       {bikes.length > 0 && (
         <div className="mt-8">
-          <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
             <BikeIcon size={18} />
             {t("bikes", { count: bikes.length })}
           </h2>
@@ -128,7 +128,7 @@ export default function PublicProfilePage({ params }: PublicProfilePageProps) {
 
       {reviewsData && reviewsData.totalElements > 0 && (
         <div className="mt-8">
-          <h2 className="text-lg font-semibold text-slate-900 mb-4">{t("reviews")}</h2>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">{t("reviews")}</h2>
           <div className="space-y-4">
             {reviewsData.content.map((review) => (
               <div key={review.id} className="card p-4">
@@ -136,15 +136,15 @@ export default function PublicProfilePage({ params }: PublicProfilePageProps) {
                   <Avatar name={review.reviewerName} avatarUrl={review.reviewerAvatarUrl} size="sm" />
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-slate-900 text-sm">
+                      <span className="font-medium text-slate-900 dark:text-slate-100 text-sm">
                         {review.reviewerName}
                       </span>
                       <StarRating rating={review.rating} size="sm" />
                     </div>
                     {review.comment && (
-                      <p className="text-sm text-slate-600 mt-1">{review.comment}</p>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{review.comment}</p>
                     )}
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                       {formatDate(review.createdAt, locale)}
                     </p>
                   </div>

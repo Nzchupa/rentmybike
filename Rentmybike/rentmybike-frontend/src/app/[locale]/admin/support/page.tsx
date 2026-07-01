@@ -80,14 +80,14 @@ export default function AdminSupportPage() {
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
             placeholder={t("searchPlaceholder")}
-            className="w-full h-10 pl-9 pr-3 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full h-10 pl-9 pr-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
 
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value as SupportTicketStatus | "")}
-          className="h-10 px-3 rounded-xl border border-slate-300 bg-white text-sm outline-none focus:ring-2 focus:ring-brand-500"
+          className="h-10 px-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm outline-none focus:ring-2 focus:ring-brand-500"
         >
           <option value="">{t("allStatuses")}</option>
           {STATUSES.map((s) => (
@@ -98,7 +98,7 @@ export default function AdminSupportPage() {
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value as SupportCategory | "")}
-          className="h-10 px-3 rounded-xl border border-slate-300 bg-white text-sm outline-none focus:ring-2 focus:ring-brand-500"
+          className="h-10 px-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm outline-none focus:ring-2 focus:ring-brand-500"
         >
           <option value="">{t("allCategories")}</option>
           {CATEGORIES.map((c) => (
@@ -110,16 +110,16 @@ export default function AdminSupportPage() {
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="card h-20 animate-pulse bg-slate-100" />
+            <div key={i} className="card h-20 animate-pulse bg-slate-100 dark:bg-slate-700" />
           ))}
         </div>
       ) : isError ? (
-        <div className="card p-10 text-center text-red-600">
+        <div className="card p-10 text-center text-red-600 dark:text-red-400">
           <p>{error instanceof Error ? error.message : t("loadError")}</p>
         </div>
       ) : tickets.length === 0 ? (
-        <div className="card p-12 text-center text-slate-500 flex flex-col items-center gap-2">
-          <LifeBuoy size={28} className="text-slate-300" />
+        <div className="card p-12 text-center text-slate-500 dark:text-slate-400 flex flex-col items-center gap-2">
+          <LifeBuoy size={28} className="text-slate-300 dark:text-slate-600" />
           {t("noTicketsFound")}
         </div>
       ) : (
@@ -128,21 +128,21 @@ export default function AdminSupportPage() {
             <Link
               key={ticket.id}
               href={`/${locale}/admin/support/${ticket.id}`}
-              className="card block p-4 hover:bg-slate-50"
+              className="card block p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
                       {tCategory(ticket.category)}
                     </span>
                     <SupportTicketStatusBadge status={ticket.status} />
                   </div>
-                  <p className="font-medium text-slate-900 mt-1 truncate">{ticket.subject}</p>
+                  <p className="font-medium text-slate-900 dark:text-slate-100 mt-1 truncate">{ticket.subject}</p>
                   {ticket.lastMessagePreview && (
-                    <p className="text-sm text-slate-600 mt-0.5 truncate">{ticket.lastMessagePreview}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5 truncate">{ticket.lastMessagePreview}</p>
                   )}
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                     {t("filedBy", { name: ticket.userName })} · {formatDate(ticket.createdAt, locale, "dd MMM yyyy HH:mm")}
                   </p>
                 </div>
@@ -155,7 +155,7 @@ export default function AdminSupportPage() {
               <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
                 {tCommon("previous")}
               </Button>
-              <span className="flex items-center px-4 text-sm text-slate-600">
+              <span className="flex items-center px-4 text-sm text-slate-600 dark:text-slate-400">
                 {page + 1} / {totalPages}
               </span>
               <Button variant="outline" size="sm" disabled={page >= totalPages - 1} onClick={() => setPage((p) => p + 1)}>

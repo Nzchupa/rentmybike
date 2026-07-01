@@ -78,7 +78,7 @@ export default function OwnerBookingsPage() {
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="card h-32 animate-pulse bg-slate-100" />
+            <div key={i} className="card h-32 animate-pulse bg-slate-100 dark:bg-slate-700" />
           ))}
         </div>
       ) : isError ? (

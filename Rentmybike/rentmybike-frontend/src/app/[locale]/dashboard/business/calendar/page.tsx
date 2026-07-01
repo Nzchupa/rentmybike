@@ -88,18 +88,18 @@ export default function RentalCalendarPage() {
             type="button"
             onClick={() => setMonthCursor((m) => subMonths(m, 1))}
             aria-label={t("prevMonth")}
-            className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+            className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           >
             <ChevronLeft size={18} />
           </button>
-          <span className="text-sm font-medium text-slate-900 w-32 text-center">
+          <span className="text-sm font-medium text-slate-900 dark:text-slate-100 w-32 text-center">
             {format(monthCursor, "MMMM yyyy", { locale: dfnsLocale })}
           </span>
           <button
             type="button"
             onClick={() => setMonthCursor((m) => addMonths(m, 1))}
             aria-label={t("nextMonth")}
-            className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+            className="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           >
             <ChevronRight size={18} />
           </button>
@@ -109,7 +109,7 @@ export default function RentalCalendarPage() {
       <div className="card p-4">
         <div className="grid grid-cols-7 gap-1 mb-2">
           {days.slice(0, 7).map((d) => (
-            <div key={d.toISOString()} className="text-xs font-medium text-slate-400 text-center py-1">
+            <div key={d.toISOString()} className="text-xs font-medium text-slate-400 dark:text-slate-500 text-center py-1">
               {format(d, "EEE", { locale: dfnsLocale })}
             </div>
           ))}
@@ -127,9 +127,9 @@ export default function RentalCalendarPage() {
                 onClick={() => setSelectedDay(day)}
                 className={cn(
                   "aspect-square rounded-lg p-1.5 flex flex-col items-start justify-between text-left transition-colors",
-                  inMonth ? "bg-white" : "bg-slate-50 text-slate-400",
-                  selected ? "ring-2 ring-brand-500" : "hover:bg-slate-50",
-                  "border border-slate-100"
+                  inMonth ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100" : "bg-slate-50 dark:bg-slate-900/40 text-slate-400 dark:text-slate-600",
+                  selected ? "ring-2 ring-brand-500" : "hover:bg-slate-50 dark:hover:bg-slate-700/50",
+                  "border border-slate-100 dark:border-slate-700"
                 )}
               >
                 <span className="text-xs font-medium">{format(day, "d")}</span>
@@ -149,7 +149,7 @@ export default function RentalCalendarPage() {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 dark:text-slate-400">
         {LEGEND_STATUSES.map((status) => (
           <span key={status} className="flex items-center gap-1.5">
             <span className={cn("w-1.5 h-1.5 rounded-full", statusDotClass[status])} />
@@ -160,25 +160,25 @@ export default function RentalCalendarPage() {
 
       {selectedDay && (
         <div className="card p-5 space-y-3">
-          <h2 className="font-semibold text-slate-900">
+          <h2 className="font-semibold text-slate-900 dark:text-slate-100">
             {t("bookingsOnDay", { date: format(selectedDay, "PPP", { locale: dfnsLocale }) })}
           </h2>
           {selectedBookings.length === 0 ? (
-            <p className="text-sm text-slate-500">{t("noBookings")}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t("noBookings")}</p>
           ) : (
             <div className="space-y-2">
               {selectedBookings.map((b) => (
-                <div key={b.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 p-3">
+                <div key={b.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 dark:border-slate-700 p-3">
                   <div>
                     <div className="flex items-center gap-2 mb-0.5">
-                      <p className="font-medium text-slate-900 text-sm">{b.bikeTitle}</p>
+                      <p className="font-medium text-slate-900 dark:text-slate-100 text-sm">{b.bikeTitle}</p>
                       <BookingStatusBadge status={b.status} />
                     </div>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       {b.renterName} · {format(parseISO(b.startDate), "MMM d")} – {format(parseISO(b.endDate), "MMM d")}
                     </p>
                   </div>
-                  <span className="text-sm font-semibold text-slate-900">{formatPrice(b.totalPrice)}</span>
+                  <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">{formatPrice(b.totalPrice)}</span>
                 </div>
               ))}
             </div>

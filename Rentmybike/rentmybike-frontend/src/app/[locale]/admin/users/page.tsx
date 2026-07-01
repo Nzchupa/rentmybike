@@ -160,7 +160,7 @@ export default function AdminUsersPage() {
           value={search}
           onChange={(e) => handleSearchChange(e.target.value)}
           placeholder={t("searchPlaceholder")}
-          className="w-full h-10 pl-9 pr-3 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+          className="w-full h-10 pl-9 pr-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm outline-none focus:ring-2 focus:ring-brand-500"
         />
       </div>
 
@@ -168,40 +168,40 @@ export default function AdminUsersPage() {
       {isLoading ? (
         <div className="space-y-2">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-14 rounded-xl bg-slate-100 animate-pulse" />
+            <div key={i} className="h-14 rounded-xl bg-slate-100 dark:bg-slate-700 animate-pulse" />
           ))}
         </div>
       ) : isError ? (
-        <div className="card p-10 text-center text-red-600">
+        <div className="card p-10 text-center text-red-600 dark:text-red-400">
           <p>{error instanceof Error ? error.message : t("loadError")}</p>
         </div>
       ) : (
         <div className="card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 border-b border-slate-200">
+              <thead className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">{t("userColumn")}</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">{t("role")}</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">{t("status")}</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">{t("activity")}</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">{t("joined")}</th>
-                  <th className="text-right px-4 py-3 font-medium text-slate-600">{t("actions")}</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600 dark:text-slate-300">{t("userColumn")}</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600 dark:text-slate-300">{t("role")}</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600 dark:text-slate-300">{t("status")}</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600 dark:text-slate-300">{t("activity")}</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600 dark:text-slate-300">{t("joined")}</th>
+                  <th className="text-right px-4 py-3 font-medium text-slate-600 dark:text-slate-300">{t("actions")}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                 {users.map((user) => (
-                  <tr key={user.id} className="hover:bg-slate-50">
+                  <tr key={user.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <Avatar name={`${user.firstName} ${user.lastName}`} avatarUrl={user.avatarUrl} size="sm" />
                         <div>
-                          <p className="font-medium text-slate-900">
+                          <p className="font-medium text-slate-900 dark:text-slate-100">
                             {user.firstName} {user.lastName}
                           </p>
-                          <p className="text-xs text-slate-500">{user.email}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
                           {user.businessName && (
-                            <p className="text-xs text-slate-400">{user.businessName}</p>
+                            <p className="text-xs text-slate-400 dark:text-slate-500">{user.businessName}</p>
                           )}
                         </div>
                       </div>
@@ -232,14 +232,14 @@ export default function AdminUsersPage() {
                         <Badge variant="green">{t("active")}</Badge>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-slate-500 text-xs">
+                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400 text-xs">
                       <p>{t("bikesCount", { count: user.bikeCount })}</p>
                       <p>{t("bookingsCount", { count: user.bookingCount })}</p>
                       {user.lastActivityAt && (
-                        <p className="text-slate-400">{formatDate(user.lastActivityAt)}</p>
+                        <p className="text-slate-400 dark:text-slate-500">{formatDate(user.lastActivityAt)}</p>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-slate-500">
+                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
                       {formatDate(user.createdAt)}
                     </td>
                     <td className="px-4 py-3">
@@ -252,7 +252,7 @@ export default function AdminUsersPage() {
                               title={t("unverifyBusiness")}
                               onClick={() => unverifyBusiness(user.id)}
                             >
-                              <BadgeX size={15} className="text-slate-500" />
+                              <BadgeX size={15} className="text-slate-500 dark:text-slate-400" />
                             </Button>
                           ) : (
                             <Button
@@ -351,13 +351,13 @@ export default function AdminUsersPage() {
             </table>
 
             {users.length === 0 && (
-              <p className="text-center py-10 text-slate-500">{t("noUsersFound")}</p>
+              <p className="text-center py-10 text-slate-500 dark:text-slate-400">{t("noUsersFound")}</p>
             )}
           </div>
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 py-4 border-t border-slate-100">
+            <div className="flex justify-center items-center gap-2 py-4 border-t border-slate-100 dark:border-slate-700">
               <Button
                 variant="outline"
                 size="sm"
@@ -366,7 +366,7 @@ export default function AdminUsersPage() {
               >
                 {t("previous")}
               </Button>
-              <span className="flex items-center px-4 text-sm text-slate-600">
+              <span className="flex items-center px-4 text-sm text-slate-600 dark:text-slate-400">
                 {page + 1} / {totalPages}
               </span>
               <Button

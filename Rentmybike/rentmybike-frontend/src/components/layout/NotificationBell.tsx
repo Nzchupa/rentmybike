@@ -80,7 +80,7 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="relative p-2 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+        className="relative p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
         aria-label={t("bellLabel")}
       >
         <Bell size={20} />
@@ -92,14 +92,14 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-80 max-w-[90vw] bg-white border border-slate-200 rounded-xl shadow-lg z-50 overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
-            <span className="text-sm font-semibold text-slate-900">{t("title")}</span>
+        <div className="absolute right-0 mt-2 w-80 max-w-[90vw] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg z-50 overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700">
+            <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">{t("title")}</span>
             {count > 0 && (
               <button
                 type="button"
                 onClick={() => markAllAsRead()}
-                className="text-xs font-medium text-brand-600 hover:text-brand-700"
+                className="text-xs font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300"
               >
                 {t("markAllRead")}
               </button>
@@ -108,7 +108,7 @@ export function NotificationBell() {
 
           <div className="max-h-96 overflow-y-auto">
             {list.length === 0 ? (
-              <p className="text-center py-8 text-sm text-slate-500">{t("empty")}</p>
+              <p className="text-center py-8 text-sm text-slate-500 dark:text-slate-400">{t("empty")}</p>
             ) : (
               list.map((n) => (
                 <Link
@@ -122,16 +122,16 @@ export function NotificationBell() {
                     setOpen(false);
                   }}
                   className={cn(
-                    "block px-4 py-3 border-b border-slate-50 last:border-0 hover:bg-slate-50",
-                    !n.read && "bg-brand-50/50"
+                    "block px-4 py-3 border-b border-slate-50 dark:border-slate-700/60 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/50",
+                    !n.read && "bg-brand-50/50 dark:bg-brand-900/20"
                   )}
                 >
                   <div className="flex items-start gap-3">
                     <NotificationIcon type={n.type} className="w-7 h-7" />
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-slate-900">{n.title}</p>
-                      <p className="text-xs text-slate-600 mt-0.5 line-clamp-2">{n.message}</p>
-                      <p className="text-[11px] text-slate-400 mt-1">{formatDate(n.createdAt, locale)}</p>
+                      <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{n.title}</p>
+                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 line-clamp-2">{n.message}</p>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">{formatDate(n.createdAt, locale)}</p>
                     </div>
                   </div>
                 </Link>
@@ -142,7 +142,7 @@ export function NotificationBell() {
           <Link
             href={`/${locale}/dashboard/notifications`}
             onClick={() => setOpen(false)}
-            className="block text-center py-2.5 text-xs font-medium text-brand-600 hover:bg-slate-50 border-t border-slate-100"
+            className="block text-center py-2.5 text-xs font-medium text-brand-600 dark:text-brand-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 border-t border-slate-100 dark:border-slate-700"
           >
             {t("viewAll")}
           </Link>

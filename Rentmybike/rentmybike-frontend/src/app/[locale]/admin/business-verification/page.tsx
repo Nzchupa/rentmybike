@@ -98,26 +98,26 @@ export default function BusinessVerificationCenterPage() {
   return (
     <div className="space-y-6">
       <h1 className="section-title">{t("title")}</h1>
-      <p className="text-sm text-slate-500 max-w-2xl">{t("subtitle")}</p>
+      <p className="text-sm text-slate-500 dark:text-slate-400 max-w-2xl">{t("subtitle")}</p>
 
       {/* Summary stats */}
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="card p-5 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
-            <ShieldQuestion size={18} className="text-amber-600" />
+          <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
+            <ShieldQuestion size={18} className="text-amber-600 dark:text-amber-400" />
           </div>
           <div>
-            <p className="text-sm font-medium text-slate-500">{t("statPending")}</p>
-            <p className="text-2xl font-bold text-slate-900">{isLoading ? "—" : pendingCount}</p>
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t("statPending")}</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{isLoading ? "—" : pendingCount}</p>
           </div>
         </div>
         <div className="card p-5 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
-            <ShieldCheck size={18} className="text-emerald-600" />
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center">
+            <ShieldCheck size={18} className="text-emerald-600 dark:text-emerald-400" />
           </div>
           <div>
-            <p className="text-sm font-medium text-slate-500">{t("statVerified")}</p>
-            <p className="text-2xl font-bold text-slate-900">{isLoading ? "—" : verifiedCount}</p>
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t("statVerified")}</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{isLoading ? "—" : verifiedCount}</p>
           </div>
         </div>
       </div>
@@ -142,7 +142,7 @@ export default function BusinessVerificationCenterPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t("searchPlaceholder")}
-            className="w-full h-10 pl-9 pr-3 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full h-10 pl-9 pr-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
       </div>
@@ -151,7 +151,7 @@ export default function BusinessVerificationCenterPage() {
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="card h-24 animate-pulse bg-slate-100" />
+            <div key={i} className="card h-24 animate-pulse bg-slate-100 dark:bg-slate-700" />
           ))}
         </div>
       ) : isError ? (
@@ -170,15 +170,15 @@ export default function BusinessVerificationCenterPage() {
                 <Avatar avatarUrl={u.avatarUrl} name={`${u.firstName} ${u.lastName}`} size="md" />
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-medium text-slate-900 truncate">
+                    <p className="font-medium text-slate-900 dark:text-slate-100 truncate">
                       {u.businessName || `${u.firstName} ${u.lastName}`}
                     </p>
                     <Badge variant={u.businessVerified ? "green" : "yellow"}>
                       {u.businessVerified ? tUsers("businessVerifiedBadge") : tUsers("businessPendingBadge")}
                     </Badge>
                   </div>
-                  <p className="text-sm text-slate-500 truncate">{u.email}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 truncate">{u.email}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                     {t("joinedLabel", { date: formatDate(u.createdAt, locale, "dd MMM yyyy") })}
                     {" · "}
                     {tUsers("bikesCount", { count: u.bikeCount })}

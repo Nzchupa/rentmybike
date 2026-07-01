@@ -68,9 +68,9 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-10">
         <div className="animate-pulse space-y-4">
-          <div className="h-72 bg-slate-100 rounded-2xl" />
-          <div className="h-8 bg-slate-100 rounded w-1/2" />
-          <div className="h-4 bg-slate-100 rounded w-1/4" />
+          <div className="h-72 bg-slate-100 dark:bg-slate-700 rounded-2xl" />
+          <div className="h-8 bg-slate-100 dark:bg-slate-700 rounded w-1/2" />
+          <div className="h-4 bg-slate-100 dark:bg-slate-700 rounded w-1/4" />
         </div>
       </div>
     );
@@ -88,7 +88,7 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
       {/* Back */}
       <Link
         href={`/${locale}/bikes`}
-        className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 mb-6"
+        className="inline-flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 mb-6"
       >
         <ChevronLeft size={16} />
         {t("backToSearch")}
@@ -98,7 +98,7 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
         {/* Left: photos + info */}
         <div className="lg:col-span-2 space-y-6">
           {/* Main photo */}
-          <div className="relative h-72 md:h-96 rounded-2xl overflow-hidden bg-slate-100">
+          <div className="relative h-72 md:h-96 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-700">
             {displayPhoto ? (
               <Image
                 src={optimizedImageUrl(displayPhoto, 1200)}
@@ -137,19 +137,19 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
           <div>
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-slate-900">{bike.title}</h1>
-                {bike.model && <p className="text-sm text-slate-500 mt-0.5">{bike.model}</p>}
+                <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">{bike.title}</h1>
+                {bike.model && <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{bike.model}</p>}
               </div>
               <div className="text-right shrink-0">
-                <span className="text-2xl font-bold text-brand-600">
+                <span className="text-2xl font-bold text-brand-600 dark:text-brand-400">
                   {formatPrice(bike.pricePerDay, locale)}
                 </span>
-                <div className="text-sm text-slate-500">{t("pricePerDay")}</div>
+                <div className="text-sm text-slate-500 dark:text-slate-400">{t("pricePerDay")}</div>
               </div>
             </div>
 
             <div className="flex items-center justify-between mt-2">
-              <div className="flex items-center gap-2 text-slate-500">
+              <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
                 <MapPin size={16} />
                 <span>{bike.city}{bike.address ? `, ${bike.address}` : ""}</span>
               </div>
@@ -159,7 +159,7 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
             {ratingData && ratingData.reviewCount > 0 && (
               <div className="flex items-center gap-2 mt-2">
                 <StarRating rating={ratingData.averageRating} size="sm" />
-                <span className="text-sm text-slate-500">
+                <span className="text-sm text-slate-500 dark:text-slate-400">
                   {ratingData.averageRating.toFixed(1)} ({t("reviewsCount", { count: ratingData.reviewCount })})
                 </span>
               </div>
@@ -168,28 +168,28 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
 
           {/* Description */}
           <div>
-            <h2 className="text-lg font-semibold text-slate-900 mb-2">{t("description")}</h2>
-            <p className="text-slate-600 whitespace-pre-line">{bike.description}</p>
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">{t("description")}</h2>
+            <p className="text-slate-600 dark:text-slate-400 whitespace-pre-line">{bike.description}</p>
           </div>
 
           {/* Owner */}
           <div className="card p-4">
-            <p className="text-sm font-medium text-slate-500 mb-3">{t("owner")}</p>
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">{t("owner")}</p>
             <Link
               href={`/${locale}/users/${bike.ownerId}`}
               className="flex items-center gap-3 hover:opacity-80"
             >
               <Avatar name={bike.ownerName} avatarUrl={bike.ownerAvatarUrl} size="md" />
               <div>
-                <span className="font-medium text-slate-900">
+                <span className="font-medium text-slate-900 dark:text-slate-100">
                   {bike.ownerBusinessVerified && bike.ownerBusinessName
                     ? bike.ownerBusinessName
                     : bike.ownerName}
                 </span>
                 {bike.ownerBusinessVerified && (
                   <div className="flex items-center gap-1 mt-0.5">
-                    <ShieldCheck size={13} className="text-emerald-600" />
-                    <span className="text-xs font-medium text-emerald-700">
+                    <ShieldCheck size={13} className="text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
                       {t("verifiedShop")}
                     </span>
                   </div>
@@ -201,7 +201,7 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
           {/* Reviews */}
           {reviewsData && reviewsData.totalElements > 0 && (
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">{t("reviews")}</h2>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">{t("reviews")}</h2>
               <div className="space-y-4">
                 {reviewsData.content.map((review) => (
                   <div key={review.id} className="card p-4">
@@ -213,15 +213,15 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
                       />
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
-                          <span className="font-medium text-slate-900 text-sm">
+                          <span className="font-medium text-slate-900 dark:text-slate-100 text-sm">
                             {review.reviewerName}
                           </span>
                           <StarRating rating={review.rating} size="sm" />
                         </div>
                         {review.comment && (
-                          <p className="text-sm text-slate-600 mt-1">{review.comment}</p>
+                          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{review.comment}</p>
                         )}
-                        <p className="text-xs text-slate-400 mt-1">
+                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                           {formatDate(review.createdAt, locale)}
                         </p>
                       </div>
@@ -239,7 +239,7 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
             {bike.approvalStatus === "APPROVED" && bike.available && !isOwner ? (
               <BookingForm bike={bike} />
             ) : isOwner ? (
-              <div className="card p-6 text-center text-slate-500">
+              <div className="card p-6 text-center text-slate-500 dark:text-slate-400">
                 <p className="mb-4">{t("ownerNotice")}</p>
                 <Button variant="outline" asChild>
                   <Link href={`/${locale}/dashboard/bikes`}>
@@ -248,15 +248,15 @@ export default function BikeDetailPage({ params }: BikeDetailPageProps) {
                 </Button>
               </div>
             ) : (
-              <div className="card p-6 text-center text-slate-500">
+              <div className="card p-6 text-center text-slate-500 dark:text-slate-400">
                 <p>
                   {!bike.available ? t("unavailable") : t("pendingApproval")}
                 </p>
               </div>
             )}
             {/* Moderation trust notice */}
-            <p className="flex items-start gap-1.5 text-xs text-slate-400 px-1">
-              <ShieldCheck size={13} className="mt-0.5 shrink-0 text-slate-400" />
+            <p className="flex items-start gap-1.5 text-xs text-slate-400 dark:text-slate-500 px-1">
+              <ShieldCheck size={13} className="mt-0.5 shrink-0 text-slate-400 dark:text-slate-500" />
               {t("moderationNotice")}
             </p>
           </div>

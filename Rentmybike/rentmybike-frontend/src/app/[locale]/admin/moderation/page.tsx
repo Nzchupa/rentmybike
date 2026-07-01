@@ -125,26 +125,26 @@ export default function ModerationCenterPage() {
       {/* Summary cards — pending bike approvals links out to the existing
           dedicated page rather than duplicating its approve/reject UI here. */}
       <div className="grid sm:grid-cols-2 gap-4">
-        <Link href="/admin/bikes" className="card p-5 flex items-center justify-between hover:border-brand-300 transition-colors">
+        <Link href="/admin/bikes" className="card p-5 flex items-center justify-between hover:border-brand-300 dark:hover:border-brand-700 transition-colors">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
-              <Bike size={18} className="text-amber-600" />
+            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
+              <Bike size={18} className="text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-500">{t("pendingBikeApprovals")}</p>
-              <p className="text-2xl font-bold text-slate-900">{stats?.pendingBikes ?? "—"}</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t("pendingBikeApprovals")}</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{stats?.pendingBikes ?? "—"}</p>
             </div>
           </div>
-          <Eye size={16} className="text-slate-400" />
+          <Eye size={16} className="text-slate-400 dark:text-slate-500" />
         </Link>
 
         <div className="card p-5 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
-            <Flag size={18} className="text-red-600" />
+          <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/40 flex items-center justify-center">
+            <Flag size={18} className="text-red-600 dark:text-red-400" />
           </div>
           <div>
-            <p className="text-sm font-medium text-slate-500">{t("openReports")}</p>
-            <p className="text-2xl font-bold text-slate-900">
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t("openReports")}</p>
+            <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
               {data ? data.totalElements : "—"}
             </p>
           </div>
@@ -169,12 +169,12 @@ export default function ModerationCenterPage() {
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="card h-24 animate-pulse bg-slate-100" />
+            <div key={i} className="card h-24 animate-pulse bg-slate-100 dark:bg-slate-700" />
           ))}
         </div>
       ) : reports.length === 0 ? (
-        <div className="card p-12 text-center text-slate-500 flex flex-col items-center gap-2">
-          <CheckCircle size={28} className="text-green-300" />
+        <div className="card p-12 text-center text-slate-500 dark:text-slate-400 flex flex-col items-center gap-2">
+          <CheckCircle size={28} className="text-green-300 dark:text-green-700" />
           {t("noOpenReports")}
         </div>
       ) : (
@@ -184,19 +184,19 @@ export default function ModerationCenterPage() {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
                       {report.targetType}
                     </span>
                     <ReportStatusBadge status={report.status} />
                   </div>
-                  <p className="font-medium text-slate-900 mt-1 truncate">
+                  <p className="font-medium text-slate-900 dark:text-slate-100 mt-1 truncate">
                     {report.targetLabel ?? t("unknownTarget")}
                   </p>
-                  <p className="text-sm text-slate-600 mt-0.5">
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">
                     {tReason(report.reason)}
-                    {report.details && <span className="text-slate-400"> — {report.details}</span>}
+                    {report.details && <span className="text-slate-400 dark:text-slate-500"> — {report.details}</span>}
                   </p>
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                     {t("reportedBy", { name: report.reporterName })} · {formatDate(report.createdAt, locale, "dd MMM yyyy HH:mm")}
                   </p>
                 </div>
@@ -263,7 +263,7 @@ export default function ModerationCenterPage() {
                     value={actionNote}
                     onChange={(e) => setActionNote(e.target.value)}
                     placeholder={t("resolutionNotePlaceholder")}
-                    className="flex-1 h-9 px-3 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+                    className="flex-1 h-9 px-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm outline-none focus:ring-2 focus:ring-brand-500"
                   />
                   <Button
                     size="sm"
@@ -297,7 +297,7 @@ export default function ModerationCenterPage() {
               >
                 {tCommon("previous")}
               </Button>
-              <span className="flex items-center px-4 text-sm text-slate-600">
+              <span className="flex items-center px-4 text-sm text-slate-600 dark:text-slate-400">
                 {page + 1} / {totalPages}
               </span>
               <Button

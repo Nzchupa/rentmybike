@@ -63,8 +63,8 @@ export default function LoginPage() {
             <VelohoodLogo size={32} />
             Velohood
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">{t("title")}</h1>
-          <p className="text-slate-500 text-sm mt-1">{t("subtitle")}</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t("title")}</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{t("subtitle")}</p>
         </div>
 
         <div className="card p-8">
@@ -91,11 +91,11 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-500">
+          <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
             {t("noAccount")}{" "}
             <Link
               href={`/${locale}/auth/register`}
-              className="font-medium text-brand-600 hover:underline"
+              className="font-medium text-brand-600 dark:text-brand-400 hover:underline"
             >
               {t("signUp")}
             </Link>

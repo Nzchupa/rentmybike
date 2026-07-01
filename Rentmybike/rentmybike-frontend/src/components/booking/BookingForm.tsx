@@ -107,7 +107,7 @@ export function BookingForm({ bike }: BookingFormProps) {
   if (!user) {
     return (
       <div className="card p-6 text-center space-y-4">
-        <p className="text-slate-600">{t("loginRequired")}</p>
+        <p className="text-slate-600 dark:text-slate-400">{t("loginRequired")}</p>
         <Button asChild className="w-full">
           <Link href={`/${locale}/auth/login`}>{tNav("login")}</Link>
         </Button>
@@ -181,12 +181,12 @@ export function BookingForm({ bike }: BookingFormProps) {
 
   return (
     <div className="card p-6 space-y-4">
-      <h2 className="text-lg font-semibold text-slate-900">{t("title")}</h2>
+      <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{t("title")}</h2>
 
       {/* Price */}
-      <div className="text-3xl font-bold text-brand-600">
+      <div className="text-3xl font-bold text-brand-600 dark:text-brand-400">
         {formatPrice(bike.pricePerDay, locale)}
-        <span className="text-base font-normal text-slate-500"> {t("pricePerDay")}</span>
+        <span className="text-base font-normal text-slate-500 dark:text-slate-400"> {t("pricePerDay")}</span>
       </div>
 
       {/* Security deposit notice — shown upfront so a renter isn't surprised
@@ -196,7 +196,7 @@ export function BookingForm({ bike }: BookingFormProps) {
           erst nach der Buchungsentscheidung davon überrascht wird. Die
           genauen Rückgabebedingungen stehen im generierten Mietvertrag (§4). */}
       {bike.depositAmount != null && (
-        <p className="text-sm text-slate-600 bg-slate-50 rounded-lg px-3 py-2">
+        <p className="text-sm text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-700/50 rounded-lg px-3 py-2">
           {t("depositNotice", { amount: formatPrice(bike.depositAmount, locale) })}
         </p>
       )}
@@ -206,18 +206,18 @@ export function BookingForm({ bike }: BookingFormProps) {
         <button
           type="button"
           onClick={() => setShowCalendar(!showCalendar)}
-          className="w-full flex items-center justify-between rounded-xl border border-slate-300 px-4 py-3 text-sm text-left hover:border-brand-500 transition"
+          className="w-full flex items-center justify-between rounded-xl border border-slate-300 dark:border-slate-600 px-4 py-3 text-sm text-left hover:border-brand-500 transition"
         >
           <div>
-            <div className="text-xs text-slate-500 mb-0.5">{t("startDate")}</div>
-            <div className={startDate ? "text-slate-900 font-medium" : "text-slate-400"}>
+            <div className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">{t("startDate")}</div>
+            <div className={startDate ? "text-slate-900 dark:text-slate-100 font-medium" : "text-slate-400 dark:text-slate-500"}>
               {startDate ? format(startDate, "dd MMM yyyy") : t("selectDate")}
             </div>
           </div>
-          <div className="w-px h-8 bg-slate-200 mx-3" />
+          <div className="w-px h-8 bg-slate-200 dark:bg-slate-600 mx-3" />
           <div>
-            <div className="text-xs text-slate-500 mb-0.5">{t("endDate")}</div>
-            <div className={endDate ? "text-slate-900 font-medium" : "text-slate-400"}>
+            <div className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">{t("endDate")}</div>
+            <div className={endDate ? "text-slate-900 dark:text-slate-100 font-medium" : "text-slate-400 dark:text-slate-500"}>
               {endDate ? format(endDate, "dd MMM yyyy") : t("selectDate")}
             </div>
           </div>
@@ -225,7 +225,7 @@ export function BookingForm({ bike }: BookingFormProps) {
 
         {/* Calendar */}
         {showCalendar && (
-          <div className="mt-2 rounded-2xl border border-slate-200 p-3 bg-white shadow-lg">
+          <div className="mt-2 rounded-2xl border border-slate-200 dark:border-slate-700 p-3 bg-white dark:bg-slate-800 shadow-lg">
             <DayPicker
               mode="range"
               selected={{ from: range.from, to: range.to }}
@@ -260,11 +260,11 @@ export function BookingForm({ bike }: BookingFormProps) {
               return (
                 <div
                   key={accessory.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 px-3 py-2.5"
+                  className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 dark:border-slate-700 px-3 py-2.5"
                 >
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-slate-900 truncate">{accessory.name}</p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">{accessory.name}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       {formatPrice(accessory.pricePerDay, locale)}{tAcc("perDay")}
                     </p>
                   </div>
@@ -273,16 +273,16 @@ export function BookingForm({ bike }: BookingFormProps) {
                       type="button"
                       onClick={() => setQty(accessory.id, qty - 1, accessory.quantityTotal)}
                       disabled={qty <= 0}
-                      className="w-7 h-7 rounded-full border border-slate-300 flex items-center justify-center text-slate-600 disabled:opacity-40 hover:border-brand-500"
+                      className="w-7 h-7 rounded-full border border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:border-brand-500"
                     >
                       <Minus size={14} />
                     </button>
-                    <span className="w-5 text-center text-sm font-medium">{qty}</span>
+                    <span className="w-5 text-center text-sm font-medium text-slate-900 dark:text-slate-100">{qty}</span>
                     <button
                       type="button"
                       onClick={() => setQty(accessory.id, qty + 1, accessory.quantityTotal)}
                       disabled={qty >= accessory.quantityTotal}
-                      className="w-7 h-7 rounded-full border border-slate-300 flex items-center justify-center text-slate-600 disabled:opacity-40 hover:border-brand-500"
+                      className="w-7 h-7 rounded-full border border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-600 dark:text-slate-300 disabled:opacity-40 hover:border-brand-500"
                     >
                       <PlusIcon size={14} />
                     </button>
@@ -303,30 +303,30 @@ export function BookingForm({ bike }: BookingFormProps) {
           rows={3}
           maxLength={500}
           placeholder={t("messagePlaceholder")}
-          className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm resize-none outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+          className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 px-3 py-2 text-sm resize-none outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
         />
       </div>
 
       {/* Price summary */}
       {canSubmit && (
-        <div className="rounded-xl bg-slate-50 p-4 space-y-2 text-sm">
+        <div className="rounded-xl bg-slate-50 dark:bg-slate-700/50 p-4 space-y-2 text-sm text-slate-900 dark:text-slate-100">
           <div className="flex justify-between">
-            <span className="text-slate-600">{t("pricePerDay")}</span>
+            <span className="text-slate-600 dark:text-slate-400">{t("pricePerDay")}</span>
             <span>{formatPrice(bike.pricePerDay, locale)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-600">× {t("days", { count: rentalDays })}</span>
+            <span className="text-slate-600 dark:text-slate-400">× {t("days", { count: rentalDays })}</span>
             <span />
           </div>
           {selectedAccessories.length > 0 && (
             <div className="flex justify-between">
-              <span className="text-slate-600">{t("accessoriesSubtotal")}</span>
+              <span className="text-slate-600 dark:text-slate-400">{t("accessoriesSubtotal")}</span>
               <span>{formatPrice(accessoriesTotal, locale)}</span>
             </div>
           )}
-          <div className="border-t border-slate-200 pt-2 flex justify-between font-semibold">
+          <div className="border-t border-slate-200 dark:border-slate-600 pt-2 flex justify-between font-semibold">
             <span>{t("totalPrice")}</span>
-            <span className="text-brand-600">{formatPrice(totalPrice, locale)}</span>
+            <span className="text-brand-600 dark:text-brand-400">{formatPrice(totalPrice, locale)}</span>
           </div>
         </div>
       )}

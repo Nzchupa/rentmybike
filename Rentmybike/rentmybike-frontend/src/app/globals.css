@@ -53,3 +53,30 @@
     @apply text-xs text-red-600 mt-1 dark:text-red-400;
   }
 }
+
+/* react-day-picker (used by BookingForm's date-range calendar) ships its
+   own light-only default stylesheet (imported directly in BookingForm.tsx)
+   — day numbers, the month caption, and the weekday header have no
+   explicit color of their own in that stylesheet, so once the calendar's
+   wrapper div is switched to a dark background they were left relying on
+   the library's light-theme CSS variables, producing barely-visible dark
+   text on a dark background. These overrides only apply under `.dark`.
+   react-day-picker (von BookingForms Datumsbereich-Kalender verwendet)
+   bringt ein eigenes, nur für helles Design gedachtes Stylesheet mit —
+   ohne diese Overrides wäre der Text auf dunklem Grund kaum sichtbar. */
+.dark .rdp {
+  --rdp-background-color: #334155; /* slate-700 — selected-range background */
+}
+.dark .rdp-day,
+.dark .rdp-caption_label,
+.dark .rdp-head_cell,
+.dark .rdp-nav_button {
+  color: #f1f5f9; /* slate-100 */
+}
+.dark .rdp-day_disabled {
+  color: #64748b; /* slate-500 */
+}
+.dark .rdp-day_selected,
+.dark .rdp-day_selected:hover {
+  color: #ffffff;
+}

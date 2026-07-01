@@ -31,7 +31,7 @@ export default function MyFavoritesPage() {
       {isLoading ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="card h-72 animate-pulse bg-slate-100" />
+            <div key={i} className="card h-72 animate-pulse bg-slate-100 dark:bg-slate-700" />
           ))}
         </div>
       ) : bikes.length === 0 ? (

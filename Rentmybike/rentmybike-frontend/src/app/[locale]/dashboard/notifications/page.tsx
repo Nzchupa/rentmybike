@@ -61,7 +61,7 @@ export default function NotificationsPage() {
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="card h-20 animate-pulse bg-slate-100" />
+            <div key={i} className="card h-20 animate-pulse bg-slate-100 dark:bg-slate-700" />
           ))}
         </div>
       ) : isError ? (
@@ -73,7 +73,7 @@ export default function NotificationsPage() {
       ) : notifications.length === 0 ? (
         <EmptyState icon={Bell} message={t("empty")} />
       ) : (
-        <div className="card divide-y divide-slate-100 overflow-hidden">
+        <div className="card divide-y divide-slate-100 dark:divide-slate-700 overflow-hidden">
           {notifications.map((n) => (
             <Link
               key={n.id}
@@ -84,23 +84,23 @@ export default function NotificationsPage() {
                 if (!n.read) markOneAsRead(n.id);
               }}
               className={cn(
-                "block px-5 py-4 hover:bg-slate-50",
-                !n.read && "bg-brand-50/40"
+                "block px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-700/50",
+                !n.read && "bg-brand-50/40 dark:bg-brand-900/20"
               )}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 min-w-0">
                   <NotificationIcon type={n.type} />
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-slate-900">{n.title}</p>
-                    <p className="text-sm text-slate-600 mt-1">{n.message}</p>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{n.title}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{n.message}</p>
                   </div>
                 </div>
                 {!n.read && (
                   <span className="shrink-0 mt-1 w-2 h-2 rounded-full bg-brand-500" />
                 )}
               </div>
-              <p className="text-xs text-slate-400 mt-2 ml-12">{formatDate(n.createdAt, locale)}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-2 ml-12">{formatDate(n.createdAt, locale)}</p>
             </Link>
           ))}
         </div>

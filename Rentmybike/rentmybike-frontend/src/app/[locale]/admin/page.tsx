@@ -20,17 +20,17 @@ interface StatCardProps {
 
 function StatCard({ label, value, icon, sub, highlight }: StatCardProps) {
   return (
-    <div className={`card p-5 ${highlight ? "border-brand-200 bg-brand-50" : ""}`}>
+    <div className={`card p-5 ${highlight ? "border-brand-200 dark:border-brand-800 bg-brand-50 dark:bg-brand-900/20" : ""}`}>
       <div className="flex items-center justify-between mb-3">
-        <p className="text-sm font-medium text-slate-500">{label}</p>
-        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${highlight ? "bg-brand-100" : "bg-slate-100"}`}>
+        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{label}</p>
+        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${highlight ? "bg-brand-100 dark:bg-brand-900/40" : "bg-slate-100 dark:bg-slate-700"}`}>
           {icon}
         </div>
       </div>
-      <p className={`text-3xl font-bold ${highlight ? "text-brand-700" : "text-slate-900"}`}>
+      <p className={`text-3xl font-bold ${highlight ? "text-brand-700 dark:text-brand-400" : "text-slate-900 dark:text-slate-100"}`}>
         {value}
       </p>
-      {sub && <p className="text-xs text-slate-500 mt-1">{sub}</p>}
+      {sub && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{sub}</p>}
     </div>
   );
 }
@@ -68,7 +68,7 @@ export default function AdminStatsPage() {
     return (
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {Array.from({ length: 9 }).map((_, i) => (
-          <div key={i} className="card h-28 animate-pulse bg-slate-100" />
+          <div key={i} className="card h-28 animate-pulse bg-slate-100 dark:bg-slate-700" />
         ))}
       </div>
     );
@@ -85,8 +85,8 @@ export default function AdminStatsPage() {
               onClick={() => setRangeDays(d)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 rangeDays === d
-                  ? "bg-slate-900 text-white"
-                  : "text-slate-600 hover:bg-slate-100"
+                  ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
+                  : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
               }`}
             >
               {t("rangeDays", { count: d })}
@@ -103,31 +103,31 @@ export default function AdminStatsPage() {
           früheren Backend-Sitzung erstellt, aber bisher nie im Frontend
           angezeigt). */}
       <section>
-        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">
+        <h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
           {t("sectionActivity")}
         </h2>
         {analyticsLoading ? (
           <div className="grid sm:grid-cols-2 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="card h-48 animate-pulse bg-slate-100" />
+              <div key={i} className="card h-48 animate-pulse bg-slate-100 dark:bg-slate-700" />
             ))}
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="card p-5">
-              <p className="text-sm font-medium text-slate-500 mb-2">{t("chartNewUsers")}</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">{t("chartNewUsers")}</p>
               <TimeSeriesChart data={usersData} color="#0ea5e9" />
             </div>
             <div className="card p-5">
-              <p className="text-sm font-medium text-slate-500 mb-2">{t("chartNewBikes")}</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">{t("chartNewBikes")}</p>
               <TimeSeriesChart data={bikesData} color="#8b5cf6" />
             </div>
             <div className="card p-5">
-              <p className="text-sm font-medium text-slate-500 mb-2">{t("chartNewBookings")}</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">{t("chartNewBookings")}</p>
               <TimeSeriesChart data={bookingsData} color="#f59e0b" />
             </div>
             <div className="card p-5">
-              <p className="text-sm font-medium text-slate-500 mb-2">{t("chartRevenue")}</p>
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">{t("chartRevenue")}</p>
               <TimeSeriesChart
                 data={revenueData}
                 color="#10b981"
@@ -149,14 +149,14 @@ export default function AdminStatsPage() {
 
       {/* User stats */}
       <section>
-        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">
+        <h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
           {t("sectionUsers")}
         </h2>
         <div className="grid sm:grid-cols-3 gap-4">
           <StatCard
             label={t("totalUsers")}
             value={stats.totalUsers}
-            icon={<Users size={18} className="text-slate-600" />}
+            icon={<Users size={18} className="text-slate-600 dark:text-slate-300" />}
           />
           <StatCard
             label={t("bannedUsers")}
@@ -174,14 +174,14 @@ export default function AdminStatsPage() {
 
       {/* Bike stats */}
       <section>
-        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">
+        <h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
           {t("sectionBikes")}
         </h2>
         <div className="grid sm:grid-cols-3 gap-4">
           <StatCard
             label={t("totalBikes")}
             value={stats.totalBikes}
-            icon={<Bike size={18} className="text-slate-600" />}
+            icon={<Bike size={18} className="text-slate-600 dark:text-slate-300" />}
           />
           <StatCard
             label={t("pendingBikes")}
@@ -200,14 +200,14 @@ export default function AdminStatsPage() {
 
       {/* Booking stats */}
       <section>
-        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">
+        <h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
           {t("sectionBookings")}
         </h2>
         <div className="grid sm:grid-cols-3 gap-4">
           <StatCard
             label={t("totalBookings")}
             value={stats.totalBookings}
-            icon={<Calendar size={18} className="text-slate-600" />}
+            icon={<Calendar size={18} className="text-slate-600 dark:text-slate-300" />}
           />
           <StatCard
             label={t("pendingBookings")}

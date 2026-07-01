@@ -188,15 +188,15 @@ export default function ProfilePage() {
           />
         </div>
         <div>
-          <p className="font-semibold text-slate-900">{user.fullName}</p>
-          <p className="text-sm text-slate-500">{user.email}</p>
+          <p className="font-semibold text-slate-900 dark:text-slate-100">{user.fullName}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{user.email}</p>
           <div className="flex flex-wrap items-center gap-2 mt-2">
             <VerificationBadge
               verified={user.emailVerified}
               verifiedLabel={t("emailVerifiedBadge")}
               unverifiedLabel={t("emailUnverifiedBadge")}
             />
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-400 dark:text-slate-500">
               {t("memberSince", { date: formatDate(user.createdAt, locale) })}
             </span>
           </div>
@@ -205,7 +205,7 @@ export default function ProfilePage() {
 
       {/* Profile form */}
       <div className="card p-6 space-y-5">
-        <h2 className="font-semibold text-slate-900">{t("fullName")}</h2>
+        <h2 className="font-semibold text-slate-900 dark:text-slate-100">{t("fullName")}</h2>
         <form
           onSubmit={handleProfile(async (data) => {
             await updateProfile({
@@ -243,7 +243,7 @@ export default function ProfilePage() {
 
       {/* Password form */}
       <div className="card p-6 space-y-5">
-        <h2 className="font-semibold text-slate-900">{t("changePassword")}</h2>
+        <h2 className="font-semibold text-slate-900 dark:text-slate-100">{t("changePassword")}</h2>
         <form
           onSubmit={handlePwd(async (data) => {
             await changePassword(data as ChangePasswordRequest);
@@ -277,7 +277,7 @@ export default function ProfilePage() {
 
       {/* Business account */}
       <div className="card p-6 space-y-5">
-        <h2 className="font-semibold text-slate-900">{t("business.title")}</h2>
+        <h2 className="font-semibold text-slate-900 dark:text-slate-100">{t("business.title")}</h2>
 
         {user.role === "BUSINESS" ? (
           <BusinessVerificationCard
@@ -290,7 +290,7 @@ export default function ProfilePage() {
           />
         ) : (
           <div className="space-y-4">
-            <p className="text-sm text-slate-500">{t("business.pitch")}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t("business.pitch")}</p>
             <form
               onSubmit={handleBiz(async (data) => {
                 await upgradeToBusiness(data as UpgradeToBusinessRequest);

@@ -129,14 +129,14 @@ export default function AdminAuditLogPage() {
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
             placeholder={t("searchPlaceholder")}
-            className="w-full h-10 pl-9 pr-3 rounded-xl border border-slate-300 text-sm outline-none focus:ring-2 focus:ring-brand-500"
+            className="w-full h-10 pl-9 pr-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
 
         <select
           value={action}
           onChange={(e) => setAction(e.target.value as AuditAction | "")}
-          className="h-10 px-3 rounded-xl border border-slate-300 bg-white text-sm outline-none focus:ring-2 focus:ring-brand-500"
+          className="h-10 px-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm outline-none focus:ring-2 focus:ring-brand-500"
         >
           <option value="">{t("allActions")}</option>
           {ACTIONS.map((a) => (
@@ -147,7 +147,7 @@ export default function AdminAuditLogPage() {
         <select
           value={targetType}
           onChange={(e) => setTargetType(e.target.value)}
-          className="h-10 px-3 rounded-xl border border-slate-300 bg-white text-sm outline-none focus:ring-2 focus:ring-brand-500"
+          className="h-10 px-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 text-sm outline-none focus:ring-2 focus:ring-brand-500"
         >
           <option value="">{t("allTargets")}</option>
           {TARGET_TYPES.map((tt) => (
@@ -160,50 +160,50 @@ export default function AdminAuditLogPage() {
       {isLoading ? (
         <div className="space-y-2">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-12 rounded-xl bg-slate-100 animate-pulse" />
+            <div key={i} className="h-12 rounded-xl bg-slate-100 dark:bg-slate-700 animate-pulse" />
           ))}
         </div>
       ) : isError ? (
-        <div className="card p-10 text-center text-red-600">
+        <div className="card p-10 text-center text-red-600 dark:text-red-400">
           <p>{error instanceof Error ? error.message : t("loadError")}</p>
         </div>
       ) : entries.length === 0 ? (
-        <div className="card p-12 text-center text-slate-500 flex flex-col items-center gap-2">
-          <ScrollText size={28} className="text-slate-300" />
+        <div className="card p-12 text-center text-slate-500 dark:text-slate-400 flex flex-col items-center gap-2">
+          <ScrollText size={28} className="text-slate-300 dark:text-slate-600" />
           {t("noEntriesFound")}
         </div>
       ) : (
         <div className="card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 border-b border-slate-200">
+              <thead className="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">{t("time")}</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">{t("actor")}</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">{t("action")}</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">{t("target")}</th>
-                  <th className="text-left px-4 py-3 font-medium text-slate-600">{t("details")}</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600 dark:text-slate-300">{t("time")}</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600 dark:text-slate-300">{t("actor")}</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600 dark:text-slate-300">{t("action")}</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600 dark:text-slate-300">{t("target")}</th>
+                  <th className="text-left px-4 py-3 font-medium text-slate-600 dark:text-slate-300">{t("details")}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                 {entries.map((entry) => (
-                  <tr key={entry.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-3 text-slate-500 whitespace-nowrap">
+                  <tr key={entry.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400 whitespace-nowrap">
                       {formatDate(entry.createdAt, locale, "dd MMM yyyy HH:mm")}
                     </td>
-                    <td className="px-4 py-3 text-slate-700">
+                    <td className="px-4 py-3 text-slate-700 dark:text-slate-300">
                       {entry.actorName ?? t("systemActor")}
                     </td>
                     <td className="px-4 py-3">
                       <Badge variant={actionVariant[entry.action]}>{tAction(entry.action)}</Badge>
                     </td>
-                    <td className="px-4 py-3 text-slate-500">
+                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
                       {entry.targetType}
                       {entry.targetId && (
-                        <span className="text-slate-400"> · {entry.targetId.slice(0, 8)}</span>
+                        <span className="text-slate-400 dark:text-slate-500"> · {entry.targetId.slice(0, 8)}</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-slate-500 max-w-xs truncate" title={entry.details ?? undefined}>
+                    <td className="px-4 py-3 text-slate-500 dark:text-slate-400 max-w-xs truncate" title={entry.details ?? undefined}>
                       {entry.details ?? "—"}
                     </td>
                   </tr>
@@ -214,7 +214,7 @@ export default function AdminAuditLogPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 py-4 border-t border-slate-100">
+            <div className="flex justify-center items-center gap-2 py-4 border-t border-slate-100 dark:border-slate-700">
               <Button
                 variant="outline"
                 size="sm"
@@ -223,7 +223,7 @@ export default function AdminAuditLogPage() {
               >
                 {t("previous")}
               </Button>
-              <span className="flex items-center px-4 text-sm text-slate-600">
+              <span className="flex items-center px-4 text-sm text-slate-600 dark:text-slate-400">
                 {page + 1} / {totalPages}
               </span>
               <Button

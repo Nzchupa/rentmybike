@@ -81,8 +81,8 @@ export default function RegisterPage() {
             <VelohoodLogo size={32} />
             Velohood
           </div>
-          <h1 className="text-2xl font-bold text-slate-900">{t("title")}</h1>
-          <p className="text-slate-500 text-sm mt-1">{t("subtitle")}</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t("title")}</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{t("subtitle")}</p>
         </div>
 
         <div className="card p-8">
@@ -139,11 +139,11 @@ export default function RegisterPage() {
                       onChange={field.onChange}
                       className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 cursor-pointer"
                     />
-                    <span className="text-xs text-slate-600">
+                    <span className="text-xs text-slate-600 dark:text-slate-400">
                       {t("agreeToTerms.before")}
                       <Link
                         href={`/${locale}/terms`}
-                        className="font-medium text-brand-600 hover:underline"
+                        className="font-medium text-brand-600 dark:text-brand-400 hover:underline"
                         target="_blank"
                       >
                         {t("agreeToTerms.terms")}
@@ -151,7 +151,7 @@ export default function RegisterPage() {
                       {t("agreeToTerms.middle")}
                       <Link
                         href={`/${locale}/privacy`}
-                        className="font-medium text-brand-600 hover:underline"
+                        className="font-medium text-brand-600 dark:text-brand-400 hover:underline"
                         target="_blank"
                       >
                         {t("agreeToTerms.privacy")}
@@ -171,11 +171,11 @@ export default function RegisterPage() {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-500">
+          <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
             {t("haveAccount")}{" "}
             <Link
               href={`/${locale}/auth/login`}
-              className="font-medium text-brand-600 hover:underline"
+              className="font-medium text-brand-600 dark:text-brand-400 hover:underline"
             >
               {t("signIn")}
             </Link>

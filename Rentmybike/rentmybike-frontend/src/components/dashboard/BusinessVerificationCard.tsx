@@ -31,7 +31,7 @@ export function BusinessVerificationCard({
   goToDashboardLabel,
 }: BusinessVerificationCardProps) {
   return (
-    <div className="flex items-start gap-4 rounded-2xl border border-slate-200 p-4">
+    <div className="flex items-start gap-4 rounded-2xl border border-slate-200 dark:border-slate-700 p-4">
       <div
         className={cn(
           "flex h-11 w-11 shrink-0 items-center justify-center rounded-full",
@@ -49,7 +49,7 @@ export function BusinessVerificationCard({
         >
           {verified ? verifiedLabel : pendingLabel}
         </span>
-        {!verified && <p className="text-sm text-slate-500">{pendingNotice}</p>}
+        {!verified && <p className="text-sm text-slate-500 dark:text-slate-400">{pendingNotice}</p>}
         <div>
           <Link href={`/${locale}/dashboard/business`}>
             <Button type="button" size="sm">
