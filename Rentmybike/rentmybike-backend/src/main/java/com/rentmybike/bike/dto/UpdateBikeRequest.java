@@ -37,6 +37,12 @@ public class UpdateBikeRequest {
     @Digits(integer = 6, fraction = 2)
     private BigDecimal pricePerDay;
 
+    /** Optional refundable security deposit — null/omitted means none required. */
+    @DecimalMin(value = "0.00", message = "Deposit cannot be negative / Kaution darf nicht negativ sein")
+    @DecimalMax(value = "9999.99")
+    @Digits(integer = 6, fraction = 2)
+    private BigDecimal depositAmount;
+
     @NotBlank(message = "City is required / Stadt ist erforderlich")
     @Size(max = 100)
     private String city;

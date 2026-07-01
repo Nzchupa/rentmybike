@@ -39,6 +39,8 @@ public class BikeResponse {
     private String model;
     private BikeCategory category;
     private BigDecimal pricePerDay;
+    /** Optional refundable security deposit — null means none required / Optionale Kaution — null bedeutet keine erforderlich */
+    private BigDecimal depositAmount;
 
     // Location / Standort
     private String city;

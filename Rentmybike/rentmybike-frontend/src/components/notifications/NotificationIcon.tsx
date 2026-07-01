@@ -1,4 +1,4 @@
-import { Calendar, MessageCircle, Bike, Flag, Bell, LifeBuoy, Banknote } from "lucide-react";
+import { Calendar, MessageCircle, Bike, Flag, Bell, LifeBuoy, Banknote, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { NotificationType } from "@/types";
 
@@ -26,6 +26,7 @@ const ICONS: Record<NotificationType, typeof Calendar> = {
   SUPPORT_TICKET_REPLY: LifeBuoy,
   PAYMENT_RECEIPT_SUBMITTED: Banknote,
   PAYMENT_CONFIRMED: Banknote,
+  REVIEW_AVAILABLE: Star,
 };
 
 const COLOR_CLASSES: Record<NotificationType, string> = {
@@ -37,6 +38,7 @@ const COLOR_CLASSES: Record<NotificationType, string> = {
   SUPPORT_TICKET_REPLY: "bg-purple-100 text-purple-700",
   PAYMENT_RECEIPT_SUBMITTED: "bg-emerald-100 text-emerald-700",
   PAYMENT_CONFIRMED: "bg-emerald-100 text-emerald-700",
+  REVIEW_AVAILABLE: "bg-yellow-100 text-yellow-700",
 };
 
 export function NotificationIcon({ type, className }: NotificationIconProps) {

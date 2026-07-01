@@ -27,6 +27,10 @@ function makeBulkSchema(t: (key: string) => string, tb: (key: string) => string)
           model:       z.string().max(150).optional(),
           category:    z.enum(["CITY", "MOUNTAIN", "ROAD", "ELECTRIC", "HYBRID", "CARGO", "KIDS"]),
           pricePerDay: z.coerce.number().min(1, t("validation.priceMin")),
+          depositAmount: z.preprocess(
+            (val) => (val === "" || val === undefined ? undefined : Number(val)),
+            z.number().min(0, t("validation.depositMin")).optional()
+          ),
           city:        z.string().min(2, t("validation.cityRequired")).max(100),
           address:     z.string().max(255).optional(),
         })
@@ -38,7 +42,10 @@ function makeBulkSchema(t: (key: string) => string, tb: (key: string) => string)
 
 type BulkFormValues = z.infer<ReturnType<typeof makeBulkSchema>>;
 
-const emptyRow = { title: "", description: "", model: "", category: "CITY" as BikeCategory, pricePerDay: 0, city: "", address: "" };
+const emptyRow = {
+  title: "", description: "", model: "", category: "CITY" as BikeCategory,
+  pricePerDay: 0, depositAmount: undefined, city: "", address: "",
+};
 
 /**
  * Bulk-add bikes page — Stage 3 "Business accounts" / Additional feature.
@@ -76,7 +83,12 @@ export default function BulkAddBikesPage() {
 
   async function onSubmit(values: BulkFormValues) {
     await bulkCreate({
-      bikes: values.bikes.map((b) => ({ ...b, address: b.address || undefined, model: b.model || undefined })),
+      bikes: values.bikes.map((b) => ({
+        ...b,
+        address: b.address || undefined,
+        model: b.model || undefined,
+        depositAmount: b.depositAmount ?? undefined,
+      })),
     });
   }
 
@@ -167,6 +179,16 @@ export default function BulkAddBikesPage() {
                 {...register(`bikes.${index}.address`)}
               />
             </div>
+
+            <Input
+              label={t("depositAmount")}
+              type="number"
+              min={0}
+              step={0.5}
+              placeholder={t("depositAmountPlaceholder")}
+              error={errors.bikes?.[index]?.depositAmount?.message}
+              {...register(`bikes.${index}.depositAmount`)}
+            />
           </div>
         ))}
 

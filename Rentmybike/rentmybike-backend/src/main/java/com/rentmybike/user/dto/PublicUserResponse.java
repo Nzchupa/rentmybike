@@ -25,4 +25,10 @@ public class PublicUserResponse {
 
     /** Member since — shown on profile page / Mitglied seit — auf der Profilseite angezeigt */
     private LocalDateTime createdAt;
+
+    /** Average star rating (1.0–5.0) received across all bookings, 0.0 if none yet / Durchschnittliche Sternebewertung, 0.0 wenn noch keine */
+    private double averageRating;
+
+    /** Total number of reviews received / Gesamtanzahl der erhaltenen Bewertungen */
+    private long reviewCount;
 }

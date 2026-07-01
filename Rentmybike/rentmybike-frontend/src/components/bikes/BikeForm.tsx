@@ -29,6 +29,18 @@ function makeBikeSchema(t: (key: string) => string) {
     model:       z.string().max(150).optional(),
     category:    z.enum(["CITY", "MOUNTAIN", "ROAD", "ELECTRIC", "HYBRID", "CARGO", "KIDS"]),
     pricePerDay: z.coerce.number().min(1, t("validation.priceMin")),
+    // Optional refundable deposit — coerced from the (possibly empty) text
+    // input; an empty string coerces to NaN rather than 0, so it's mapped to
+    // undefined first so "no deposit" round-trips cleanly instead of failing
+    // min(0) validation.
+    // Optionale rückzahlbare Kaution — aus dem (möglicherweise leeren)
+    // Text-Input umgewandelt; ein leerer String wird zu NaN statt 0, daher
+    // wird er zuerst auf undefined abgebildet, damit "keine Kaution" sauber
+    // durchläuft, statt an der min(0)-Validierung zu scheitern.
+    depositAmount: z.preprocess(
+      (val) => (val === "" || val === undefined ? undefined : Number(val)),
+      z.number().min(0, t("validation.depositMin")).optional()
+    ),
     city:        z.string().min(2, t("validation.cityRequired")).max(100),
     address:     z.string().max(255).optional(),
     available:   z.boolean(),
@@ -149,6 +161,19 @@ export function BikeForm({ defaultValues, existingBike, onSubmit, isEditing }: B
         error={errors.address?.message}
         {...register("address")}
       />
+
+      <div>
+        <Input
+          label={t("depositAmount")}
+          type="number"
+          min={0}
+          step={0.5}
+          placeholder={t("depositAmountPlaceholder")}
+          error={errors.depositAmount?.message}
+          {...register("depositAmount")}
+        />
+        <p className="mt-1.5 text-xs text-slate-500">{t("depositAmountHint")}</p>
+      </div>
 
       {isEditing && (
         <div className="flex items-center gap-3">

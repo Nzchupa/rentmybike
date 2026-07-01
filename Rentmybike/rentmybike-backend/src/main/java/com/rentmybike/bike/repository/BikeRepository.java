@@ -61,6 +61,7 @@ public interface BikeRepository extends JpaRepository<Bike, UUID> {
               AND (:model      IS NULL OR LOWER(b.model) LIKE LOWER(CONCAT('%', CAST(:model AS string), '%')))
               AND (:minPrice   IS NULL OR b.pricePerDay >= :minPrice)
               AND (:maxPrice   IS NULL OR b.pricePerDay <= :maxPrice)
+              AND (:ownerId    IS NULL OR b.owner.id = :ownerId)
             ORDER BY b.createdAt DESC
             """)
     Page<Bike> searchPublic(
@@ -69,6 +70,7 @@ public interface BikeRepository extends JpaRepository<Bike, UUID> {
             @Param("model")     String model,
             @Param("minPrice")  BigDecimal minPrice,
             @Param("maxPrice")  BigDecimal maxPrice,
+            @Param("ownerId")   UUID ownerId,
             Pageable pageable
     );
 

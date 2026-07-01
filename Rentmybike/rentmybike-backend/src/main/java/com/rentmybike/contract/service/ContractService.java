@@ -91,7 +91,12 @@ public class ContractService {
                 .pricePerDay(booking.getBike().getPricePerDay())
                 .totalPrice(booking.getTotalPrice())
                 .paymentMethod(paymentMethod)
-                .depositAmount(null) // no deposit feature yet — §4's deposit line is omitted when null
+                // Frozen from the bike's listing-time deposit setting — null means the
+                // owner didn't require one, in which case §4's deposit line is omitted.
+                // Eingefroren aus der Kautionseinstellung des Fahrrads zum Zeitpunkt des
+                // Inserats — null bedeutet, der Eigentümer verlangte keine, in diesem Fall
+                // entfällt die Kautionszeile in §4.
+                .depositAmount(booking.getBike().getDepositAmount())
                 .build();
 
         contractRepository.save(contract);
@@ -266,8 +271,14 @@ public class ContractService {
                 formatMoney(c.getPricePerDay()), formatMoney(c.getTotalPrice()), paymentClause(c.getPaymentMethod())));
         if (c.getDepositAmount() != null) {
             priceClause.append(String.format(
-                    " Zusätzlich ist eine Kaution in Höhe von %s EUR zu hinterlegen, die nach " +
-                    "vollständiger und mangelfreier Rückgabe des Fahrrads zurückerstattet wird.",
+                    " Zusätzlich ist eine Kaution in Höhe von %s EUR zu hinterlegen. Die Kaution " +
+                    "wird unmittelbar nach Rückgabe und gemeinsamer Zustandsprüfung des Fahrrads " +
+                    "vollständig zurückerstattet, sofern keine über die gewöhnliche Abnutzung " +
+                    "hinausgehenden Schäden festgestellt werden und die Rückgabe fristgerecht " +
+                    "erfolgt ist. Werden Schäden festgestellt oder erfolgt die Rückgabe verspätet, " +
+                    "kann der Vermieter die Kaution in dem Umfang einbehalten, der zur Deckung des " +
+                    "entstandenen Schadens bzw. der Verspätung erforderlich ist; ein darüber " +
+                    "hinausgehender Betrag ist unverzüglich zurückzuzahlen.",
                     formatMoney(c.getDepositAmount())));
         }
         sections.add(section("§4 Mietpreis und Zahlung", priceClause.toString()));

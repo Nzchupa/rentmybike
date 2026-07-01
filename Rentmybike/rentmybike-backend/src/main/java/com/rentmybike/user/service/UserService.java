@@ -4,6 +4,7 @@ import com.rentmybike.common.exception.AccessDeniedException;
 import com.rentmybike.common.exception.BusinessException;
 import com.rentmybike.common.exception.ResourceNotFoundException;
 import com.rentmybike.common.service.CloudinaryService;
+import com.rentmybike.review.repository.ReviewRepository;
 import com.rentmybike.user.dto.ChangePasswordRequest;
 import com.rentmybike.user.dto.PublicUserResponse;
 import com.rentmybike.user.dto.UpdateProfileRequest;
@@ -39,6 +40,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final CloudinaryService cloudinaryService;
+    private final ReviewRepository reviewRepository;
 
     // ──────────────────────────────────────────────────────────────────────────
     // Read operations / Leseoperationen
@@ -268,11 +270,30 @@ public class UserService {
      * Mappt eine User-Entity auf eine minimale PublicUserResponse.
      */
     private PublicUserResponse toPublicUserResponse(User user) {
+        // Bug fix: averageRating/reviewCount were declared on this DTO (and
+        // consumed by the frontend profile page) but never actually
+        // populated here, so profile.reviewCount was always undefined and
+        // the entire rating/review-count block on the public profile page
+        // silently never rendered ("profile.reviewCount > 0" === false).
+        // Reuses the same aggregate queries as ReviewService.getUserRating.
+        //
+        // Bugfix: averageRating/reviewCount waren auf diesem DTO deklariert
+        // (und wurden von der Frontend-Profilseite konsumiert), aber hier nie
+        // tatsächlich befüllt, sodass profile.reviewCount immer undefined war
+        // und der gesamte Bewertungs-/Anzahl-Block auf der öffentlichen
+        // Profilseite stillschweigend nie gerendert wurde
+        // ("profile.reviewCount > 0" === false). Verwendet dieselben
+        // Aggregat-Abfragen wie ReviewService.getUserRating.
+        double avgRating = reviewRepository.findAverageRatingByRevieweeId(user.getId());
+        long reviewCount = reviewRepository.countByRevieweeId(user.getId());
+
         return PublicUserResponse.builder()
                 .id(user.getId())
                 .fullName(user.getFullName())
                 .avatarUrl(user.getAvatarUrl())
                 .createdAt(user.getCreatedAt())
+                .averageRating(Math.round(avgRating * 10.0) / 10.0)
+                .reviewCount(reviewCount)
                 .build();
     }
 }

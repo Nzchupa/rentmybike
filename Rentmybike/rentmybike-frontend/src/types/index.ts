@@ -139,6 +139,8 @@ export interface BikeResponse {
   model: string | null;
   category: BikeCategory;
   pricePerDay: number;
+  /** Optional refundable security deposit — null means none required */
+  depositAmount: number | null;
   city: string;
   address: string | null;
   latitude: number | null;
@@ -161,6 +163,8 @@ export interface CreateBikeRequest {
   model?: string;
   category: BikeCategory;
   pricePerDay: number;
+  /** Optional refundable security deposit — omit for none required */
+  depositAmount?: number;
   city: string;
   address?: string;
   latitude?: number;
@@ -416,7 +420,8 @@ export type NotificationType =
   | "ADMIN_NEW_SUPPORT_TICKET"
   | "SUPPORT_TICKET_REPLY"
   | "PAYMENT_RECEIPT_SUBMITTED"
-  | "PAYMENT_CONFIRMED";
+  | "PAYMENT_CONFIRMED"
+  | "REVIEW_AVAILABLE";
 
 export interface NotificationResponse {
   id: string;

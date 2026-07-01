@@ -39,6 +39,12 @@ public class CreateBikeRequest {
     @Digits(integer = 6, fraction = 2)
     private BigDecimal pricePerDay;
 
+    /** Optional refundable security deposit — null/omitted means none required. */
+    @DecimalMin(value = "0.00", message = "Deposit cannot be negative / Kaution darf nicht negativ sein")
+    @DecimalMax(value = "9999.99", message = "Maximum deposit is €9999.99 / Maximale Kaution ist 9999,99 €")
+    @Digits(integer = 6, fraction = 2)
+    private BigDecimal depositAmount;
+
     @NotBlank(message = "City is required / Stadt ist erforderlich")
     @Size(max = 100, message = "City too long / Stadt zu lang")
     private String city;

@@ -302,7 +302,8 @@
       "notFound": "Benutzer nicht gefunden.",
       "memberSince": "Mitglied seit {date}",
       "reviewsCount": "{count, plural, one {# Bewertung} other {# Bewertungen}}",
-      "reviews": "Bewertungen"
+      "reviews": "Bewertungen",
+      "bikes": "{count, plural, one {# Fahrrad eingestellt} other {# Fahrräder eingestellt}}"
     }
   },
   "bikes": {
@@ -373,7 +374,8 @@
       "accessoriesTitle": "Zubehör",
       "accessoriesNone": "Dieser Anbieter hat kein Zubehör verfügbar.",
       "accessoriesSubtotal": "Zubehör",
-      "accessoryUnavailable": "Für diesen Zeitraum ausgebucht"
+      "accessoryUnavailable": "Für diesen Zeitraum ausgebucht",
+      "depositNotice": "Es ist eine rückzahlbare Kaution von {amount} erforderlich, die nach schadenfreier Übergabe zurückerstattet wird."
     },
     "status": {
       "ALL": "Alle",
@@ -535,6 +537,9 @@
       "modelPlaceholder": "z.B. Trek FX2 Disc",
       "category": "Kategorie",
       "pricePerDay": "Preis pro Tag (€)",
+      "depositAmount": "Kaution (€, optional)",
+      "depositAmountPlaceholder": "z.B. 50",
+      "depositAmountHint": "Rückzahlbare Kaution, die der Mieter im Voraus zahlt und nach schadenfreier Rückgabe zurückerhält — leer lassen, falls keine erforderlich ist. Die Rückgabebedingungen stehen im Mietvertrag.",
       "city": "Stadt",
       "address": "Adresse (optional)",
       "available": "Zum Mieten verfügbar",
@@ -552,6 +557,7 @@
         "titleMin": "Titel muss mindestens 5 Zeichen haben",
         "descriptionMin": "Beschreibung muss mindestens 20 Zeichen haben",
         "priceMin": "Preis muss mindestens 1 € sein",
+        "depositMin": "Kaution darf nicht negativ sein",
         "cityRequired": "Stadt ist erforderlich"
       },
       "hints": {

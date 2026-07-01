@@ -220,6 +220,37 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
+    /**
+     * Notifies one participant of a just-completed booking that they can now
+     * leave a review — reviews are gated on COMPLETED status, and this was
+     * previously silent (users had to know to come back and check). In-app
+     * only, same reasoning as {@link #notifyNewChatMessage}.
+     * Benachrichtigt einen Teilnehmer einer gerade abgeschlossenen Buchung,
+     * dass er jetzt eine Bewertung abgeben kann — Bewertungen sind an den
+     * Status COMPLETED gebunden, und dies war zuvor unbemerkt (Benutzer
+     * mussten wissen, dass sie zurückkommen und nachsehen müssen). Nur
+     * In-App, gleiche Begründung wie bei {@link #notifyNewChatMessage}.
+     *
+     * @param booking the booking that was just completed / die gerade abgeschlossene Buchung
+     * @param recipient the renter or owner to notify / der zu benachrichtigende Mieter oder Eigentümer
+     */
+    public void notifyReviewAvailable(Booking booking, User recipient) {
+        String bikeTitle = booking.getBike().getTitle();
+
+        String title = "Leave a review / Bewertung abgeben";
+        String message = "Your rental of \"" + bikeTitle + "\" is complete — you can now leave a review."
+                + " / Ihre Miete von \"" + bikeTitle + "\" ist abgeschlossen — Sie können jetzt eine Bewertung abgeben.";
+
+        Notification notification = Notification.builder()
+                .user(recipient)
+                .booking(booking)
+                .type(NotificationType.REVIEW_AVAILABLE)
+                .title(title)
+                .message(message)
+                .build();
+        notificationRepository.save(notification);
+    }
+
     // ──────────────────────────────────────────────────────────────────────────
     // Admin notification center / Admin-Benachrichtigungszentrum
     // ──────────────────────────────────────────────────────────────────────────

@@ -88,6 +88,7 @@ public class BikeService {
                 .model(normalizeModel(request.getModel()))
                 .category(request.getCategory())
                 .pricePerDay(request.getPricePerDay())
+                .depositAmount(request.getDepositAmount())
                 .city(request.getCity().strip())
                 .address(request.getAddress())
                 .latitude(request.getLatitude())
@@ -136,6 +137,7 @@ public class BikeService {
                         .model(normalizeModel(request.getModel()))
                         .category(request.getCategory())
                         .pricePerDay(request.getPricePerDay())
+                        .depositAmount(request.getDepositAmount())
                         .city(request.getCity().strip())
                         .address(request.getAddress())
                         .latitude(request.getLatitude())
@@ -172,15 +174,19 @@ public class BikeService {
      * @param model     optional brand/model filter (substring match) / optionaler Marke/Modell-Filter (Teilstring)
      * @param minPrice  optional min price filter / optionaler Mindestpreisfilter
      * @param maxPrice  optional max price filter / optionaler Höchstpreisfilter
+     * @param ownerId   optional owner filter — powers the "bikes by this owner" list
+     *                  on the public profile page / optionaler Eigentümer-Filter —
+     *                  versorgt die "Fahrräder dieses Eigentümers"-Liste auf der
+     *                  öffentlichen Profilseite
      * @param pageable  pagination / Seitennavigation
      */
     @Transactional(readOnly = true)
     public PageResponse<BikeResponse> searchBikes(
             String city, BikeCategory category, String model,
-            BigDecimal minPrice, BigDecimal maxPrice,
+            BigDecimal minPrice, BigDecimal maxPrice, UUID ownerId,
             Pageable pageable) {
 
-        Page<Bike> page = bikeRepository.searchPublic(city, category, model, minPrice, maxPrice, pageable);
+        Page<Bike> page = bikeRepository.searchPublic(city, category, model, minPrice, maxPrice, ownerId, pageable);
         // Public view: no address, no rejection reason / Öffentliche Ansicht: keine Adresse, kein Ablehnungsgrund
         return PageResponse.from(page.map(bike -> toBikeResponse(bike, false)));
     }
@@ -327,19 +333,23 @@ public class BikeService {
         requireOwner(bike, ownerId);
 
         String newModel = normalizeModel(request.getModel());
+        boolean depositChanged = !java.util.Objects.equals(
+                normalizeAmount(bike.getDepositAmount()), normalizeAmount(request.getDepositAmount()));
         boolean contentChanged =
                 !bike.getTitle().equals(request.getTitle().strip())
                 || !bike.getDescription().equals(request.getDescription().strip())
                 || bike.getCategory() != request.getCategory()
                 || bike.getPricePerDay().compareTo(request.getPricePerDay()) != 0
                 || !bike.getCity().equals(request.getCity().strip())
-                || !java.util.Objects.equals(bike.getModel(), newModel);
+                || !java.util.Objects.equals(bike.getModel(), newModel)
+                || depositChanged;
 
         bike.setTitle(request.getTitle().strip());
         bike.setDescription(request.getDescription().strip());
         bike.setModel(newModel);
         bike.setCategory(request.getCategory());
         bike.setPricePerDay(request.getPricePerDay());
+        bike.setDepositAmount(request.getDepositAmount());
         bike.setCity(request.getCity().strip());
         bike.setAddress(request.getAddress());
         bike.setLatitude(request.getLatitude());
@@ -620,6 +630,20 @@ public class BikeService {
     }
 
     /**
+     * Normalizes a nullable BigDecimal to a scale-independent comparable
+     * form (e.g. so 5.0 and 5.00 are treated as equal) — plain {@code
+     * BigDecimal.equals()} is scale-sensitive and would otherwise flag a
+     * no-op re-save as a content change.
+     * Normalisiert ein nullable BigDecimal in eine skalenunabhängig
+     * vergleichbare Form (z. B. damit 5.0 und 5.00 als gleich gelten) —
+     * einfaches {@code BigDecimal.equals()} ist skalenabhängig und würde
+     * sonst ein wirkungsloses erneutes Speichern als Inhaltsänderung werten.
+     */
+    private BigDecimal normalizeAmount(BigDecimal amount) {
+        return amount == null ? null : amount.stripTrailingZeros();
+    }
+
+    /**
      * Verifies that the given user is the owner of the bike.
      * Überprüft, dass der gegebene Benutzer der Eigentümer des Fahrrads ist.
      *
@@ -665,6 +689,11 @@ public class BikeService {
                 .model(bike.getModel())
                 .category(bike.getCategory())
                 .pricePerDay(bike.getPricePerDay())
+                // Always visible, even in the public view — a renter must know about a
+                // deposit requirement before booking, unlike address/rejectionReason.
+                // Immer sichtbar, auch in der öffentlichen Ansicht — ein Mieter muss vor
+                // der Buchung von einer Kautionspflicht wissen, anders als Adresse/Ablehnungsgrund.
+                .depositAmount(bike.getDepositAmount())
                 .city(bike.getCity())
                 .address(includePrivate ? bike.getAddress() : null)
                 .latitude(bike.getLatitude())

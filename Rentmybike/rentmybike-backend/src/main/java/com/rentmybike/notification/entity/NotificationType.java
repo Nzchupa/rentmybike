@@ -36,5 +36,7 @@ public enum NotificationType {
     /** Owner-facing: the renter uploaded a PayPal transfer receipt and marked payment as sent. */
     PAYMENT_RECEIPT_SUBMITTED,
     /** Renter-facing: the owner confirmed the PayPal payment was received. */
-    PAYMENT_CONFIRMED
+    PAYMENT_CONFIRMED,
+    /** Both renter and owner: the booking was marked completed, so a review can now be left. */
+    REVIEW_AVAILABLE
 }

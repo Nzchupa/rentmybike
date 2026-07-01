@@ -414,6 +414,10 @@ export const bikesApi = {
     model?: string;
     minPrice?: number;
     maxPrice?: number;
+    // Filters to bikes listed by a single owner — used by the public profile
+    // page's "bikes" section. / Filtert auf Fahrräder eines einzigen
+    // Eigentümers — wird im "Fahrräder"-Bereich der öffentlichen Profilseite verwendet.
+    ownerId?: string;
     page?: number;
     size?: number;
   }) =>

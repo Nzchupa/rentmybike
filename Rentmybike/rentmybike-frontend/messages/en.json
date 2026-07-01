@@ -302,7 +302,8 @@
       "notFound": "User not found.",
       "memberSince": "Member since {date}",
       "reviewsCount": "{count, plural, one {# review} other {# reviews}}",
-      "reviews": "Reviews"
+      "reviews": "Reviews",
+      "bikes": "{count, plural, one {# bike listed} other {# bikes listed}}"
     }
   },
   "bikes": {
@@ -373,7 +374,8 @@
       "accessoriesTitle": "Add-ons",
       "accessoriesNone": "This owner has no add-ons available.",
       "accessoriesSubtotal": "Add-ons",
-      "accessoryUnavailable": "Sold out for these dates"
+      "accessoryUnavailable": "Sold out for these dates",
+      "depositNotice": "A refundable security deposit of {amount} is required, returned after a damage-free handover."
     },
     "status": {
       "ALL": "All",
@@ -535,6 +537,9 @@
       "modelPlaceholder": "e.g. Trek FX2 Disc",
       "category": "Category",
       "pricePerDay": "Price per day (€)",
+      "depositAmount": "Security deposit (€, optional)",
+      "depositAmountPlaceholder": "e.g. 50",
+      "depositAmountHint": "Refundable deposit the renter pays upfront and gets back after a damage-free return — leave blank if you don't require one. Return conditions are spelled out in the rental contract.",
       "city": "City",
       "address": "Address (optional)",
       "available": "Available for rent",
@@ -552,6 +557,7 @@
         "titleMin": "Title must be at least 5 characters",
         "descriptionMin": "Description must be at least 20 characters",
         "priceMin": "Price must be at least €1",
+        "depositMin": "Deposit cannot be negative",
         "cityRequired": "City is required"
       },
       "hints": {

@@ -67,13 +67,15 @@ export default function EditBikePage({ params }: EditBikePageProps) {
           isEditing
           existingBike={bike}
           defaultValues={{
-            title:       bike.title,
-            description: bike.description,
-            category:    bike.category,
-            pricePerDay: bike.pricePerDay,
-            city:        bike.city,
-            address:     bike.address ?? "",
-            available:   bike.available,
+            title:         bike.title,
+            description:   bike.description,
+            model:         bike.model ?? "",
+            category:      bike.category,
+            pricePerDay:   bike.pricePerDay,
+            depositAmount: bike.depositAmount ?? undefined,
+            city:          bike.city,
+            address:       bike.address ?? "",
+            available:     bike.available,
           }}
           onSubmit={async (values) => { await updateBike(values); }}
         />

@@ -189,6 +189,18 @@ export function BookingForm({ bike }: BookingFormProps) {
         <span className="text-base font-normal text-slate-500"> {t("pricePerDay")}</span>
       </div>
 
+      {/* Security deposit notice — shown upfront so a renter isn't surprised
+          by it after already deciding to book. The exact return conditions
+          are spelled out in the generated rental contract (§4). */}
+      {/* Kautionshinweis — wird im Voraus angezeigt, damit ein Mieter nicht
+          erst nach der Buchungsentscheidung davon überrascht wird. Die
+          genauen Rückgabebedingungen stehen im generierten Mietvertrag (§4). */}
+      {bike.depositAmount != null && (
+        <p className="text-sm text-slate-600 bg-slate-50 rounded-lg px-3 py-2">
+          {t("depositNotice", { amount: formatPrice(bike.depositAmount, locale) })}
+        </p>
+      )}
+
       {/* Date selection */}
       <div>
         <button

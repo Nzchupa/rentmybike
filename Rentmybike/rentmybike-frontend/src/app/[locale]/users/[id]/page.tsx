@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft } from "lucide-react";
-import { usersApi, reviewsApi } from "@/lib/api";
+import { ChevronLeft, MapPin, Bike as BikeIcon } from "lucide-react";
+import { usersApi, reviewsApi, bikesApi } from "@/lib/api";
 import { Avatar } from "@/components/ui/Avatar";
 import { StarRating } from "@/components/ui/StarRating";
+import { BikeCard } from "@/components/bikes/BikeCard";
 import { formatDate } from "@/lib/utils";
 
 interface PublicProfilePageProps {
@@ -39,6 +40,24 @@ export default function PublicProfilePage({ params }: PublicProfilePageProps) {
     select: (r) => r.data.data,
     enabled: !!profile,
   });
+
+  // Bikes listed by this owner — powers both the bikes grid below and the
+  // "city" shown in the header (derived client-side from the first listing
+  // rather than a dedicated backend field, since an owner's bikes can span
+  // multiple cities and the search endpoint already returns city per bike).
+  // Fahrräder dieses Eigentümers — versorgt sowohl das Fahrrad-Raster unten
+  // als auch die im Kopfbereich angezeigte "Stadt" (client-seitig aus dem
+  // ersten Eintrag abgeleitet statt eines eigenen Backend-Felds, da die
+  // Fahrräder eines Eigentümers mehrere Städte umfassen können).
+  const { data: bikesData } = useQuery({
+    queryKey: ["user-bikes", id],
+    queryFn: () => bikesApi.search({ ownerId: id, size: 50 }),
+    select: (r) => r.data.data,
+    enabled: !!profile,
+  });
+
+  const bikes = bikesData?.content ?? [];
+  const primaryCity = bikes[0]?.city;
 
   if (isLoading) {
     return (
@@ -76,6 +95,12 @@ export default function PublicProfilePage({ params }: PublicProfilePageProps) {
           <p className="text-sm text-slate-500 mt-1">
             {t("memberSince", { date: formatDate(profile.createdAt, locale) })}
           </p>
+          {primaryCity && (
+            <div className="flex items-center gap-1 text-sm text-slate-500 mt-1">
+              <MapPin size={14} className="shrink-0" />
+              <span>{primaryCity}</span>
+            </div>
+          )}
           {profile.reviewCount > 0 && (
             <div className="flex items-center gap-2 mt-2">
               <StarRating rating={profile.averageRating} size="sm" />
@@ -86,6 +111,20 @@ export default function PublicProfilePage({ params }: PublicProfilePageProps) {
           )}
         </div>
       </div>
+
+      {bikes.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+            <BikeIcon size={18} />
+            {t("bikes", { count: bikes.length })}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {bikes.map((bike) => (
+              <BikeCard key={bike.id} bike={bike} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {reviewsData && reviewsData.totalElements > 0 && (
         <div className="mt-8">

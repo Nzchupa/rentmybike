@@ -58,6 +58,9 @@ public class BikeController {
             @RequestParam(required = false) String model,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
+            // Powers the "bikes by this owner" list on the public profile page —
+            // versorgt die "Fahrräder dieses Eigentümers"-Liste auf der öffentlichen Profilseite.
+            @RequestParam(required = false) UUID ownerId,
             @RequestParam(defaultValue = "0")  int page,
             @RequestParam(defaultValue = "20") int size) {
 
@@ -80,7 +83,7 @@ public class BikeController {
         // Pageable bleibt unsortiert; die Query liefert die Sortierung.
         Pageable pageable = PageRequest.of(page, size);
 
-        PageResponse<BikeResponse> result = bikeService.searchBikes(city, category, model, minPrice, maxPrice, pageable);
+        PageResponse<BikeResponse> result = bikeService.searchBikes(city, category, model, minPrice, maxPrice, ownerId, pageable);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 

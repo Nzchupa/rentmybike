@@ -91,6 +91,22 @@ public class Bike extends BaseEntity {
     @Column(name = "price_per_day", nullable = false, precision = 10, scale = 2)
     private BigDecimal pricePerDay;
 
+    /**
+     * Optional refundable security deposit (Kaution) the owner requires,
+     * set when listing the bike (not at booking-accept time). Frozen into
+     * the rental contract snapshot when a booking is accepted — see
+     * {@code com.rentmybike.contract.service.ContractService}, which also
+     * renders the return-conditions clause. Null means no deposit required.
+     * Optionale rückzahlbare Kaution, die der Eigentümer verlangt, festgelegt
+     * beim Inserieren des Fahrrads (nicht bei der Buchungsannahme). Wird bei
+     * Buchungsannahme in die Mietvertrags-Momentaufnahme eingefroren — siehe
+     * {@code com.rentmybike.contract.service.ContractService}, die auch die
+     * Rückgabebedingungs-Klausel rendert. Null bedeutet, dass keine Kaution
+     * erforderlich ist.
+     */
+    @Column(name = "deposit_amount", precision = 10, scale = 2)
+    private BigDecimal depositAmount;
+
     // ──────────────────────────────────────────────────────────────────────────
     // Location / Standort
     // ──────────────────────────────────────────────────────────────────────────

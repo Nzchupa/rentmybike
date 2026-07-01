@@ -610,6 +610,14 @@ public class BookingService {
         booking.setStatus(BookingStatus.COMPLETED);
         bookingRepository.save(booking);
 
+        // Reviews are gated on COMPLETED status but nothing told either side
+        // this had just unlocked — notify both the renter and the owner.
+        // Bewertungen sind an den Status COMPLETED gebunden, aber bisher
+        // erfuhr keine Seite, dass dies gerade freigeschaltet wurde —
+        // sowohl Mieter als auch Eigentümer benachrichtigen.
+        notificationService.notifyReviewAvailable(booking, booking.getRenter());
+        notificationService.notifyReviewAvailable(booking, booking.getOwner());
+
         log.info("Booking COMPLETED: {} / Buchung ABGESCHLOSSEN: {}", bookingId, bookingId);
         return toBookingResponse(booking);
     }
